@@ -1,0 +1,318 @@
+- generic [ref=f1e3]:
+  - generic [ref=f1e5]:
+    - generic [ref=f1e6]:
+      - button "menu" [ref=f1e8] [cursor=pointer]
+      - generic [ref=f1e10]:
+        - generic [ref=f1e12] [cursor=pointer]:
+          - generic [ref=f1e13]: home
+          - generic [ref=f1e14]: Inicio
+        - generic [ref=f1e15]:
+          - generic [ref=f1e16] [cursor=pointer]:
+            - generic [ref=f1e17]: manage_accounts
+            - generic [ref=f1e18]: Administrador ...
+            - generic [ref=f1e19]: "20"
+          - generic [ref=f1e20] [cursor=pointer]:
+            - generic [ref=f1e21]: grid_view
+            - generic [ref=f1e22]: Operación
+            - generic [ref=f1e23]: "5"
+          - generic [ref=f1e24] [cursor=pointer]:
+            - generic [ref=f1e25]: bar_chart
+            - generic [ref=f1e26]: Informes
+            - generic [ref=f1e27]: "7"
+          - generic [ref=f1e28] [cursor=pointer]:
+            - generic [ref=f1e29]: grid_view
+            - generic [ref=f1e30]: Seguridad soci...
+            - generic [ref=f1e31]: "6"
+          - generic [ref=f1e32] [cursor=pointer]:
+            - generic [ref=f1e33]: grid_view
+            - generic [ref=f1e34]: Prestaciones s...
+            - generic [ref=f1e35]: "4"
+          - generic [ref=f1e36] [cursor=pointer]:
+            - generic [ref=f1e37]: groups
+            - generic [ref=f1e38]: Novedades
+            - generic [ref=f1e39]: "11"
+          - generic [ref=f1e40] [cursor=pointer]:
+            - generic [ref=f1e41]: grid_view
+            - generic [ref=f1e42]: Configuración
+            - generic [ref=f1e43]: "12"
+          - generic [ref=f1e44] [cursor=pointer]:
+            - generic [ref=f1e45]: receipt_long
+            - generic [ref=f1e46]: Nomina electro...
+            - generic [ref=f1e47]: "4"
+    - generic:
+      - generic [ref=f1e48]:
+        - generic:
+          - generic:
+            - generic [ref=f1e49]: AS
+            - generic: ADA S.A.
+      - generic "Buscar..." [ref=f1e51]:
+        - generic [ref=f1e52]:
+          - generic [ref=f1e53]: search
+          - text: Buscar...
+        - generic [ref=f1e54]: Ctrl + K
+      - generic:
+        - generic:
+          - generic [ref=f1e55] [cursor=pointer]: keyboard_arrow_down
+          - text: Administrador del sistema
+        - generic:
+          - generic:
+            - generic [ref=f1e56] [cursor=pointer]:
+              - generic [ref=f1e57]: manage_accounts
+              - generic: Asignación de módulos
+            - generic [ref=f1e58] [cursor=pointer]:
+              - generic [ref=f1e59]: trending_up
+              - generic: Históricos de salario mínimos
+            - generic [ref=f1e60] [cursor=pointer]:
+              - generic [ref=f1e61]: tune
+              - generic: Configuración formato 220 dian
+            - generic [ref=f1e62] [cursor=pointer]:
+              - generic [ref=f1e63]: tune
+              - generic: Maestro conceptos formato 220 dian
+            - generic [ref=f1e64] [cursor=pointer]:
+              - generic [ref=f1e65]: tune
+              - generic: Formato hoja vida persona natural
+            - generic [ref=f1e66] [cursor=pointer]:
+              - generic [ref=f1e67]: badge
+              - generic: Empleados
+            - generic [ref=f1e68] [cursor=pointer]:
+              - generic [ref=f1e69]: domain
+              - generic: Empresa
+            - generic [ref=f1e70] [cursor=pointer]:
+              - generic [ref=f1e71]: trending_up
+              - generic: Aumento de sueldos
+            - generic [ref=f1e72] [cursor=pointer]:
+              - generic [ref=f1e73]: dataset
+              - generic: Maestros
+            - generic [ref=f1e74] [cursor=pointer]:
+              - generic [ref=f1e75]: balance
+              - generic: Juzgados
+            - generic [ref=f1e76] [cursor=pointer]:
+              - generic [ref=f1e77]: category
+              - generic: Cuentas por sección
+            - generic [ref=f1e78] [cursor=pointer]:
+              - generic [ref=f1e79]: receipt_long
+              - generic: Tipos de liquidaciones
+            - generic [ref=f1e80] [cursor=pointer]:
+              - generic [ref=f1e81]: contacts
+              - generic: Maestro terceros
+            - generic [ref=f1e82] [cursor=pointer]:
+              - generic [ref=f1e83]: bar_chart
+              - generic: Supervivencia
+            - generic [ref=f1e84] [cursor=pointer]:
+              - generic [ref=f1e85]: warning
+              - generic: Riesgos profesionales
+            - generic [ref=f1e86] [cursor=pointer]:
+              - generic [ref=f1e87]: payments
+              - generic: Provisiones
+            - generic [ref=f1e88] [cursor=pointer]:
+              - generic [ref=f1e89]: lock
+              - generic: Cierre de nómina
+            - generic [ref=f1e90] [cursor=pointer]:
+              - generic [ref=f1e91]: money_off
+              - generic: Aumento de descuentos
+            - generic [ref=f1e92] [cursor=pointer]:
+              - generic [ref=f1e93]: dataset
+              - generic: Maestro entidades cuotaspartes
+            - generic [ref=f1e94] [cursor=pointer]:
+              - generic [ref=f1e95]: lock
+              - generic: Cierre de nã³mina
+  - generic [ref=f1e96]:
+    - generic [ref=f1e98]:
+      - generic "Nómina" [ref=f1e99]:
+        - generic [ref=f1e100]:
+          - generic [ref=f1e101]: Nómina
+          - generic [ref=f1e105]:
+            - separator [ref=f1e106]
+            - button "Aurora" [ref=f1e108] [cursor=pointer]
+            - generic "Logout" [ref=f1e113] [cursor=pointer]: logout
+      - button "Reportar error" [ref=f1e116]:
+        - generic [ref=f1e118]:
+          - img [ref=f1e119]: bug_report
+          - generic [ref=f1e120]: Reportar error
+    - generic [ref=f1e124]:
+      - generic [ref=f1e125]:
+        - heading "Priorización de liquidación de conceptos" [level=1] [ref=f1e127]
+        - generic [ref=f1e128]:
+          - generic [ref=f1e129]:
+            - button "Guardar" [disabled]
+          - button "Cancelar" [active] [ref=f1e131] [cursor=pointer]
+      - generic [ref=f1e138]:
+        - generic [ref=f1e140]:
+          - heading "Conceptos disponibles" [level=2] [ref=f1e142]
+          - generic [ref=f1e145]:
+            - table [ref=f1e147]:
+              - rowgroup [ref=f1e148]:
+                - row [ref=f1e149]:
+                  - columnheader "Código" [ref=f1e150]
+                  - columnheader "Concepto" [ref=f1e151]
+                  - columnheader "Signo" [ref=f1e152]
+              - rowgroup [ref=f1e153]:
+                - row [ref=f1e154] [cursor=pointer]:
+                  - cell "1001" [ref=f1e155]
+                  - cell "SUELDO ORDINARIO ADMINISTRATIVO" [ref=f1e156]
+                  - cell "+" [ref=f1e157]
+                - row [ref=f1e158] [cursor=pointer]:
+                  - cell "1002" [ref=f1e159]
+                  - cell "RECARGO NOCTURNO ADMINISTRATIVO" [ref=f1e160]
+                  - cell "+" [ref=f1e161]
+                - row [ref=f1e162] [cursor=pointer]:
+                  - cell "10021" [ref=f1e163]
+                  - cell "RECARGO NOCTURNO DOMINICAL O FESTIVO ADMINISTRATIVO" [ref=f1e164]
+                  - cell "+" [ref=f1e165]
+                - row [ref=f1e166] [cursor=pointer]:
+                  - cell "1003" [ref=f1e167]
+                  - cell "HORAS EXTRAS DIURNAS ADMINISTRATIVO" [ref=f1e168]
+                  - cell "+" [ref=f1e169]
+                - row [ref=f1e170] [cursor=pointer]:
+                  - cell "1004" [ref=f1e171]
+                  - cell "HORAS EXTRAS NOCTURNAS ADMINISTRATIVO" [ref=f1e172]
+                  - cell "+" [ref=f1e173]
+                - row [ref=f1e174] [cursor=pointer]:
+                  - cell "1005" [ref=f1e175]
+                  - cell "HORAS EXTRAS FESTIVAS DIURNAS ADMINISTRATIVO" [ref=f1e176]
+                  - cell "+" [ref=f1e177]
+                - row [ref=f1e178] [cursor=pointer]:
+                  - cell "1006" [ref=f1e179]
+                  - cell "HORAS EXTRAS FESTIVAS NOCTURNAS ADMINISTRATIVO" [ref=f1e180]
+                  - cell "+" [ref=f1e181]
+                - row [ref=f1e182] [cursor=pointer]:
+                  - cell "1007" [ref=f1e183]
+                  - cell "DOMINICAL TRABAJADO ADMINISTRATIVO" [ref=f1e184]
+                  - cell "+" [ref=f1e185]
+                - row [ref=f1e186] [cursor=pointer]:
+                  - cell "1009" [ref=f1e187]
+                  - cell "AUXILIO POR MATRIMONIO ADMINISTRATIVO" [ref=f1e188]
+                  - cell "+" [ref=f1e189]
+                - row [ref=f1e190] [cursor=pointer]:
+                  - cell "1011" [ref=f1e191]
+                  - cell "APOYO Y SOSTENIMIENTO" [ref=f1e192]
+                  - cell "+" [ref=f1e193]
+                - row [ref=f1e194] [cursor=pointer]:
+                  - cell "1012" [ref=f1e195]
+                  - cell "DOMINICALES Y FESTIVOS APRENDICES ADMINISTRATIVOS" [ref=f1e196]
+                  - cell "+" [ref=f1e197]
+                - row [ref=f1e198] [cursor=pointer]:
+                  - cell "1013" [ref=f1e199]
+                  - cell "INCAPACIDAD POR ENFERMEDAD APRENDICES" [ref=f1e200]
+                  - cell "+" [ref=f1e201]
+                - row [ref=f1e202] [cursor=pointer]:
+                  - cell "1014" [ref=f1e203]
+                  - cell "FESTIVO LABORADO CON COMPENSATORIO ADMINISTRATIVO" [ref=f1e204]
+                  - cell "+" [ref=f1e205]
+                - row [ref=f1e206] [cursor=pointer]:
+                  - cell "1015" [ref=f1e207]
+                  - cell "INCAPACIDAD POR ENFERMEDAD ADMINISTRATIVO" [ref=f1e208]
+                  - cell "+" [ref=f1e209]
+                - row [ref=f1e210] [cursor=pointer]:
+                  - cell "10151" [ref=f1e211]
+                  - cell "RETROACTIVIDAD INCAPACIDAD POR ENFERMEDAD ADMINISTRATIVO" [ref=f1e212]
+                  - cell "+" [ref=f1e213]
+                - row [ref=f1e214] [cursor=pointer]:
+                  - cell "10152" [ref=f1e215]
+                  - cell "INCAPACIDAD POR ENFERMEDAD TRABAJADOR OFICIAL ADMINISTRATIVO" [ref=f1e216]
+                  - cell "+" [ref=f1e217]
+                - row [ref=f1e218] [cursor=pointer]:
+                  - cell "10153" [ref=f1e219]
+                  - cell "INCAPACIDAD POR ENFERMEDAD EMPLEADO PUBLICO ADMINISTRATIVO" [ref=f1e220]
+                  - cell "+" [ref=f1e221]
+                - row [ref=f1e222] [cursor=pointer]:
+                  - cell "1016" [ref=f1e223]
+                  - cell "LICENCIA POR MATERNIDAD ADMINISTRATIVO" [ref=f1e224]
+                  - cell "+" [ref=f1e225]
+                - row [ref=f1e226] [cursor=pointer]:
+                  - cell "10166" [ref=f1e227]
+                  - cell "AJUSTE LICENCIA DE MATERNIDAD PAGO EPS ADMINISTRATIVO" [ref=f1e228]
+                  - cell "+" [ref=f1e229]
+                - row [ref=f1e230] [cursor=pointer]:
+                  - cell "1017" [ref=f1e231]
+                  - cell "INCAPACIDAD POR ACCIDENTE DE TRABAJO ADMINISTRATIVO" [ref=f1e232]
+                  - cell "+" [ref=f1e233]
+                - row [ref=f1e234] [cursor=pointer]:
+                  - cell "10171" [ref=f1e235]
+                  - cell "RETROACTIVIDAD POR INCAP POR ACCIDENTE DE TRABAJO" [ref=f1e236]
+                  - cell "+" [ref=f1e237]
+                - row [ref=f1e238] [cursor=pointer]:
+                  - cell "10172" [ref=f1e239]
+                  - cell "AJUSTE INCAPACIDAD POR ACCIDENTE DE TRABAJO ADM" [ref=f1e240]
+                  - cell "+" [ref=f1e241]
+                - row [ref=f1e242] [cursor=pointer]:
+                  - cell "10173" [ref=f1e243]
+                  - cell "AJUSTE INCAPACIDAD OPERATIVO (+)" [ref=f1e244]
+                  - cell "+" [ref=f1e245]
+                - row [ref=f1e246] [cursor=pointer]:
+                  - cell "1018" [ref=f1e247]
+                  - cell "PRIMA ANTIGUEDAD ADMINISTRATIVO" [ref=f1e248]
+                  - cell "+" [ref=f1e249]
+                - row [ref=f1e250] [cursor=pointer]:
+                  - cell "1019" [ref=f1e251]
+                  - cell "LICENCIA REMUNERADA ADMINISTRATIVO" [ref=f1e252]
+                  - cell "+" [ref=f1e253]
+            - generic [ref=f1e254]:
+              - generic [ref=f1e255]:
+                - generic [ref=f1e256]: Mostrar
+                - button "10" [ref=f1e257] [cursor=pointer]
+                - button "25" [pressed] [ref=f1e258] [cursor=pointer]
+                - button "50" [ref=f1e259] [cursor=pointer]
+                - button "100" [ref=f1e260] [cursor=pointer]
+              - generic [ref=f1e261]:
+                - button "Anterior" [disabled] [ref=f1e262]
+                - generic [ref=f1e263]: 1-25 de 352
+                - button "Siguiente" [ref=f1e264] [cursor=pointer]
+        - generic [ref=f1e265]:
+          - generic "Asignar" [ref=f1e266]:
+            - button [disabled]:
+              - generic:
+                - generic:
+                  - img: arrow_forward
+          - generic "Retirar" [ref=f1e267]:
+            - button [disabled]:
+              - generic:
+                - generic:
+                  - img: arrow_back
+          - generic "Subir" [ref=f1e268]:
+            - button [disabled]:
+              - generic:
+                - generic:
+                  - img: arrow_upward
+          - generic "Bajar" [ref=f1e269]:
+            - button [disabled]:
+              - generic:
+                - generic:
+                  - img: arrow_downward
+        - generic [ref=f1e271]:
+          - heading "Orden de prioridad" [level=2] [ref=f1e273]
+          - generic [ref=f1e276]:
+            - table [ref=f1e278]:
+              - rowgroup [ref=f1e279]:
+                - row [ref=f1e280]:
+                  - columnheader "#" [ref=f1e281]
+                  - columnheader "Código" [ref=f1e282]
+                  - columnheader "Concepto" [ref=f1e283]
+                  - columnheader "Signo" [ref=f1e284]
+              - rowgroup [ref=f1e285]:
+                - row [ref=f1e286] [cursor=pointer]:
+                  - cell "1" [ref=f1e287]
+                  - cell "10021" [ref=f1e288]
+                  - cell "RECARGO NOCTURNO DOMINICAL O FESTIVO ADMINISTRATIVO" [ref=f1e289]
+                  - cell "+" [ref=f1e290]
+                - row [ref=f1e291] [cursor=pointer]:
+                  - cell "2" [ref=f1e292]
+                  - cell "1004" [ref=f1e293]
+                  - cell "HORAS EXTRAS NOCTURNAS ADMINISTRATIVO" [ref=f1e294]
+                  - cell "+" [ref=f1e295]
+                - row [ref=f1e296] [cursor=pointer]:
+                  - cell "3" [ref=f1e297]
+                  - cell "1006" [ref=f1e298]
+                  - cell "HORAS EXTRAS FESTIVAS NOCTURNAS ADMINISTRATIVO" [ref=f1e299]
+                  - cell "+" [ref=f1e300]
+            - generic [ref=f1e301]:
+              - generic [ref=f1e302]:
+                - generic [ref=f1e303]: Mostrar
+                - button "10" [ref=f1e304] [cursor=pointer]
+                - button "25" [pressed] [ref=f1e305] [cursor=pointer]
+                - button "50" [ref=f1e306] [cursor=pointer]
+                - button "100" [ref=f1e307] [cursor=pointer]
+              - generic [ref=f1e308]:
+                - button "Anterior" [disabled] [ref=f1e309]
+                - generic [ref=f1e310]: 1-3 de 3
+                - button "Siguiente" [disabled] [ref=f1e311]

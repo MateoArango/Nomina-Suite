@@ -35,6 +35,10 @@ const config = defineConfig({
     // baseURL: 'http://localhost:3000',
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: "on-first-retry",
+    contextOptions: {
+      /* Disable CSS animations and transitions through prefers-reduced-motion. */
+      reducedMotion: "reduce",
+    },
   },
 
   /* Configure projects for major browsers */

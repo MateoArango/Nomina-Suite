@@ -6,6 +6,8 @@ Validate the dual-listbox behavior on `/priorizacion-conceptos`, including selec
 
 This plan uses the stable `data-testid` locators exposed by `PriorizacionLiqConceptosPage`. Row assertions must use the concept ID and row content, never a row index.
 
+The available-concepts table is the catalog and source of truth. Assigning a concept adds it to the priority table but does not remove it from the available table or decrease the available total. Removing a priority assignment removes only the priority-table entry; the available catalog and its total remain unchanged.
+
 ## Risk and State Management
 
 This page edits shared prioritization data. Before implementing or running tests that save changes:
@@ -17,7 +19,38 @@ This page edits shared prioritization data. Before implementing or running tests
 5. Run state-mutating scenarios serially unless each worker has isolated data.
 6. Fail cleanup loudly if the original state cannot be restored.
 
-The first implementation task is to observe the save and load network requests and document their endpoints, methods, payloads, and response contracts. Prefer API-backed setup and restoration if those contracts safely support it.
+The save request still needs to be observed and documented. Prefer API-backed setup and restoration if the discovered save contract safely supports it.
+
+## Page-Load API Contract
+
+Opening `/priorizacion-conceptos` requests:
+
+1. `GET https://nomina-qa-api.adacsc.co/api/v1/w-priorizacion-conceptos/conceptos`
+2. `GET https://nomina-qa-api.adacsc.co/api/v1/w-priorizacion-conceptos/rows`
+
+The `/conceptos` response is the available-catalog source. It returns an array with:
+
+- `kaNlConcepto`: unique concept ID used by the row `data-testid`.
+- `ssCodigo`: displayed concept code.
+- `ssConcepto`: displayed concept name.
+- `scSigno`: displayed sign.
+
+The `/rows` response returns the same concept fields plus:
+
+- `kaNlOrden`: one-based priority position, or `null` when the concept is not prioritized.
+
+Both supplied snapshots contain the same 352 unique concept IDs. In the `/rows` snapshot, ten concepts have unique contiguous priority positions from 1 through 10, and 342 have a `null` priority position. These counts describe the supplied snapshots only; tests must derive expected totals from the intercepted responses at runtime.
+
+Page-load assertions must verify:
+
+- Both requests occur after navigation and succeed before table assertions begin.
+- Both responses contain unique concept IDs and expose the same concept-ID set.
+- The available-table total equals the `/conceptos` response-array length.
+- The priority-table total equals the number of `/rows` records where `kaNlOrden !== null`.
+- Priority rows are ordered by ascending `kaNlOrden`.
+- Each available row maps its ID, code, name, and sign to the corresponding `/conceptos` object.
+- Each priority row maps to its corresponding non-null ordered `/rows` object.
+- Assigning and removing priority membership changes only the client-side priority state until save; it does not remove entries from the `/conceptos` catalog.
 
 ## Page Object Updates Before Test Implementation
 
@@ -37,7 +70,9 @@ Keep concept-specific rows parameterized by ID. Do not add one property per seed
 ## Common Assertions
 
 - Use `availableConceptRow(id)` and `priorityConceptRow(id)` for membership.
-- After a transfer, wait for the source row count to become zero and the destination row count to become one.
+- After assignment, wait for the priority row count to become one and assert the available row remains present.
+- After removal, wait for the priority row count to become zero and assert the available row remains present.
+- Assert the available catalog total remains unchanged after assignment and removal.
 - Assert transfer and reorder buttons with `toBeEnabled()` and `toBeDisabled()`.
 - Assert pager totals before and after transfers.
 - For reordering, compare the complete visible ID array before and after the action.
@@ -47,20 +82,31 @@ Keep concept-specific rows parameterized by ID. Do not add one property per seed
 
 ## Test Scenarios
 
-### PLC-001: Initial dual-listbox state and controls
+### ✅ PLC-001: Initial dual-listbox state and controls
 
 **Priority:** P0
 
 **Starting state:** Page loaded with no row selected and no unsaved changes.
 
-1. Open the prioritization page.
-2. Assert both tables and both scoped pager summaries are visible.
-3. Assert the assign, remove, move-up, and move-down buttons are disabled.
-4. Assert the save button is disabled.
-5. Assert the cancel button is available.
-6. Verify the pager ranges are internally consistent with their totals.
+1. Start waiting for both documented page-load responses.
+2. Open the prioritization page.
+3. Assert both requests use their documented endpoints and succeed.
+4. Validate that both responses are arrays with their documented fields and unique concept IDs.
+5. Assert both responses expose the same concept-ID set.
+6. Derive the expected available total from `/conceptos` and the ordered priority rows from `/rows`.
+7. Assert both tables and both scoped pager summaries are visible.
+8. Assert the available total equals the `/conceptos` response-array length.
+9. Assert the priority total equals the number of non-null `kaNlOrden` values from `/rows`. When none exist, verify the empty-state row and its current `1-1 de 1` pager behavior.
+10. Assert the visible available rows match their `/conceptos` data.
+11. Assert the visible priority rows follow ascending `kaNlOrden` and match their `/rows` data.
+12. Assert the assign, remove, move-up, and move-down buttons are disabled.
+13. Assert the save button is disabled.
+14. Assert the cancel button is available.
+15. Verify the pager ranges are internally consistent with their totals.
 
-**Expected result:** Both lists load successfully, no action is possible without a valid selection, and the page has no pending changes.
+**Expected result:** The available list represents `/conceptos`, the priority list represents ordered `/rows` records, no action is possible without a valid selection, and the page has no pending changes.
+
+**Implementation note:** The test loops through the visible rows in both tables and compares each one with its matching API record. This validates the displayed code, concept, sign, priority position, and order without hardcoded records.
 
 ### PLC-002: Select an available concept and assign it
 
@@ -68,17 +114,18 @@ Keep concept-specific rows parameterized by ID. Do not add one property per seed
 
 **Starting state:** Choose at runtime a concept present in the available table and absent from the priority table.
 
-1. Capture both table totals.
+1. Capture the available catalog total and priority total.
 2. Select the available concept by its row ID.
 3. Assert assign is enabled and remove, move-up, and move-down remain disabled.
 4. Click assign once.
-5. Wait until the concept row detaches from the available table and appears in the priority table.
-6. Assert the available total decreased by one.
-7. Assert the priority total increased by one.
-8. Assert the save button is enabled.
-9. Cancel the changes and verify the initial membership and totals return.
+5. Wait until the concept row appears in the priority table.
+6. Assert the concept row remains present in the available table.
+7. Assert the available catalog total is unchanged.
+8. Assert the priority total increased by one.
+9. Assert the save button is enabled.
+10. Cancel the changes and verify the initial priority membership and totals return.
 
-**Expected result:** Exactly one concept transfers to the priority list and cancel restores the original state.
+**Expected result:** Exactly one priority assignment is added, the available catalog stays unchanged, and cancel restores the original priority state.
 
 ### PLC-003: Assign a concept by double-click
 
@@ -86,32 +133,34 @@ Keep concept-specific rows parameterized by ID. Do not add one property per seed
 
 **Starting state:** Choose at runtime a concept present only in the available table.
 
-1. Capture its initial membership and both totals.
+1. Capture its initial priority membership, the available catalog total, and the priority total.
 2. Double-click the available concept row.
-3. Wait for source detachment and destination attachment.
-4. Assert both totals changed by exactly one in opposite directions.
-5. Assert the save button is enabled.
-6. Cancel and verify restoration.
+3. Wait for the priority row to appear.
+4. Assert the available row remains present and the available catalog total is unchanged.
+5. Assert the priority total increased by exactly one.
+6. Assert the save button is enabled.
+7. Cancel and verify restoration.
 
-**Expected result:** Double-click performs the same single transfer as the assign button, without duplication.
+**Expected result:** Double-click adds the same single priority assignment as the assign button without changing or duplicating the available catalog entry.
 
 ### PLC-004: Remove a prioritized concept
 
 **Priority:** P0
 
-**Starting state:** Choose at runtime a concept present in the priority table and absent from the available table.
+**Starting state:** Choose at runtime a concept present in both the available catalog and the priority table.
 
-1. Capture both totals.
+1. Capture the available catalog total and priority total.
 2. Select the prioritized concept by row ID.
 3. Assert remove is enabled.
 4. Assert assign is disabled.
 5. Click remove once.
-6. Wait until the row detaches from the priority table and appears in the available table.
-7. Assert the priority total decreased by one and the available total increased by one.
-8. Assert the save button is enabled.
-9. Cancel and verify restoration.
+6. Wait until the row detaches from the priority table.
+7. Assert the row remains present in the available table.
+8. Assert the priority total decreased by one and the available catalog total is unchanged.
+9. Assert the save button is enabled.
+10. Cancel and verify restoration.
 
-**Expected result:** Exactly one concept transfers back to the available list and cancel restores it.
+**Expected result:** Exactly one priority assignment is removed, the available catalog stays unchanged, and cancel restores the assignment.
 
 ### PLC-005: Move a prioritized concept upward
 
@@ -163,6 +212,7 @@ Keep concept-specific rows parameterized by ID. Do not add one property per seed
 5. Assert move-up is enabled when a preceding concept exists.
 6. Verify that attempting unavailable boundary actions does not change the ordered ID array.
 
+**Current Behavior:** The UI may silently ignore boundary actions, but the test must assert that no state mutation occurs.
 **Expected result:** Boundary buttons prevent invalid reordering and no silent state mutation occurs.
 
 ### PLC-008: Selection changes the valid action set
@@ -213,13 +263,14 @@ Keep concept-specific rows parameterized by ID. Do not add one property per seed
 
 1. Capture ranges, totals, current pages, and visible row counts for both tables.
 2. Assign one available concept.
-3. Assert both totals change by one and each range remains valid.
-4. Verify navigation-button states update if the transfer creates or removes a page boundary.
-5. Remove the same concept.
-6. Assert the original totals and valid page boundaries return.
-7. Cancel any remaining changes.
+3. Assert the priority total increases by one and its range remains valid.
+4. Assert the available catalog total, range, and current page remain unchanged.
+5. Verify priority navigation-button states update if the assignment creates a page boundary.
+6. Remove the same concept.
+7. Assert the original priority total and valid page boundaries return while the available catalog remains unchanged.
+8. Cancel any remaining changes.
 
-**Expected result:** Pagination remains consistent as membership changes.
+**Expected result:** Priority pagination remains consistent as assignments change, while available-catalog pagination and total remain unchanged.
 
 ### PLC-012: Cancel discards membership and ordering changes
 
@@ -279,9 +330,9 @@ Keep concept-specific rows parameterized by ID. Do not add one property per seed
 
 1. Select the concept.
 2. Trigger assign twice rapidly using the safest supported interaction.
-3. Wait for the transfer to settle.
-4. Assert the source contains zero matching rows and the destination contains exactly one.
-5. Assert totals changed by exactly one.
+3. Wait for the assignment to settle.
+4. Assert the available catalog still contains exactly one matching row and the priority table contains exactly one.
+5. Assert the available catalog total is unchanged and the priority total increased by exactly one.
 6. Cancel and verify restoration.
 
 **Expected result:** A concept cannot be duplicated by repeated user input.
@@ -308,5 +359,4 @@ The recorded seed should be treated as discovery evidence, not retained as the f
 - Every saved mutation is restored and verified.
 - Tests use stable row IDs and scoped table assertions.
 - Transfer totals and complete reorder results are asserted.
-- Network contracts for load and save are documented.
-- No credentials are stored in test source or emitted in logs.
+- The documented page-load contract is asserted, and the save contract is documented before its scenarios are implemented.
