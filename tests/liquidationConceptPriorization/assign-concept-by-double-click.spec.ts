@@ -13,7 +13,7 @@ const rowsUrl =
   "https://nomina-qa-api.adacsc.co/api/v1/w-priorizacion-conceptos/rows";
 
 test.describe("Liquidation Concept Prioritization", () => {
-  test("PLC-002: Select an available concept and assign it", async ({ page }) => {
+  test("PLC-003: Assign a concept by double-click", async ({ page }) => {
     const prioritizationPage = new PriorizacionLiqConceptosPage(page);
     const rowsResponsePromise = page.waitForResponse(
       response =>
@@ -32,26 +32,41 @@ test.describe("Liquidation Concept Prioritization", () => {
         .map(row => String(row.kaNlConcepto)),
     );
 
-    // 1. Capture the available catalog total and priority total.
+    // 1. Capture its initial priority membership, the available catalog total, and the priority total.
+    await expect
+      .poll(async () =>
+        (
+          await prioritizationPage.readPagerRange(
+            prioritizationPage.availablePagerSummary,
+          )
+        ).total,
+      )
+      .toBe(rows.length);
+    await expect
+      .poll(async () =>
+        (
+          await prioritizationPage.readPagerRange(
+            prioritizationPage.priorityPagerSummary,
+          )
+        ).total,
+      )
+      .toBe(initialPriorityIds.size);
     const initialAvailableRange = await prioritizationPage.readPagerRange(
       prioritizationPage.availablePagerSummary,
     );
     const initialPriorityRange = await prioritizationPage.readPagerRange(
       prioritizationPage.priorityPagerSummary,
     );
+    expect(
+      initialPriorityIds.size,
+      "The API priority count must match the priority pager total",
+    ).toBe(initialPriorityRange.total);
+
     const availableRowTestIds = await prioritizationPage
       .availableVisibleRows()
       .evaluateAll(visibleRows =>
         visibleRows.map(row => row.getAttribute("data-testid") ?? ""),
       );
-    expect(
-      availableRowTestIds.length,
-      "Expected visible available rows",
-    ).toBeGreaterThan(0);
-    expect(
-      initialPriorityIds.size,
-      "The API priority count must match the priority pager total",
-    ).toBe(initialPriorityRange.total);
     const conceptId = availableRowTestIds
       .map(testId => testId.split("--").at(-1))
       .find(id => id !== undefined && !initialPriorityIds.has(id));
@@ -62,27 +77,18 @@ test.describe("Liquidation Concept Prioritization", () => {
 
     const availableRow = prioritizationPage.availableConceptRow(conceptId!);
     const priorityRow = prioritizationPage.priorityConceptRow(conceptId!);
+    await expect(availableRow).toHaveCount(1);
+    await expect(priorityRow).toHaveCount(0);
 
     try {
-      // 2. Select the available concept by its row ID.
-      await availableRow.click();
+      // 2. Double-click the available concept row.
+      await availableRow.dblclick();
 
-      // 3. Assert assign is enabled and remove, move-up, and move-down remain disabled.
-      await expect(prioritizationPage.assignButton).toBeEnabled();
-      await expect(prioritizationPage.removeButton).toBeDisabled();
-      await expect(prioritizationPage.moveUpButton).toBeDisabled();
-      await expect(prioritizationPage.moveDownButton).toBeDisabled();
-
-      // 4. Click assign once.
-      await prioritizationPage.assignButton.click();
-
-      // 5. Wait until the concept row appears in the priority table.
+      // 3. Wait for the priority row to appear.
       await expect(priorityRow).toHaveCount(1);
 
-      // 6. Assert the concept row remains present in the available table.
+      // 4. Assert the available row remains present and the available catalog total is unchanged.
       await expect(availableRow).toHaveCount(1);
-
-      // 7. Assert the available catalog total is unchanged.
       await expect
         .poll(async () =>
           prioritizationPage.readPagerRange(
@@ -91,7 +97,7 @@ test.describe("Liquidation Concept Prioritization", () => {
         )
         .toEqual(initialAvailableRange);
 
-      // 8. Assert the priority total increased by one.
+      // 5. Assert the priority total increased by exactly one.
       await expect
         .poll(async () =>
           prioritizationPage.readPagerRange(
@@ -104,10 +110,10 @@ test.describe("Liquidation Concept Prioritization", () => {
           total: initialPriorityRange.total + 1,
         });
 
-      // 9. Assert the save button is enabled.
+      // 6. Assert the save button is enabled.
       await expect(prioritizationPage.saveButton).toBeEnabled();
     } finally {
-      // 10. Cancel the changes and verify the initial priority membership and totals return.
+      // 7. Cancel and verify restoration.
       if (await prioritizationPage.saveButton.isEnabled()) {
         await prioritizationPage.cancelButton.click();
       }

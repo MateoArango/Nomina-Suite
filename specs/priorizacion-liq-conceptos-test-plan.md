@@ -108,7 +108,7 @@ Keep concept-specific rows parameterized by ID. Do not add one property per seed
 
 **Implementation note:** The test loops through the visible rows in both tables and compares each one with its matching API record. This validates the displayed code, concept, sign, priority position, and order without hardcoded records.
 
-### PLC-002: Select an available concept and assign it
+### ✅ PLC-002: Select an available concept and assign it
 
 **Priority:** P0
 
@@ -127,7 +127,7 @@ Keep concept-specific rows parameterized by ID. Do not add one property per seed
 
 **Expected result:** Exactly one priority assignment is added, the available catalog stays unchanged, and cancel restores the original priority state.
 
-### PLC-003: Assign a concept by double-click
+### ✅ PLC-003: Assign a concept by double-click
 
 **Priority:** P1
 
@@ -146,7 +146,7 @@ Keep concept-specific rows parameterized by ID. Do not add one property per seed
 ### PLC-004: Remove a prioritized concept
 
 **Priority:** P0
-
+**Default:**The range always says for only one record or empty records 1-1 de 1
 **Starting state:** Choose at runtime a concept present in both the available catalog and the priority table.
 
 1. Capture the available catalog total and priority total.
