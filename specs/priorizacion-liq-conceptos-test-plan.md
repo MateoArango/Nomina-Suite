@@ -215,21 +215,8 @@ Keep concept-specific rows parameterized by ID. Do not add one property per seed
 **Current Behavior:** Reorder buttons remain enabled at both boundaries, but clicking the unavailable boundary action is silently ignored.
 **Expected result:** Invalid boundary reordering leaves the selected concept at the same index, preserves the ordered ID array, and does not enable Save.
 
-### PLC-008: Selection changes the valid action set
 
-**Priority:** P1
-
-**Starting state:** No selection.
-
-1. Assert all four transfer/reorder buttons are disabled.
-2. Select an available concept and verify only assign is enabled.
-3. Select a priority concept and verify remove is enabled and reorder buttons reflect its position.
-4. Change the selected priority concept and verify button states update for the new position.
-5. Clear or cancel the selection and verify all action buttons return to their default disabled state.
-
-**Expected result:** Buttons always represent the currently selected row and list context.
-
-### PLC-009: Available-table page sizes and navigation
+### PLC-008: Available-table page sizes and navigation
 
 **Priority:** P1
 
@@ -250,8 +237,7 @@ Keep concept-specific rows parameterized by ID. Do not add one property per seed
 
 **Starting state:** Priority total exceeds one page at size 10.
 
-1. Repeat the page-size, forward/back navigation, range, and boundary assertions from PLC-009, scoped to the priority table.
-2. Verify the available-table page and page size are not changed by priority-table navigation.
+1. Repeat the page-size, forward/back navigation, range, and boundary assertions from PLC-008, scoped to the priority table.
 
 **Expected result:** Priority pagination works independently from available pagination.
 
