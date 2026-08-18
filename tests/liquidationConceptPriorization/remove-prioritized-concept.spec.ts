@@ -45,14 +45,18 @@ test.describe("Liquidation Concept Prioritization", () => {
       return range.total;
     };
 
+    const readAvailableTotal = async (): Promise<number> =>
+      (
+        await prioritizationPage.readPagerRange(
+          prioritizationPage.availablePagerSummary,
+        )
+      ).total;
+
     // 1. Capture the available catalog total and priority total.
-    const initialAvailableTotal = (
-      await prioritizationPage.readPagerRange(
-        prioritizationPage.availablePagerSummary,
-      )
-    ).total;
-    const initialPriorityTotal = await readPriorityTotal();
-    expect(initialPriorityTotal).toBe(initialPriorityIds.size);
+    const initialAvailableTotal = rows.length;
+    const initialPriorityTotal = initialPriorityIds.size;
+    await expect.poll(readAvailableTotal).toBe(initialAvailableTotal);
+    await expect.poll(readPriorityTotal).toBe(initialPriorityTotal);
     test.skip(
       initialPriorityTotal === 0,
       "PLC-004 requires at least one persisted prioritized concept",
@@ -100,15 +104,7 @@ test.describe("Liquidation Concept Prioritization", () => {
 
       // 8. Assert the priority total decreased by one and the available catalog total is unchanged.
       await expect.poll(readPriorityTotal).toBe(initialPriorityTotal - 1);
-      await expect
-        .poll(async () =>
-          (
-            await prioritizationPage.readPagerRange(
-              prioritizationPage.availablePagerSummary,
-            )
-          ).total,
-        )
-        .toBe(initialAvailableTotal);
+      await expect.poll(readAvailableTotal).toBe(initialAvailableTotal);
 
       // 9. Assert the save button is enabled.
       await expect(prioritizationPage.saveButton).toBeEnabled();
@@ -122,15 +118,7 @@ test.describe("Liquidation Concept Prioritization", () => {
     await expect(priorityRow).toHaveCount(1);
     await expect(availableRow).toHaveCount(1);
     await expect.poll(readPriorityTotal).toBe(initialPriorityTotal);
-    await expect
-      .poll(async () =>
-        (
-          await prioritizationPage.readPagerRange(
-            prioritizationPage.availablePagerSummary,
-          )
-        ).total,
-      )
-      .toBe(initialAvailableTotal);
+    await expect.poll(readAvailableTotal).toBe(initialAvailableTotal);
     await expect(prioritizationPage.saveButton).toBeDisabled();
   });
 });

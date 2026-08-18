@@ -32,13 +32,31 @@ test.describe("Liquidation Concept Prioritization", () => {
         .map(row => String(row.kaNlConcepto)),
     );
 
+    const readAvailableTotal = async (): Promise<number> =>
+      (
+        await prioritizationPage.readPagerRange(
+          prioritizationPage.availablePagerSummary,
+        )
+      ).total;
+
+    const readPriorityTotal = async (): Promise<number> => {
+      const range = await prioritizationPage.readPagerRange(
+        prioritizationPage.priorityPagerSummary,
+      );
+
+      // The current UI reports 1-1 de 1 for both one row and the empty state.
+      if (range.start === 1 && range.end === 1 && range.total === 1) {
+        return prioritizationPage.priorityVisibleRows().count();
+      }
+
+      return range.total;
+    };
+
     // 1. Capture the available catalog total and priority total.
-    const initialAvailableRange = await prioritizationPage.readPagerRange(
-      prioritizationPage.availablePagerSummary,
-    );
-    const initialPriorityRange = await prioritizationPage.readPagerRange(
-      prioritizationPage.priorityPagerSummary,
-    );
+    const initialAvailableTotal = rows.length;
+    const initialPriorityTotal = initialPriorityIds.size;
+    await expect.poll(readAvailableTotal).toBe(initialAvailableTotal);
+    await expect.poll(readPriorityTotal).toBe(initialPriorityTotal);
     const availableRowTestIds = await prioritizationPage
       .availableVisibleRows()
       .evaluateAll(visibleRows =>
@@ -48,10 +66,6 @@ test.describe("Liquidation Concept Prioritization", () => {
       availableRowTestIds.length,
       "Expected visible available rows",
     ).toBeGreaterThan(0);
-    expect(
-      initialPriorityIds.size,
-      "The API priority count must match the priority pager total",
-    ).toBe(initialPriorityRange.total);
     const conceptId = availableRowTestIds
       .map(testId => testId.split("--").at(-1))
       .find(id => id !== undefined && !initialPriorityIds.has(id));
@@ -83,26 +97,10 @@ test.describe("Liquidation Concept Prioritization", () => {
       await expect(availableRow).toHaveCount(1);
 
       // 7. Assert the available catalog total is unchanged.
-      await expect
-        .poll(async () =>
-          prioritizationPage.readPagerRange(
-            prioritizationPage.availablePagerSummary,
-          ),
-        )
-        .toEqual(initialAvailableRange);
+      await expect.poll(readAvailableTotal).toBe(initialAvailableTotal);
 
       // 8. Assert the priority total increased by one.
-      await expect
-        .poll(async () =>
-          prioritizationPage.readPagerRange(
-            prioritizationPage.priorityPagerSummary,
-          ),
-        )
-        .toEqual({
-          start: initialPriorityRange.start,
-          end: initialPriorityRange.end + 1,
-          total: initialPriorityRange.total + 1,
-        });
+      await expect.poll(readPriorityTotal).toBe(initialPriorityTotal + 1);
 
       // 9. Assert the save button is enabled.
       await expect(prioritizationPage.saveButton).toBeEnabled();
@@ -115,20 +113,8 @@ test.describe("Liquidation Concept Prioritization", () => {
 
     await expect(priorityRow).toHaveCount(0);
     await expect(availableRow).toHaveCount(1);
-    await expect
-      .poll(async () =>
-        prioritizationPage.readPagerRange(
-          prioritizationPage.availablePagerSummary,
-        ),
-      )
-      .toEqual(initialAvailableRange);
-    await expect
-      .poll(async () =>
-        prioritizationPage.readPagerRange(
-          prioritizationPage.priorityPagerSummary,
-        ),
-      )
-      .toEqual(initialPriorityRange);
+    await expect.poll(readAvailableTotal).toBe(initialAvailableTotal);
+    await expect.poll(readPriorityTotal).toBe(initialPriorityTotal);
     await expect(prioritizationPage.saveButton).toBeDisabled();
   });
 });

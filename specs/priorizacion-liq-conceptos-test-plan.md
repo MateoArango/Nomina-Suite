@@ -143,7 +143,7 @@ Keep concept-specific rows parameterized by ID. Do not add one property per seed
 
 **Expected result:** Double-click adds the same single priority assignment as the assign button without changing or duplicating the available catalog entry.
 
-### PLC-004: Remove a prioritized concept
+### ✅ PLC-004: Remove a prioritized concept
 
 **Priority:** P0
 **Default:**The range always says for only one record or empty records 1-1 de 1
@@ -162,7 +162,7 @@ Keep concept-specific rows parameterized by ID. Do not add one property per seed
 
 **Expected result:** Exactly one priority assignment is removed, the available catalog stays unchanged, and cancel restores the assignment.
 
-### PLC-005: Move a prioritized concept upward
+### ✅ PLC-005: Move a prioritized concept upward
 
 **Priority:** P0
 
