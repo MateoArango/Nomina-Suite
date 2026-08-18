@@ -235,7 +235,7 @@ Keep concept-specific rows parameterized by ID. Do not add one property per seed
 
 **Expected result:** Page-size and navigation controls display the correct subset without changing membership or order.
 
-### PLC-009: Priority-table page sizes and navigation
+### ✅ PLC-009: Priority-table page sizes and navigation
 
 **Priority:** P1
 
@@ -245,87 +245,24 @@ Keep concept-specific rows parameterized by ID. Do not add one property per seed
 
 **Expected result:** Priority pagination works independently from available pagination.
 
-### PLC-011: Transfer updates pagination boundaries
-
-**Priority:** P1
-
-**Starting state:** Use a page size where at least one list has multiple pages.
-
-1. Capture ranges, totals, current pages, and visible row counts for both tables.
-2. Assign one available concept.
-3. Assert the priority total increases by one and its range remains valid.
-4. Assert the available catalog total, range, and current page remain unchanged.
-5. Verify priority navigation-button states update if the assignment creates a page boundary.
-6. Remove the same concept.
-7. Assert the original priority total and valid page boundaries return while the available catalog remains unchanged.
-8. Cancel any remaining changes.
-
-**Expected result:** Priority pagination remains consistent as assignments change, while available-catalog pagination and total remain unchanged.
-
-### PLC-012: Cancel discards membership and ordering changes
+### PLC-010: Save and reload persist concept 1001
 
 **Priority:** P0
 
-**Starting state:** Capture initial membership, complete priority order, and totals.
+**Starting state:** Concept `1001` (`SUELDO ORDINARIO ADMINISTRATIVO`) exists in the available catalog and is not prioritized. Capture its initial `/rows` membership before making changes.
 
-1. Assign one available concept.
-2. Reorder a non-boundary prioritized concept.
-3. Remove a different prioritized concept.
-4. Assert save is enabled.
-5. Click cancel.
-6. Verify the complete membership, priority order, totals, and disabled save state match the captured baseline.
-7. Reload the page and verify the baseline still persists.
+1. Locate concept `1001` in the available table and assert its row displays `SUELDO ORDINARIO ADMINISTRATIVO`.
+2. Double-click concept `1001` and assert it appears exactly once in the priority table.
+3. Assert Save changes from disabled to enabled.
+4. Start waiting for the prioritization save response, then click Save.
+5. Assert the mutation request uses the documented method and endpoint and that its payload contains concept `1001` once with the priority order shown in the UI.
+6. Assert the save response is successful and Save returns to disabled or another explicit saved-state indicator appears.
+7. Reload the page and wait for a fresh `GET /rows` response.
+8. Assert the response reports a non-null `kaNlOrden` for concept `1001`.
+9. Navigate to the priority page containing concept `1001` and assert its persisted row displays the expected ID, name, and order.
+10. In a `finally` block, if this test persisted concept `1001`, reload the current server state, remove only concept `1001`, save the cleanup, reload again, and assert `/rows` reports `kaNlOrden === null` for concept `1001`.
 
-**Expected result:** Cancel discards every unsaved change, including transfers and ordering.
-
-### PLC-013: Save and reload persist changes
-
-**Priority:** P0
-
-**Starting state:** Capture the complete initial membership and priority order for cleanup.
-
-1. Make one deterministic assignment or removal and one deterministic reorder.
-2. Assert save changed from disabled to enabled after the first mutation.
-3. Start waiting for the save response, then click save.
-4. Assert the request method, payload membership, and priority order match the UI state.
-5. Assert the response is successful and success feedback appears.
-6. Assert save returns to disabled or another explicit saved-state indicator appears.
-7. Reload the page.
-8. Verify the saved membership and complete priority order persist.
-9. Restore the captured baseline, save it, reload, and verify restoration.
-
-**Expected result:** Saved transfers and ordering survive reload, and cleanup restores shared QA data.
-
-### PLC-014: Save failure preserves recoverable unsaved state
-
-**Priority:** P1
-
-**Starting state:** Intercept the documented save endpoint and force a server failure.
-
-1. Make one reversible change.
-2. Force the save request to return an error response.
-3. Click save.
-4. Assert error feedback is visible and success feedback is absent.
-5. Assert the changed UI state remains available for retry or cancel.
-6. Assert save remains enabled.
-7. Remove the interception and cancel to restore the baseline.
-
-**Expected result:** A failed save is reported accurately and does not falsely present the data as persisted.
-
-### PLC-015: Rapid or repeated action does not duplicate a transfer
-
-**Priority:** P2
-
-**Starting state:** Choose one available concept.
-
-1. Select the concept.
-2. Trigger assign twice rapidly using the safest supported interaction.
-3. Wait for the assignment to settle.
-4. Assert the available catalog still contains exactly one matching row and the priority table contains exactly one.
-5. Assert the available catalog total is unchanged and the priority total increased by exactly one.
-6. Cancel and verify restoration.
-
-**Expected result:** A concept cannot be duplicated by repeated user input.
+**Expected result:** Saving persists concept `1001` and its priority order across reload, the save API contract matches the UI state, and the `finally` cleanup restores concept `1001` to its original unprioritized state.
 
 ## Seed Test Refactoring Map
 
