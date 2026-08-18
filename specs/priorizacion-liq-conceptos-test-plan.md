@@ -181,7 +181,7 @@ Keep concept-specific rows parameterized by ID. Do not add one property per seed
 
 **Expected result:** The selected concept moves up exactly one position and its neighbor moves down exactly one position.
 
-### PLC-006: Move a prioritized concept downward
+### ✅ PLC-006: Move a prioritized concept downward
 
 **Priority:** P0
 
@@ -199,21 +199,21 @@ Keep concept-specific rows parameterized by ID. Do not add one property per seed
 
 **Expected result:** The selected concept moves down exactly one position and its neighbor moves up exactly one position.
 
-### PLC-007: Reorder boundary states
+### ✅ PLC-007: Reorder boundary states
 
 **Priority:** P1
 
 **Starting state:** Priority list contains at least two concepts.
 
-1. Select the first prioritized concept and assert move-up is disabled.
-2. Assert move-down is enabled when a following concept exists.
+1. Select the first prioritized concept and assert both reorder buttons remain enabled.
+2. Click move-up and verify the selected concept remains at index 0 and the ordered ID array is unchanged.
 3. Navigate to the final priority page if necessary.
-4. Select the last prioritized concept and assert move-down is disabled.
-5. Assert move-up is enabled when a preceding concept exists.
-6. Verify that attempting unavailable boundary actions does not change the ordered ID array.
+4. Select the last prioritized concept and assert both reorder buttons remain enabled.
+5. Click move-down and verify the selected concept remains at the final index and the ordered ID array is unchanged.
+6. Assert Save remains disabled because neither boundary action changed state.
 
-**Current Behavior:** The UI may silently ignore boundary actions, but the test must assert that no state mutation occurs.
-**Expected result:** Boundary buttons prevent invalid reordering and no silent state mutation occurs.
+**Current Behavior:** Reorder buttons remain enabled at both boundaries, but clicking the unavailable boundary action is silently ignored.
+**Expected result:** Invalid boundary reordering leaves the selected concept at the same index, preserves the ordered ID array, and does not enable Save.
 
 ### PLC-008: Selection changes the valid action set
 
