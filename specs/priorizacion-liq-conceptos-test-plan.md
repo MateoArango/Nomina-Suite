@@ -245,7 +245,7 @@ Keep concept-specific rows parameterized by ID. Do not add one property per seed
 
 **Expected result:** Priority pagination works independently from available pagination.
 
-### PLC-010: Save and reload persist concept 1001
+### ✅ PLC-010: Save and reload persist concept 1001
 
 **Priority:** P0
 

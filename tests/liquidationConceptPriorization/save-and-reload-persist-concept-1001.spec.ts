@@ -1,7 +1,7 @@
 // spec: specs/priorizacion-liq-conceptos-test-plan.md
 // seed: tests/seed.spec.ts
 
-import type { APIResponse, Locator } from "@playwright/test";
+import type { Locator, Request, Response } from "@playwright/test";
 import { expect, test } from "../fixtures/auth.fixture";
 import { PriorizacionLiqConceptosPage } from "../../pages/PriorizacionLiqConceptos.page";
 
@@ -28,9 +28,17 @@ const rowsUrl =
 const saveUrl =
   "https://nomina-qa-api.adacsc.co/api/v1/w-priorizacion-conceptos/actions/grabar";
 
-async function readRows(response: APIResponse): Promise<PrioritizedConcept[]> {
+async function readRows(response: Response): Promise<PrioritizedConcept[]> {
   expect(response.ok()).toBe(true);
   return (await response.json()) as PrioritizedConcept[];
+}
+
+async function readRowsFromRequest(
+  request: Request,
+): Promise<PrioritizedConcept[]> {
+  const response = await request.response();
+  expect(response).not.toBeNull();
+  return readRows(response!);
 }
 
 async function findRowAcrossPages(
@@ -65,22 +73,22 @@ test.describe("Liquidation Concept Prioritization", () => {
     let saveAttempted = false;
     let conceptId: number | undefined;
 
-    const waitForRowsResponse = (): Promise<APIResponse> =>
-      page.waitForResponse(
-        response =>
-          response.url() === rowsUrl && response.request().method() === "GET",
+    const waitForRowsRequest = (): Promise<Request> =>
+      page.waitForRequest(
+        request =>
+          request.url() === rowsUrl && request.method() === "GET",
       );
-    const waitForSaveResponse = (): Promise<APIResponse> =>
+    const waitForSaveResponse = (): Promise<Response> =>
       page.waitForResponse(
         response =>
           response.url() === saveUrl && response.request().method() === "POST",
       );
 
     const reloadAndReadRows = async (): Promise<PrioritizedConcept[]> => {
-      const [rows] = await Promise.all([
-        waitForRowsResponse().then(readRows),
-        page.reload(),
-      ]);
+      const rowsRequestPromise = waitForRowsRequest();
+      const reloadPromise = page.reload();
+      const rows = await readRowsFromRequest(await rowsRequestPromise);
+      await reloadPromise;
       return rows;
     };
 
@@ -95,10 +103,11 @@ test.describe("Liquidation Concept Prioritization", () => {
       return concept!;
     };
 
-    const initialRowsPromise = waitForRowsResponse().then(readRows);
-    await page.goto(pageUrl);
+    const initialRowsRequestPromise = waitForRowsRequest();
+    const gotoPromise = page.goto(pageUrl);
+    const initialRows = await readRowsFromRequest(await initialRowsRequestPromise);
+    await gotoPromise;
     await expect(page).toHaveURL(/\/priorizacion-conceptos/);
-    const initialRows = await initialRowsPromise;
     const initialConcept = persistedConcept(initialRows);
     conceptId = initialConcept.kaNlConcepto;
     const availableRow = prioritizationPage.availableConceptRow(conceptId);
