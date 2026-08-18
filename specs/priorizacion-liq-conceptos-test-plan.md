@@ -8,6 +8,10 @@ This plan uses the stable `data-testid` locators exposed by `PriorizacionLiqConc
 
 The available-concepts table is the catalog and source of truth. Assigning a concept adds it to the priority table but does not remove it from the available table or decrease the available total. Removing a priority assignment removes only the priority-table entry; the available catalog and its total remain unchanged.
 
+## Pre-rule for PLC-009
+
+Before running PLC-009, assign and save enough records from the available table so that the priority table contains at least 11 persisted records. The available table remains unchanged because it is the source catalog. Eleven priority records are required to produce a second page when the page size is 10.
+
 ## Risk and State Management
 
 This page edits shared prioritization data. Before implementing or running tests that save changes:
@@ -231,7 +235,7 @@ Keep concept-specific rows parameterized by ID. Do not add one property per seed
 
 **Expected result:** Page-size and navigation controls display the correct subset without changing membership or order.
 
-### PLC-010: Priority-table page sizes and navigation
+### PLC-009: Priority-table page sizes and navigation
 
 **Priority:** P1
 
