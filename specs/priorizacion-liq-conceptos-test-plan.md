@@ -1,5 +1,7 @@
 # Liquidation Concept Prioritization Test Plan
 
+**Plan summary:** Validates concept assignment, removal, ordering, pagination, cancellation, saving, and persistence in the prioritization dual-listbox.
+
 ## Scope
 
 Validate the dual-listbox behavior on `/priorizacion-conceptos`, including selection, assignment, removal, ordering, pagination, cancel, save, and persistence.
@@ -7,6 +9,19 @@ Validate the dual-listbox behavior on `/priorizacion-conceptos`, including selec
 This plan uses the stable `data-testid` locators exposed by `PriorizacionLiqConceptosPage`. Row assertions must use the concept ID and row content, never a row index.
 
 The available-concepts table is the catalog and source of truth. Assigning a concept adds it to the priority table but does not remove it from the available table or decrease the available total. Removing a priority assignment removes only the priority-table entry; the available catalog and its total remain unchanged.
+
+## Test Summary
+
+- **PLC-001:** Verifies API-backed initial data, table contents, totals, ordering, and default control states.
+- **PLC-002:** Verifies button-based assignment and cancellation without changing the available catalog.
+- **PLC-003:** Verifies double-click assignment adds one priority entry and can be canceled.
+- **PLC-004:** Verifies removal affects only priority membership and cancel restores it.
+- **PLC-005:** Verifies a prioritized concept moves up exactly one position.
+- **PLC-006:** Verifies a prioritized concept moves down exactly one position.
+- **PLC-007:** Verifies invalid first-item and last-item moves leave priority order unchanged.
+- **PLC-008:** Verifies available-catalog pagination, page sizes, ranges, and navigation boundaries.
+- **PLC-009:** Verifies priority-table pagination works independently from the available catalog.
+- **PLC-010:** Verifies saving concept `1001`, persistence after reload, API data, and cleanup.
 
 ## Pre-rule for PLC-009
 
