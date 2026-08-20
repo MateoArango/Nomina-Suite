@@ -117,6 +117,12 @@ export class RiesgosProfesionalesPage {
     );
   }
 
+  currentPageRiskRows(): Locator {
+    return this.riskTable.locator(
+      'tbody tr[data-testid^="riesgos-profesionales-table-riesgo-row--"]:visible',
+    );
+  }
+
   async readPagerRange(): Promise<{
     start: number;
     end: number;
