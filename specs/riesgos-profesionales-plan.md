@@ -237,7 +237,7 @@ Implementation-readiness notes:
 
 **Seed:** `tests/riesgosProfesionales/seed-test.spec.ts`
 
-#### RP-013: Activity modal loads and maps runtime lookup data
+#### ✅ RP-013: Activity modal loads and maps runtime lookup data
 
 **File:** `tests/riesgosProfesionales/activity-modal-initial-state.spec.ts`
 
@@ -250,6 +250,8 @@ Implementation-readiness notes:
     - expect: The pager total is derived from the response; 980 is not hard-coded.
   3. Inspect the initial selection and close with Cancel.
     - expect: No activity is applied and the main activity field remains at its original/default value.
+
+**Implementation summary:** The test captures the runtime activity lookup, validates unique `kaNlActividad` records, maps the visible rows to `scCodActividad` and `ssActividad`, derives the pager total dynamically, verifies the modal controls, and confirms Cancel leaves the original activity value unchanged. Focused Chromium verification passed: 1 test.
 
 #### RP-014: Activity selection is single-select and Accept applies the latest choice
 

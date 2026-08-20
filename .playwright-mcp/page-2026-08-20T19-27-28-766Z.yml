@@ -1,0 +1,179 @@
+- generic [ref=f2e3]:
+  - generic [ref=f2e5]:
+    - generic [ref=f2e6]:
+      - button "menu" [ref=f2e8] [cursor=pointer]
+      - generic [ref=f2e10]:
+        - generic [ref=f2e12] [cursor=pointer]:
+          - generic [ref=f2e13]: home
+          - generic [ref=f2e14]: Inicio
+        - generic [ref=f2e15]:
+          - generic [ref=f2e16] [cursor=pointer]:
+            - generic [ref=f2e17]: manage_accounts
+            - generic [ref=f2e18]: Administrador ...
+            - generic [ref=f2e19]: "20"
+          - generic [ref=f2e20] [cursor=pointer]:
+            - generic [ref=f2e21]: grid_view
+            - generic [ref=f2e22]: Operación
+            - generic [ref=f2e23]: "5"
+          - generic [ref=f2e24] [cursor=pointer]:
+            - generic [ref=f2e25]: bar_chart
+            - generic [ref=f2e26]: Informes
+            - generic [ref=f2e27]: "7"
+          - generic [ref=f2e28] [cursor=pointer]:
+            - generic [ref=f2e29]: grid_view
+            - generic [ref=f2e30]: Seguridad soci...
+            - generic [ref=f2e31]: "6"
+          - generic [ref=f2e32] [cursor=pointer]:
+            - generic [ref=f2e33]: grid_view
+            - generic [ref=f2e34]: Prestaciones s...
+            - generic [ref=f2e35]: "4"
+          - generic [ref=f2e36] [cursor=pointer]:
+            - generic [ref=f2e37]: groups
+            - generic [ref=f2e38]: Novedades
+            - generic [ref=f2e39]: "11"
+          - generic [ref=f2e40] [cursor=pointer]:
+            - generic [ref=f2e41]: grid_view
+            - generic [ref=f2e42]: Configuración
+            - generic [ref=f2e43]: "12"
+          - generic [ref=f2e44] [cursor=pointer]:
+            - generic [ref=f2e45]: receipt_long
+            - generic [ref=f2e46]: Nomina electro...
+            - generic [ref=f2e47]: "4"
+    - generic:
+      - generic [ref=f2e48]:
+        - generic:
+          - generic:
+            - generic [ref=f2e49]: AS
+            - generic: ADA S.A.
+      - generic "Buscar..." [ref=f2e51]:
+        - generic [ref=f2e52]:
+          - generic [ref=f2e53]: search
+          - text: Buscar...
+        - generic [ref=f2e54]: Ctrl + K
+      - generic:
+        - generic:
+          - generic [ref=f2e55] [cursor=pointer]: keyboard_arrow_down
+          - text: Administrador del sistema
+        - generic:
+          - generic:
+            - generic [ref=f2e56] [cursor=pointer]:
+              - generic [ref=f2e57]: manage_accounts
+              - generic: Asignación de módulos
+            - generic [ref=f2e58] [cursor=pointer]:
+              - generic [ref=f2e59]: trending_up
+              - generic: Históricos de salario mínimos
+            - generic [ref=f2e60] [cursor=pointer]:
+              - generic [ref=f2e61]: tune
+              - generic: Configuración formato 220 dian
+            - generic [ref=f2e62] [cursor=pointer]:
+              - generic [ref=f2e63]: tune
+              - generic: Maestro conceptos formato 220 dian
+            - generic [ref=f2e64] [cursor=pointer]:
+              - generic [ref=f2e65]: tune
+              - generic: Formato hoja vida persona natural
+            - generic [ref=f2e66] [cursor=pointer]:
+              - generic [ref=f2e67]: badge
+              - generic: Empleados
+            - generic [ref=f2e68] [cursor=pointer]:
+              - generic [ref=f2e69]: domain
+              - generic: Empresa
+            - generic [ref=f2e70] [cursor=pointer]:
+              - generic [ref=f2e71]: trending_up
+              - generic: Aumento de sueldos
+            - generic [ref=f2e72] [cursor=pointer]:
+              - generic [ref=f2e73]: dataset
+              - generic: Maestros
+            - generic [ref=f2e74] [cursor=pointer]:
+              - generic [ref=f2e75]: balance
+              - generic: Juzgados
+            - generic [ref=f2e76] [cursor=pointer]:
+              - generic [ref=f2e77]: category
+              - generic: Cuentas por sección
+            - generic [ref=f2e78] [cursor=pointer]:
+              - generic [ref=f2e79]: receipt_long
+              - generic: Tipos de liquidaciones
+            - generic [ref=f2e80] [cursor=pointer]:
+              - generic [ref=f2e81]: contacts
+              - generic: Maestro terceros
+            - generic [ref=f2e82] [cursor=pointer]:
+              - generic [ref=f2e83]: bar_chart
+              - generic: Supervivencia
+            - generic [ref=f2e84] [cursor=pointer]:
+              - generic [ref=f2e85]: warning
+              - generic: Riesgos profesionales
+            - generic [ref=f2e86] [cursor=pointer]:
+              - generic [ref=f2e87]: payments
+              - generic: Provisiones
+            - generic [ref=f2e88] [cursor=pointer]:
+              - generic [ref=f2e89]: lock
+              - generic: Cierre de nómina
+            - generic [ref=f2e90] [cursor=pointer]:
+              - generic [ref=f2e91]: money_off
+              - generic: Aumento de descuentos
+            - generic [ref=f2e92] [cursor=pointer]:
+              - generic [ref=f2e93]: dataset
+              - generic: Maestro entidades cuotaspartes
+            - generic [ref=f2e94] [cursor=pointer]:
+              - generic [ref=f2e95]: lock
+              - generic: Cierre de nã³mina
+  - generic [ref=f2e96]:
+    - generic [ref=f2e98]:
+      - generic "Nómina" [ref=f2e99]:
+        - generic [ref=f2e100]:
+          - generic [ref=f2e101]: Nómina
+          - generic [ref=f2e105]:
+            - separator [ref=f2e106]
+            - button "Aurora" [ref=f2e108] [cursor=pointer]
+            - generic "Logout" [ref=f2e113] [cursor=pointer]: logout
+      - button "Reportar error" [ref=f2e116]:
+        - generic [ref=f2e118]:
+          - img [ref=f2e119]: bug_report
+          - generic [ref=f2e120]: Reportar error
+    - generic [ref=f2e124]:
+      - generic [ref=f2e125]:
+        - generic "Riesgos Profesionales" [ref=f2e126]:
+          - generic [ref=f2e127]:
+            - generic [ref=f2e128]: Riesgos Profesionales
+            - generic [ref=f2e132]:
+              - button "Nuevo" [ref=f2e134]
+              - button "Grabar" [ref=f2e141]
+              - button "Cancelar" [ref=f2e148]
+              - generic [ref=f2e154]:
+                - button "Borrar seleccionados" [disabled]
+              - separator [ref=f2e155]
+        - generic [ref=f2e162]:
+          - generic [ref=f2e163]:
+            - generic [ref=f2e167]:
+              - generic: "Código: *"
+              - 'textbox "Código: *" [ref=f2e170]'
+            - generic [ref=f2e175]:
+              - generic: "Clase: *"
+              - 'textbox "Clase: *" [ref=f2e178]'
+            - generic [ref=f2e183]:
+              - generic: "Porcentaje: *"
+              - 'spinbutton "Porcentaje: *" [ref=f2e186]'
+            - generic [ref=f2e188]:
+              - generic [ref=f2e192]:
+                - generic: Actividades
+                - textbox "Actividades" [ref=f2e195]: N/A
+              - button "..." [ref=f2e198]
+          - generic [ref=f2e204]:
+            - img [ref=f2e205]: assignment
+            - paragraph [ref=f2e206]: No hay riesgos profesionales registrados.
+      - dialog "Side sheets" [ref=f2e207]:
+        - banner [ref=f2e208]:
+          - heading "Actividades" [level=2] [ref=f2e209]
+          - generic "Cerrar" [ref=f2e210] [cursor=pointer]: close
+        - generic [ref=f2e215]:
+          - heading "Actividades" [level=2] [ref=f2e218]
+          - generic [ref=f2e221]:
+            - generic [ref=f2e225] [cursor=pointer]:
+              - img [ref=f2e226]: search
+              - textbox "Buscar actividad"
+            - generic [ref=f2e227]:
+              - img [ref=f2e228]: assignment
+              - paragraph [ref=f2e229]: No hay actividades registradas.
+            - generic [ref=f2e230]:
+              - generic [ref=f2e231]:
+                - button "Aceptar" [disabled]
+              - button "Cancelar" [ref=f2e233]
