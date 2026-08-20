@@ -113,9 +113,9 @@ Implementation-readiness notes:
   3. If the runtime dataset cannot produce a second page for any available size, skip only the multi-page navigation branch with an explicit prerequisite reason.
     - expect: The page-size and first-page assertions still run.
 
-**Implementation summary:** The test captures the runtime risks response, validates page sizes 10, 25, 50, and 100 against visible ID slices and pager ranges, and traverses every available page forward and backward while checking both navigation boundaries. The pagination-specific `currentPageRiskRows()` helper excludes hidden mounted rows without changing the shared `visibleRiskRows()` behavior. Focused Chromium verification passed: 1 test.
+**Implementation summary:** The test captures the runtime risks response, validates page sizes 10, 25, 50, and 100 against visible ID slices and pager ranges, and traverses every available page forward and backward while checking both navigation boundaries. Chromium Verification passed: 1 test.
 
-#### RP-005: Individual selection controls Delete Selected without deleting data
+#### ✅ RP-005: Individual selection controls Delete Selected without deleting data
 
 **File:** `tests/riesgosProfesionales/grid-selection-state.spec.ts`
 
@@ -127,6 +127,8 @@ Implementation-readiness notes:
     - expect: Selection states remain independent.
     - expect: Delete Selected becomes disabled after the final deselection.
     - expect: No delete request occurs.
+
+**Implementation summary:** The test derives deletable visible rows from positive runtime `kaNlClase` IDs, verifies independent one-row and two-row checkbox states, confirms Delete Selected is enabled until the final deselection, and captures zero requests to `/actions/borrar`. The page-object checkbox helper now targets the native input that owns the stable `data-testid`. Focused Chromium verification passed: 1 test.
 
 ### 2. Validation and backend error contracts
 

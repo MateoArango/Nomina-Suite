@@ -153,8 +153,8 @@ export class RiesgosProfesionalesPage {
   }
 
   riskCheckbox(id: string | number): Locator {
-    return this.page.locator(
-      `bds-checkbox[data-testid="riesgos-profesionales-table-select-checkbox--${id}"] input[type="checkbox"]`,
+    return this.page.getByTestId(
+      `riesgos-profesionales-table-select-checkbox--${id}`,
     );
   }
 
