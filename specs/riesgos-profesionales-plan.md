@@ -192,7 +192,7 @@ Implementation-readiness notes:
     - expect: Cleanup succeeds even if an assertion fails.
     - expect: No pre-existing record is deleted.
 
-#### RP-010: Percentage above database precision is rejected without persistence
+#### ✅ RP-010: Percentage above database precision is rejected without persistence
 
 **File:** `tests/riesgosProfesionales/percentage-over-maximum.spec.ts`
 
@@ -204,6 +204,8 @@ Implementation-readiness notes:
     - expect: The assertion checks the stable status/code and a concise business-relevant message fragment, not a full Oracle stack trace.
   3. Reload and query /rows for the attempted code.
     - expect: No record was persisted.
+
+**Implementation summary:** The test derives an unused three-character code from the runtime `/rows` response, submits percentage 100 exactly once, and asserts the live rejection contract: HTTP 409, response code `CONFLICT`, the concise precision-error fragment, and the exact visible feedback `El porcentaje ingresado no puede ser superior al 100%`. It reloads from a response wait and verifies the attempted code is absent from the refreshed dataset. Focused Chromium verification passed: 1 test.
 
 #### RP-011: Class length boundary distinguishes accepted data from current server failure
 
