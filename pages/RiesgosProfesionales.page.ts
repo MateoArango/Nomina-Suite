@@ -32,6 +32,10 @@ export class RiesgosProfesionalesPage {
   readonly validationTitle: Locator;
   readonly validationMessage: Locator;
   readonly acknowledgeValidationButton: Locator;
+  readonly feedbackDialog: Locator;
+  readonly feedbackTitle: Locator;
+  readonly feedbackMessage: Locator;
+  readonly acknowledgeFeedbackButton: Locator;
 
   constructor(readonly page: Page) {
     const routeHost = page.getByTestId('app-shell-route-host');
@@ -119,6 +123,14 @@ export class RiesgosProfesionalesPage {
     this.validationMessage = this.validationDialog.locator(
       '.swal2-html-container',
     );
+    this.feedbackDialog = page.getByRole('dialog', { name: 'Riesgos' });
+    this.feedbackTitle = this.feedbackDialog.getByRole('heading', {
+      level: 2,
+    });
+    this.feedbackMessage = this.feedbackDialog.locator('.swal2-html-container');
+    this.acknowledgeFeedbackButton = this.feedbackDialog.getByRole('button', {
+      name: 'Aceptar',
+    });
   }
 
   riskRow(id: string | number): Locator {

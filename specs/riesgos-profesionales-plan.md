@@ -162,7 +162,7 @@ Implementation-readiness notes:
 
 **Implementation summary:** The test confirms the live `maxlength=3` attribute, types four characters through keyboard-style input and verifies truncation to three, exercises the empty, one-character, and three-character states, asserts the exact required-code validation feedback, and captures zero POST requests to `/actions/grabar`. Focused Chromium verification passed: 1 test.
 
-#### RP-008: Duplicate code is rejected on create without adding a row
+#### ✅ RP-008: Duplicate code is rejected on create without adding a row
 
 **File:** `tests/riesgosProfesionales/duplicate-code-create.spec.ts`
 
@@ -175,6 +175,8 @@ Implementation-readiness notes:
     - expect: The count of records with that code remains exactly one.
   3. Reload the page and re-read /rows.
     - expect: No duplicate row was persisted.
+
+**Implementation summary:** The test selects a unique existing code from the runtime `/rows` response, submits it once in create mode with otherwise valid fields, and asserts the live duplicate contract: HTTP 409, response code `CONFLICT`, and the exact visible feedback `Ya existe un registro con esos datos.` It verifies the matching API record count remains one immediately after rejection and after a fresh reload. Focused Chromium verification passed: 1 test.
 
 #### RP-009: Percentage accepted boundaries persist exactly
 
