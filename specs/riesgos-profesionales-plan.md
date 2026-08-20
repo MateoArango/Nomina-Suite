@@ -148,10 +148,10 @@ Implementation-readiness notes:
 
 **Implementation summary:** The test exercises the missing-code, missing-class, and missing-percentage branches independently, asserts the exact live `Riesgos` alert message for each branch, captures zero POST requests to `/actions/grabar`, verifies the visible grid count remains unchanged, and proves Cancel restores a blank form between cases. Focused Chromium verification passed: 1 test.
 
-#### RP-007: Code input enforces its three-character UI boundary
+#### ✅ RP-007: Code input enforces its three-character UI boundary
 
 **File:** `tests/riesgosProfesionales/code-length-boundary.spec.ts`
-What's the plan for avoid send request when the code is one character, two or three characters?
+
 **Steps:**
   1. Click New and fill the Code input with four characters.
     - expect: The input retains at most three characters, matching the live maxlength=3 contract.
@@ -159,6 +159,8 @@ What's the plan for avoid send request when the code is one character, two or th
     - expect: One and three characters are accepted by the control.
     - expect: Empty code remains subject to the required-field validation.
     - expect: No save request is sent during this UI-boundary test.
+
+**Implementation summary:** The test confirms the live `maxlength=3` attribute, types four characters through keyboard-style input and verifies truncation to three, exercises the empty, one-character, and three-character states, asserts the exact required-code validation feedback, and captures zero POST requests to `/actions/grabar`. Focused Chromium verification passed: 1 test.
 
 #### RP-008: Duplicate code is rejected on create without adding a row
 
