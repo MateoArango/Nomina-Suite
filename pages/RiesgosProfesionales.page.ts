@@ -28,6 +28,10 @@ export class RiesgosProfesionalesPage {
   readonly nextActivityPageButton: Locator;
   readonly acceptActivityButton: Locator;
   readonly cancelActivityButton: Locator;
+  readonly validationDialog: Locator;
+  readonly validationTitle: Locator;
+  readonly validationMessage: Locator;
+  readonly acknowledgeValidationButton: Locator;
 
   constructor(readonly page: Page) {
     const routeHost = page.getByTestId('app-shell-route-host');
@@ -102,6 +106,18 @@ export class RiesgosProfesionalesPage {
     );
     this.cancelActivityButton = page.getByTestId(
       'riesgos-profesionales-actividad-modal-cancel-button',
+    );
+    this.acknowledgeValidationButton = page.getByTestId(
+      'riesgos-profesionales-validation-acknowledge-button',
+    );
+    this.validationDialog = this.acknowledgeValidationButton.locator(
+      'xpath=ancestor::*[@role="dialog"][1]',
+    );
+    this.validationTitle = this.validationDialog.getByRole('heading', {
+      level: 2,
+    });
+    this.validationMessage = this.validationDialog.locator(
+      '.swal2-html-container',
     );
   }
 

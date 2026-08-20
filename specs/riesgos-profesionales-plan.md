@@ -134,7 +134,7 @@ Implementation-readiness notes:
 
 **Seed:** `tests/riesgosProfesionales/seed-test.spec.ts`
 
-#### RP-006: Required fields block save in validation order
+#### ✅ RP-006: Required fields block save in validation order
 
 **File:** `tests/riesgosProfesionales/required-fields.spec.ts`
 
@@ -146,10 +146,12 @@ Implementation-readiness notes:
   2. Dismiss each alert and reset with Cancel before the next case.
     - expect: Each case starts from a blank create form and is independent of the previous case.
 
+**Implementation summary:** The test exercises the missing-code, missing-class, and missing-percentage branches independently, asserts the exact live `Riesgos` alert message for each branch, captures zero POST requests to `/actions/grabar`, verifies the visible grid count remains unchanged, and proves Cancel restores a blank form between cases. Focused Chromium verification passed: 1 test.
+
 #### RP-007: Code input enforces its three-character UI boundary
 
 **File:** `tests/riesgosProfesionales/code-length-boundary.spec.ts`
-
+What's the plan for avoid send request when the code is one character, two or three characters?
 **Steps:**
   1. Click New and fill the Code input with four characters.
     - expect: The input retains at most three characters, matching the live maxlength=3 contract.
