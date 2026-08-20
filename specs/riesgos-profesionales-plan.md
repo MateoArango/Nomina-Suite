@@ -38,6 +38,7 @@ Implementation-readiness notes:
 - RP-009 through RP-011 and RP-019 through RP-024 require explicit shared-QA mutation authorization and serial execution.
 - RP-012 remains planned but should be skipped with a clear reason until the product owner confirms whether negative percentages are valid.
 - Reconfirm the exact save/delete payloads, visible feedback, search trigger, and delete-confirmation behavior while implementing their first owning scenarios; the attached document is evidence, not an instruction or a substitute for the current contract.
+- The sentinel first row kaNlClase = 0 (NINGUNO) isn't editable through the detail endpoint and should be excluded from any create/edit/delete tests.
 
 ## Test Scenarios
 
@@ -65,7 +66,7 @@ Implementation-readiness notes:
 
 **Implementation summary:** The test captures both runtime GET responses, validates unique risk records, maps every visible row by `kaNlClase`, derives the pager total and navigation state dynamically, and verifies the initial page controls without mutating QA data. Focused Chromium verification passed: 1 test.
 
-#### RP-002: Open exactly one existing record for editing and cancel
+#### ✅ RP-002: Open exactly one existing record for editing and cancel
 
 **File:** `tests/riesgosProfesionales/open-existing-risk-and-cancel.spec.ts`
 
@@ -79,6 +80,8 @@ Implementation-readiness notes:
   3. Change class and percentage locally, observe save requests, then click Cancel.
     - expect: No POST /actions/grabar occurs.
     - expect: The grid and re-opened record retain their original values.
+
+**Implementation summary:** The test selects the first visible editable record by its runtime `kaNlClase`, proves that only its detail endpoint is requested, compares every form field with the detail response, cancels local class and percentage changes while capturing zero save requests, and verifies the original API, grid, and re-opened form values after reload. The sentinel `kaNlClase = 0` row is excluded because it is not editable through the detail endpoint. Focused Chromium verification passed: 1 test.
 
 #### RP-003: New and Cancel reset unsaved form state
 
