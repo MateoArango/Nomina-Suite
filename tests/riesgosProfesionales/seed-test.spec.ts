@@ -2,7 +2,11 @@ import { expect, test } from '../fixtures/auth.fixture';
 
 test('Seed Test', async ({ page }) => {
   await page.goto('https://nomina-qa.adacsc.co/riesgos-profesionales');
-  await expect(page.getByTestId('app-shell-route-host').getByText('Riesgos Profesionales')).toBeVisible();
+  await expect(
+    page
+      .getByTestId('app-shell-route-host')
+      .getByText('Riesgos Profesionales', { exact: true }),
+  ).toBeVisible();
   await expect(page.locator('bds-button').filter({ hasText: 'Borrar seleccionados' })).toBeVisible();
   await expect(page.getByTestId('riesgos-profesionales-topbar-cancel-button')).toBeVisible();
   await expect(page.getByTestId('riesgos-profesionales-topbar-save-button')).toBeVisible();

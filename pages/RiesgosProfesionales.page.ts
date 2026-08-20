@@ -3,6 +3,12 @@ import type { Locator, Page } from '@playwright/test';
 type PageSize = 10 | 25 | 50 | 100;
 
 export class RiesgosProfesionalesPage {
+  readonly heading: Locator;
+  readonly toolbar: Locator;
+  readonly form: Locator;
+  readonly riskTable: Locator;
+  readonly pager: Locator;
+  readonly pagerSummary: Locator;
   readonly createButton: Locator;
   readonly saveButton: Locator;
   readonly cancelButton: Locator;
@@ -24,9 +30,15 @@ export class RiesgosProfesionalesPage {
   readonly cancelActivityButton: Locator;
 
   constructor(readonly page: Page) {
+    const routeHost = page.getByTestId('app-shell-route-host');
+
+    this.heading = routeHost.getByText('Riesgos Profesionales', {
+      exact: true,
+    });
     this.createButton = page.getByTestId(
       'riesgos-profesionales-topbar-create-button',
     );
+    this.toolbar = this.createButton.locator('xpath=ancestor::bds-top-bar');
     this.saveButton = page.getByTestId(
       'riesgos-profesionales-topbar-save-button',
     );
@@ -38,6 +50,9 @@ export class RiesgosProfesionalesPage {
     );
     this.codeInput = page.getByTestId(
       'riesgos-profesionales-form-codigo-input',
+    );
+    this.form = this.codeInput.locator(
+      'xpath=ancestor::div[contains(concat(" ", normalize-space(@class), " "), " card-content ")][1]',
     );
     this.classInput = page.getByTestId(
       'riesgos-profesionales-form-clase-input',
@@ -57,6 +72,13 @@ export class RiesgosProfesionalesPage {
     this.nextPageButton = page.getByTestId(
       'riesgos-profesionales-table-next-page-button',
     );
+    this.riskTable = routeHost.locator(
+      'table[data-testid-pager-prefix="riesgos-profesionales-table"]',
+    );
+    this.pager = this.previousPageButton.locator(
+      'xpath=ancestor::div[contains(concat(" ", normalize-space(@class), " "), " erp-table-pager ")][1]',
+    );
+    this.pagerSummary = this.pager.locator('.erp-table-pager__summary');
     this.activityModal = page.getByTestId(
       'riesgos-profesionales-actividad-modal-panel',
     );
@@ -87,6 +109,41 @@ export class RiesgosProfesionalesPage {
     return this.page.getByTestId(
       `riesgos-profesionales-table-riesgo-row--${id}`,
     );
+  }
+
+  visibleRiskRows(): Locator {
+    return this.riskTable.locator(
+      'tbody tr[data-testid^="riesgos-profesionales-table-riesgo-row--"]',
+    );
+  }
+
+  async readPagerRange(): Promise<{
+    start: number;
+    end: number;
+    total: number;
+  }> {
+    const summary = (await this.pagerSummary.textContent())?.trim() ?? '';
+    const match = summary.match(/^(\d+)-(\d+) de (\d+)$/);
+
+    if (!match) {
+      throw new Error(`Unexpected occupational-risks pager summary: "${summary}"`);
+    }
+
+    return {
+      start: Number(match[1]),
+      end: Number(match[2]),
+      total: Number(match[3]),
+    };
+  }
+
+  async selectedPageSize(): Promise<PageSize> {
+    for (const size of [10, 25, 50, 100] as const) {
+      if ((await this.pageSizeButton(size).getAttribute('aria-pressed')) === 'true') {
+        return size;
+      }
+    }
+
+    throw new Error('No occupational-risks page size is selected');
   }
 
   riskCheckbox(id: string | number): Locator {

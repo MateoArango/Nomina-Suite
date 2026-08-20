@@ -45,7 +45,7 @@ Implementation-readiness notes:
 
 **Seed:** `tests/riesgosProfesionales/seed-test.spec.ts`
 
-#### RP-001: Load the occupational-risks page from runtime API data
+#### ✅ RP-001: Load the occupational-risks page from runtime API data
 
 **File:** `tests/riesgosProfesionales/initial-grid-state.spec.ts`
 
@@ -62,6 +62,8 @@ Implementation-readiness notes:
     - expect: Delete Selected is disabled with no selection.
     - expect: Previous is disabled on the first page.
     - expect: Next is enabled only when the runtime total exceeds the selected page size.
+
+**Implementation summary:** The test captures both runtime GET responses, validates unique risk records, maps every visible row by `kaNlClase`, derives the pager total and navigation state dynamically, and verifies the initial page controls without mutating QA data. Focused Chromium verification passed: 1 test.
 
 #### RP-002: Open exactly one existing record for editing and cancel
 
