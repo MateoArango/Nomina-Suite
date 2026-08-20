@@ -253,7 +253,7 @@ Implementation-readiness notes:
 
 **Implementation summary:** The test captures the runtime activity lookup, validates unique `kaNlActividad` records, maps the visible rows to `scCodActividad` and `ssActividad`, derives the pager total dynamically, verifies the modal controls, and confirms Cancel leaves the original activity value unchanged. Focused Chromium verification passed: 1 test.
 
-#### RP-014: Activity selection is single-select and Accept applies the latest choice
+#### ✅ RP-014: Activity selection is single-select and Accept applies the latest choice
 
 **File:** `tests/riesgosProfesionales/activity-single-select-accept.spec.ts`
 
@@ -265,6 +265,8 @@ Implementation-readiness notes:
     - expect: The read-only main activity field shows the latest activity, not the first one.
   3. Click Cancel on the main form.
     - expect: No save request occurs and no record is created.
+
+**Implementation summary:** The test selects two visible activities derived from the runtime lookup, proves that only the latest row keeps the `current` state, accepts that row and verifies its full code-description value in the read-only field, then cancels the main form while asserting zero save requests and an unchanged runtime risk-ID set. Focused Chromium verification passed: 1 test.
 
 #### RP-015: Activity Cancel and Close discard a pending selection
 
