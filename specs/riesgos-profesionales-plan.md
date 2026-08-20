@@ -83,7 +83,7 @@ Implementation-readiness notes:
 
 **Implementation summary:** The test selects the first visible editable record by its runtime `kaNlClase`, proves that only its detail endpoint is requested, compares every form field with the detail response, cancels local class and percentage changes while capturing zero save requests, and verifies the original API, grid, and re-opened form values after reload. The sentinel `kaNlClase = 0` row is excluded because it is not editable through the detail endpoint. Focused Chromium verification passed: 1 test.
 
-#### RP-003: New and Cancel reset unsaved form state
+#### ✅ RP-003: New and Cancel reset unsaved form state
 
 **File:** `tests/riesgosProfesionales/new-and-cancel-reset-form.spec.ts`
 
@@ -96,6 +96,8 @@ Implementation-readiness notes:
     - expect: The unsaved values are discarded.
   3. Re-open the original row.
     - expect: Its persisted values are unchanged.
+
+**Implementation summary:** The test selects a visible editable record by its runtime `kaNlClase`, changes every form field without saving, and proves that New clears the form into its default create state. It then enters a second unsaved dataset, captures zero POST requests to `/actions/grabar` when Cancel is clicked, and re-opens the original row to verify its API, form, and grid values remain unchanged. Focused Chromium verification passed: 1 test.
 
 #### RP-004: Main-grid page sizes and navigation boundaries
 
