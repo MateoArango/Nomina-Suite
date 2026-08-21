@@ -343,7 +343,7 @@ Implementation-readiness notes:
 
 **Implementation summary:** The test derives an unused worker-safe code and activity from runtime APIs, asserts the single create request and complete persisted detail by returned ID, then deletes only that ID while proving the delete payload excludes every baseline record. Focused Chromium verification passed: 1 test.
 
-#### RP-019: Save again without New updates the same record
+#### ✅ RP-019: Save again without New updates the same record
 
 **File:** `tests/riesgosProfesionales/repeated-save-updates-current-record.spec.ts`
 
@@ -358,6 +358,8 @@ Implementation-readiness notes:
     - expect: No paginator total, range, order, or row-position assertion is made.
   4. Delete the disposable record and verify its ID is absent from a fresh /rows response.
     - expect: Cleanup removes the test-owned mutation without relying on a global total.
+
+**Implementation summary:** The test creates one runtime-coded disposable record, saves a percentage change again without clicking New, and proves the second request targets the original `kaNlClase` while preserving its code, class, and activity. A fresh `/rows` response contains exactly one matching ID/code with the updated percentage, and failure-safe cleanup deletes every test-owned ID with no baseline ID in the payload. Focused Chromium verification passed: 1 test.
 
 #### RP-020: Edit with unchanged code persists other fields and can be restored
 
