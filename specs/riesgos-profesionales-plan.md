@@ -179,7 +179,7 @@ Implementation-readiness notes:
 
 **Implementation summary:** The test selects a unique existing code from the runtime `/rows` response, submits it once in create mode with otherwise valid fields, and asserts the live duplicate contract: HTTP 409, response code `CONFLICT`, and the exact visible feedback `Ya existe un registro con esos datos.` It verifies the matching API record count remains one immediately after rejection and after a fresh reload. Focused Chromium verification passed: 1 test.
 
-#### RP-009: Percentage accepted boundaries persist exactly
+#### ✅ RP-009: Percentage accepted boundaries persist exactly
 
 **File:** `tests/riesgosProfesionales/percentage-accepted-boundaries.spec.ts`
 
@@ -193,6 +193,8 @@ Implementation-readiness notes:
   3. Delete only the records created by this test, fetch /rows again, and verify their IDs are absent.
     - expect: Cleanup succeeds even if an assertion fails.
     - expect: No pre-existing record is deleted.
+
+**Implementation summary:** The test creates three disposable runtime-coded records for percentages `0`, `0.522`, and `99.999`, verifies each successful save payload and exact persisted numeric value, reloads and rechecks every record by its returned ID and unique code, then confirms one ID-scoped delete operation in `finally` and proves all test-owned IDs are absent. Focused Chromium verification passed: 1 test.
 
 #### ✅ RP-010: Percentage above database precision is rejected without persistence
 
