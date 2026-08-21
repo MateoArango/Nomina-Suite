@@ -294,7 +294,7 @@ Implementation-readiness notes:
 
 **Implementation summary:** The test derives the first visible activity from the runtime lookup by its stable `kaNlActividad`, double-clicks that row without using Accept, verifies the side sheet closes and the read-only field shows the runtime code-description value, then cancels the main form while asserting zero save requests and an unchanged runtime risk-ID set. Focused Chromium verification passed: 1 test.
 
-#### RP-017: Activity search handles matches, duplicates, and no-results
+#### ✅ RP-017: Activity search handles matches, duplicates, and no-results
 
 **File:** `tests/riesgosProfesionales/activity-search.spec.ts`
 
@@ -308,6 +308,8 @@ Implementation-readiness notes:
     - expect: A clear empty result is shown, navigation controls reflect zero/one-page state, and Accept cannot apply a nonexistent activity.
   4. Clear search.
     - expect: The full runtime total and first-page results return.
+
+**Implementation summary:** The test derives selective, duplicate-code, and absent search values from the runtime activity lookup, validates filtered rows and pager totals, distinguishes duplicate displayed codes through stable `kaNlActividad` row IDs, verifies the no-results message with hidden navigation and disabled Accept, and confirms clearing search restores the original first page and full total. Focused Chromium verification passed: 1 test.
 
 ### 4. CRUD persistence and safe deletion
 
