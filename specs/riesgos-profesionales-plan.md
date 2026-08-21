@@ -227,7 +227,7 @@ Implementation-readiness notes:
 
 **Implementation summary:** The test derives two unused runtime codes, proves that a 50-character class persists exactly for the returned ID, and confirms that 51 characters produces the current HTTP 503 response with stable `value too large` API/UI fragments and no persisted row. Failure-safe cleanup selects only test-owned runtime IDs, confirms the ID-scoped delete payload, and verifies both disposable codes are absent. The raw `ORA-12899` database feedback and 503 mapping remain a product gap. Focused Chromium verification passed: 1 test.
 
-#### RP-012: Negative percentage captures observed behavior as a product contract decision
+#### ✅⏸️ RP-012: Negative percentage captures observed behavior as a product contract decision
 
 **File:** `tests/riesgosProfesionales/negative-percentage-contract.spec.ts`
 
@@ -240,6 +240,8 @@ Implementation-readiness notes:
     - expect: No paginator total, range, order, or row-position assertion is made.
   3. If the record was created, delete it by its returned/runtime ID and verify absence in a fresh /rows response.
     - expect: The test-owned mutation is removed without relying on a global total.
+
+**Implementation summary:** The test derives an unused runtime code in the N00-NZZ range and covers the currently observed acceptance contract with an exact -10 save payload, fresh /rows persistence verification, and failure-safe ID-scoped cleanup. It remains explicitly skipped until the product owner confirms whether negative percentages are valid, so focused Chromium verification reported 1 skipped test and performed no shared-QA mutation.
 
 ### 3. Activity lookup and modal behavior
 
