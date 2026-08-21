@@ -211,7 +211,7 @@ Implementation-readiness notes:
 
 **Implementation summary:** The test derives an unused three-character code from the runtime `/rows` response, submits percentage 100 exactly once, and asserts the live rejection contract: HTTP 409, response code `CONFLICT`, the concise precision-error fragment, and the exact visible feedback `El porcentaje ingresado no puede ser superior al 100%`. It reloads from a response wait and verifies the attempted code is absent from the refreshed dataset. Focused Chromium verification passed: 1 test.
 
-#### RP-011: Class length boundary distinguishes accepted data from current server failure
+#### ✅ RP-011: Class length boundary distinguishes accepted data from current server failure
 
 **File:** `tests/riesgosProfesionales/class-length-boundary.spec.ts`
 
@@ -224,6 +224,8 @@ Implementation-readiness notes:
     - expect: A fresh /rows response contains no record with the rejected test-owned code; no paginator assertion is made.
   3. Delete the accepted disposable record and verify through a fresh /rows response that its ID is absent.
     - expect: Only test-owned data is removed.
+
+**Implementation summary:** The test derives two unused runtime codes, proves that a 50-character class persists exactly for the returned ID, and confirms that 51 characters produces the current HTTP 503 response with stable `value too large` API/UI fragments and no persisted row. Failure-safe cleanup selects only test-owned runtime IDs, confirms the ID-scoped delete payload, and verifies both disposable codes are absent. The raw `ORA-12899` database feedback and 503 mapping remain a product gap. Focused Chromium verification passed: 1 test.
 
 #### RP-012: Negative percentage captures observed behavior as a product contract decision
 

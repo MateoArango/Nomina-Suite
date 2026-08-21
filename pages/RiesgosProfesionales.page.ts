@@ -36,6 +36,7 @@ export class RiesgosProfesionalesPage {
   readonly feedbackTitle: Locator;
   readonly feedbackMessage: Locator;
   readonly acknowledgeFeedbackButton: Locator;
+  readonly deleteConfirmButton: Locator;
 
   constructor(readonly page: Page) {
     const routeHost = page.getByTestId('app-shell-route-host');
@@ -131,6 +132,9 @@ export class RiesgosProfesionalesPage {
     this.acknowledgeFeedbackButton = this.feedbackDialog.getByRole('button', {
       name: 'Aceptar',
     });
+    this.deleteConfirmButton = page.getByTestId(
+      'riesgos-profesionales-delete-confirm-button',
+    );
   }
 
   riskRow(id: string | number): Locator {
