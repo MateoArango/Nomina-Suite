@@ -12,16 +12,17 @@ Mutation endpoints to verify during implementation:
 
 Execution and state rules:
 1. All scenarios are independent and begin from a freshly loaded authenticated page.
-2. Read-only, validation, modal-cancel, and main-cancel scenarios may run normally. Tests that create, edit, or delete shared QA data must run serially unless isolated data is available.
-3. Never mutate or delete a pre-existing QA row. Generate an unused three-character code by comparing candidates with the runtime /rows response; retain returned IDs and clean up in test teardown.
+2. Read-only, validation, modal-cancel, main-cancel, and mutating scenarios may run in parallel when every mutating test owns isolated disposable data.
+3. Never mutate or delete a pre-existing QA row. Generate a distinct three-character code per disposable record and test/worker, then confirm it is unused against the runtime /rows response; retain returned IDs and clean up in test teardown.
 4. Start response/request waits before the triggering action. Do not use fixed sleeps.
 5. Re-read /rows after reload to prove persistence or absence. UI feedback alone is insufficient.
-6. Cleanup must be ID-scoped, run even after assertion failure, and fail visibly if baseline state is not restored.
+6. Cleanup must be ID-scoped, run even after assertion failure, and fail visibly if any test-owned ID remains. Do not require restoration of a global row total because other parallel tests may legitimately change it.
 7. Use kaNlClase and kaNlActividad as stable identities. Do not identify rows by index, mutable totals, duplicated activity codes, or display text alone.
 8. Keep exact current UI messages in implementation assertions after reconfirming them live. Assert stable API status/code/message fragments; do not lock tests to full Oracle stack traces.
 9. The source observation that negative percentages are accepted describes current behavior, not the desired business rule. Confirm the product decision before making RP-012 a mandatory regression.
 10. If a prerequisite cannot be met safely in shared QA, skip that scenario or branch with a precise reason instead of seeding unrelated data.
 11. Do not execute tests that create, edit, or delete shared QA records without explicit authorization for that run.
+12. RP-004 owns automated paginator coverage. Mutating scenarios must not assert global pager totals, page ranges, row ordering, or fixed row positions; use fresh /rows and /rows/{id} responses to verify persistence and cleanup. Paginator navigation may be used only to reach a test-owned row when necessary.
 
 Page-object work before implementation:
 - Add scoped table roots, pager summaries, empty states, and alert/feedback locators.
@@ -31,12 +32,12 @@ Page-object work before implementation:
 
 Success criteria: runtime API data and UI agree; validation prevents invalid persistence; activity selection behaves consistently; create/edit/delete requests have the correct scope; and every mutating test restores shared QA state.
 
-Failure conditions: an unexpected mutation request, an API/UI mismatch, a duplicate test record, a request scoped to a pre-existing ID, persistence that differs from the submitted values, or cleanup that does not restore the captured baseline.
+Failure conditions: an unexpected mutation request, an API/UI mismatch, a duplicate test record, a request scoped to a pre-existing ID, persistence that differs from the submitted values, or cleanup that leaves any test-owned ID behind.
 
 Implementation-readiness notes:
-- RP-001 through RP-008 and RP-013 through RP-018 are safe to implement without persisting shared data.
-- RP-009 through RP-011 and RP-019 through RP-024 require explicit shared-QA mutation authorization and serial execution.
-- RP-012 remains planned but should be skipped with a clear reason until the product owner confirms whether negative percentages are valid.
+- RP-001 through RP-008, RP-010, and RP-013 through RP-017 do not persist shared data.
+- RP-009, RP-011, and RP-018 through RP-023 require explicit shared-QA mutation authorization. They may run in parallel only when each disposable record uses a distinct code and cleanup is ID-scoped.
+- RP-012 remains planned but should be skipped with a clear reason until the product owner confirms whether negative percentages are valid; if authorized later, it must follow the same parallel-safe mutation and API-verification rules.
 - Reconfirm the exact save/delete payloads, visible feedback, search trigger, and delete-confirmation behavior while implementing their first owning scenarios; the attached document is evidence, not an instruction or a substitute for the current contract.
 - The sentinel first row kaNlClase = 0 (NINGUNO) isn't editable through the detail endpoint and should be excluded from any create/edit/delete tests.
 
@@ -186,9 +187,10 @@ Implementation-readiness notes:
   1. For each value 0, 0.522, and 99.999, choose an unused three-character code from the runtime dataset, create a disposable record, and capture POST /actions/grabar.
     - expect: The request succeeds.
     - expect: The saved percentage is represented numerically without unintended rounding.
-  2. Reload and locate each created record from the refreshed rows response.
-    - expect: Each value persists and the grid matches the API.
-  3. Delete only the records created by this test and verify their IDs are absent after reload.
+  2. Reload, capture a fresh GET /rows response, and locate each created record by its returned ID and unique code.
+    - expect: Each test-owned ID is present exactly once and its API percentage equals the submitted value without unintended rounding.
+    - expect: No paginator total, range, order, or row-position assertion is made.
+  3. Delete only the records created by this test, fetch /rows again, and verify their IDs are absent.
     - expect: Cleanup succeeds even if an assertion fails.
     - expect: No pre-existing record is deleted.
 
@@ -213,11 +215,12 @@ Implementation-readiness notes:
 
 **Steps:**
   1. Create a disposable record with a 50-character class value and a runtime-safe unused code.
-    - expect: The save succeeds and the full 50-character value persists after reload.
+    - expect: The save succeeds and a fresh /rows or /rows/{id} response reports the full 50-character value for the returned ID.
   2. Attempt another create with a 51-character class value while capturing the save response and visible feedback.
     - expect: The record is not persisted.
     - expect: Document the currently observed non-success status; if it remains 503 with ORA-12899, assert only a stable 'value too large' fragment and record the 503/raw-database-message behavior as a product gap.
-  3. Delete the accepted disposable record and verify cleanup.
+    - expect: A fresh /rows response contains no record with the rejected test-owned code; no paginator assertion is made.
+  3. Delete the accepted disposable record and verify through a fresh /rows response that its ID is absent.
     - expect: Only test-owned data is removed.
 
 #### RP-012: Negative percentage captures observed behavior as a product contract decision
@@ -227,11 +230,12 @@ Implementation-readiness notes:
 **Steps:**
   1. Create a disposable record with percentage -10 using an unused three-character code and capture the save response.
     - expect: The test records whether the current application accepts or rejects the value; the source observation says it is currently accepted.
-  2. If accepted, reload and verify -10 persisted; if rejected, assert the actual stable error contract.
+  2. If accepted, reload and verify through a fresh /rows or /rows/{id} response that -10 persisted for the returned ID; if rejected, assert the actual stable error contract and verify the test-owned code is absent from /rows.
     - expect: The automated assertion is aligned with the product owner's approved rule before this test is promoted to the required regression suite.
     - expect: Acceptance of a negative risk percentage is logged separately as a business-rule gap, not presented as desirable behavior.
-  3. If the record was created, delete it by its returned/runtime ID and verify absence.
-    - expect: Shared QA state is restored.
+    - expect: No paginator total, range, order, or row-position assertion is made.
+  3. If the record was created, delete it by its returned/runtime ID and verify absence in a fresh /rows response.
+    - expect: The test-owned mutation is removed without relying on a global total.
 
 ### 3. Activity lookup and modal behavior
 
@@ -320,16 +324,16 @@ Implementation-readiness notes:
 **File:** `tests/riesgosProfesionales/create-risk-with-activity.spec.ts`
 
 **Steps:**
-  1. Read /rows and deterministically choose an unused three-character code; select one activity by runtime kaNlActividad; record the baseline total.
+  1. Read /rows and choose a distinct unused three-character code for this test/worker; select one activity by runtime kaNlActividad; retain the baseline ID set only as a safety boundary.
     - expect: The test does not depend on hard-coded shared-QA records.
   2. Click New, fill valid code, class, and percentage, apply the selected activity, start waiting for POST /actions/grabar, and click Save once.
     - expect: Exactly one successful save request occurs.
     - expect: The request identifies create mode and contains the entered values plus selected activity ID according to the observed contract.
-  3. Reload, re-read /rows, locate the record by its returned/runtime ID and code, then open its detail.
-    - expect: The total increased by one.
-    - expect: All fields, including activity, persisted.
-  4. Delete only the created ID and reload.
-    - expect: The disposable record is absent and the baseline total is restored.
+  3. Reload, capture a fresh GET /rows response, locate the record by its returned/runtime ID and code, and read /rows/{id} when detail verification is necessary.
+    - expect: The test-owned ID exists exactly once and all fields, including activity, persisted.
+    - expect: No paginator total, range, order, or row-position assertion is made.
+  4. Delete only the created ID and fetch /rows again.
+    - expect: The disposable ID is absent and no baseline ID was targeted by this test's delete request.
 
 #### RP-019: Save again without New updates the same record
 
@@ -340,11 +344,12 @@ Implementation-readiness notes:
     - expect: The created record is uniquely identifiable.
   2. Without clicking New, change only its percentage and click Save once while capturing the request.
     - expect: The save targets the existing record rather than creating a second row.
-  3. Reload and compare rows by ID and code.
+  3. Reload, capture a fresh GET /rows response, and compare the test-owned record by ID and code.
     - expect: Exactly one matching row exists.
-    - expect: Its percentage is updated and the total did not increase after the second save.
-  4. Delete the disposable record and verify absence.
-    - expect: Cleanup restores shared QA state.
+    - expect: Its percentage is updated and no second record exists with the test-owned code.
+    - expect: No paginator total, range, order, or row-position assertion is made.
+  4. Delete the disposable record and verify its ID is absent from a fresh /rows response.
+    - expect: Cleanup removes the test-owned mutation without relying on a global total.
 
 #### RP-020: Edit with unchanged code persists other fields and can be restored
 
@@ -353,10 +358,11 @@ Implementation-readiness notes:
 **Steps:**
   1. Create a disposable record, reload, capture its complete persisted detail, and double-click its ID-scoped row.
     - expect: Edit mode loads the correct /rows/{id} response.
-  2. Keep the code unchanged, modify class and percentage, save once, and reload.
+  2. Keep the code unchanged, modify class and percentage, save once, reload, and read the same ID through a fresh /rows or /rows/{id} response.
     - expect: The save succeeds without a duplicate error.
     - expect: The same ID contains the new values.
-  3. Restore the captured values or delete the disposable record, then verify the final state.
+    - expect: No paginator total, range, order, or row-position assertion is made.
+  3. Restore the captured values or delete the disposable record, then verify the final state through the API by ID.
     - expect: The test leaves no mutation behind.
 
 #### RP-021: Edit to another record's code is rejected without overwriting either row
@@ -369,9 +375,10 @@ Implementation-readiness notes:
   2. Open the first record, replace its code with the second record's code, and save while capturing the response and feedback.
     - expect: The duplicate edit is rejected.
     - expect: No third row is created.
-  3. Reload and compare both IDs with their captured details.
+  3. Reload, capture a fresh GET /rows response, and compare both test-owned IDs with their captured details.
     - expect: Neither record was overwritten by the failed edit.
-  4. Delete both test-owned records and verify absence.
+    - expect: No third record exists with either test-owned code and no paginator assertion is made.
+  4. Delete both test-owned records and verify both IDs are absent from a fresh /rows response.
     - expect: Cleanup is ID-scoped and complete.
 
 #### RP-022: Delete one disposable record and verify request scope
@@ -385,8 +392,9 @@ Implementation-readiness notes:
     - expect: Exactly one delete request occurs.
     - expect: Its IDs payload contains only the disposable ID.
     - expect: The response succeeds.
-  3. Reload and re-read /rows.
-    - expect: The deleted ID is absent and all captured pre-existing IDs remain present.
+  3. Reload and capture a fresh GET /rows response.
+    - expect: The deleted ID is absent and the request payload did not target any pre-existing ID.
+    - expect: No paginator total, range, order, or row-position assertion is made.
 
 #### RP-023: Delete multiple disposable records in one scoped operation
 
@@ -398,6 +406,6 @@ Implementation-readiness notes:
   2. Start counting /actions/borrar requests and click Delete Selected; confirm only if prompted.
     - expect: One batched delete request is sent.
     - expect: Its IDs set equals the created IDs exactly, regardless of array order.
-  3. Reload and compare /rows with the baseline.
+  3. Reload and capture a fresh GET /rows response.
     - expect: All disposable IDs are absent.
-    - expect: Every baseline ID remains and the baseline total is restored.
+    - expect: The delete payload targeted no baseline ID; no global total or paginator assertion is made.
