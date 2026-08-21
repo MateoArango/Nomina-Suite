@@ -268,7 +268,7 @@ Implementation-readiness notes:
 
 **Implementation summary:** The test selects two visible activities derived from the runtime lookup, proves that only the latest row keeps the `current` state, accepts that row and verifies its full code-description value in the read-only field, then cancels the main form while asserting zero save requests and an unchanged runtime risk-ID set. Focused Chromium verification passed: 1 test.
 
-#### RP-015: Activity Cancel and Close discard a pending selection
+#### ✅ RP-015: Activity Cancel and Close discard a pending selection
 
 **File:** `tests/riesgosProfesionales/activity-dismiss-selection.spec.ts`
 
@@ -278,6 +278,8 @@ Implementation-readiness notes:
   2. Repeat with the Close control in the modal header.
     - expect: Close has the same discard behavior as Cancel.
     - expect: No save request occurs.
+
+**Implementation summary:** The test captures the original main activity value, selects distinct runtime activity rows before dismissing the modal through Cancel and the header Close control, verifies both paths move the side sheet outside the viewport without applying either pending selection, and asserts that no save request is sent. Focused Chromium verification passed: 1 test.
 
 #### RP-016: Double-clicking an activity applies it directly
 
