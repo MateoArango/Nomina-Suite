@@ -281,7 +281,7 @@ Implementation-readiness notes:
 
 **Implementation summary:** The test captures the original main activity value, selects distinct runtime activity rows before dismissing the modal through Cancel and the header Close control, verifies both paths move the side sheet outside the viewport without applying either pending selection, and asserts that no save request is sent. Focused Chromium verification passed: 1 test.
 
-#### RP-016: Double-clicking an activity applies it directly
+#### ✅ RP-016: Double-clicking an activity applies it directly
 
 **File:** `tests/riesgosProfesionales/activity-double-click.spec.ts`
 
@@ -291,6 +291,8 @@ Implementation-readiness notes:
     - expect: The main activity field reflects the double-clicked activity.
   2. Cancel the main form.
     - expect: No record is persisted.
+
+**Implementation summary:** The test derives the first visible activity from the runtime lookup by its stable `kaNlActividad`, double-clicks that row without using Accept, verifies the side sheet closes and the read-only field shows the runtime code-description value, then cancels the main form while asserting zero save requests and an unchanged runtime risk-ID set. Focused Chromium verification passed: 1 test.
 
 #### RP-017: Activity search handles matches, duplicates, and no-results
 
