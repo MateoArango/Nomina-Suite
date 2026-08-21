@@ -1,7 +1,6 @@
 // spec: specs/riesgos-profesionales-plan.md
 // seed: tests/riesgosProfesionales/seed-test.spec.ts
 
-import type { Request } from "@playwright/test";
 import { expect, test } from "../fixtures/auth.fixture";
 import { RiesgosProfesionalesPage } from "../../pages/RiesgosProfesionales.page";
 
@@ -27,15 +26,16 @@ const deleteUrl =
   "https://nomina-qa-api.adacsc.co/api/v1/w-riesgos-profesionales/actions/borrar";
 
 test.describe("CRUD persistence and safe deletion", () => {
-  test("RP-019: A second Save updates the existing record without creating a duplicate", async ({
+  test("RP-020: Edit with unchanged code persists other fields and can be restored", async ({
     page,
   }, testInfo) => {
     test.setTimeout(90_000);
 
     const risksPage = new RiesgosProfesionalesPage(page);
-    const className = "RP-019 REPEATED SAVE";
-    const initialPercentage = 19.019;
-    const updatedPercentage = 29.029;
+    const originalClass = "RP-020 ORIGINAL";
+    const originalPercentage = 20.02;
+    const updatedClass = "RP-020 UPDATED";
+    const updatedPercentage = 30.03;
     const baselineIds = new Set<number>();
     const testOwnedIds = new Set<number>();
     let disposableCode: string | undefined;
@@ -63,7 +63,10 @@ test.describe("CRUD persistence and safe deletion", () => {
           }
         }
 
-        if (remainingIds.size === 0 || (await risksPage.nextPageButton.isDisabled())) {
+        if (
+          remainingIds.size === 0 ||
+          (await risksPage.nextPageButton.isDisabled())
+        ) {
           break;
         }
 
@@ -72,19 +75,12 @@ test.describe("CRUD persistence and safe deletion", () => {
 
       expect(
         [...remainingIds],
-        "Every RP-019 test-owned ID must be visible and selectable for cleanup.",
+        "Every RP-020 test-owned ID must be visible and selectable for cleanup.",
       ).toEqual([]);
     };
 
-    const saveRequests: Request[] = [];
-    const recordSaveRequest = (request: Request): void => {
-      if (request.method() === "POST" && request.url() === saveUrl) {
-        saveRequests.push(request);
-      }
-    };
-
     try {
-      // 1. Create one disposable record and retain its returned/runtime ID.
+      // 1. Create a disposable record, reload, capture its complete persisted detail, and double-click its ID-scoped row.
       const initialRowsResponsePromise = page.waitForResponse(
         (response) =>
           response.url() === rowsUrl && response.request().method() === "GET",
@@ -102,7 +98,7 @@ test.describe("CRUD persistence and safe deletion", () => {
       const candidateOffset = (Date.now() + testInfo.workerIndex) % (36 * 36);
 
       for (let attempt = 0; attempt < 36 * 36; attempt += 1) {
-        const candidate = `R${((candidateOffset + attempt) % (36 * 36))
+        const candidate = `E${((candidateOffset + attempt) % (36 * 36))
           .toString(36)
           .toUpperCase()
           .padStart(2, "0")}`;
@@ -115,13 +111,13 @@ test.describe("CRUD persistence and safe deletion", () => {
 
       test.skip(
         disposableCode === undefined,
-        "RP-019 requires one unused R00-RZZ code.",
+        "RP-020 requires one unused E00-EZZ code.",
       );
 
       await risksPage.createButton.click();
       await risksPage.codeInput.fill(disposableCode!);
-      await risksPage.classInput.fill(className);
-      await risksPage.percentageInput.fill(String(initialPercentage));
+      await risksPage.classInput.fill(originalClass);
+      await risksPage.percentageInput.fill(String(originalPercentage));
       await risksPage.openActivityModalButton.click();
 
       const firstVisibleActivityRow = risksPage.activityModal
@@ -140,7 +136,6 @@ test.describe("CRUD persistence and safe deletion", () => {
       await firstVisibleActivityRow.click();
       await risksPage.acceptActivityButton.click();
 
-      page.on("request", recordSaveRequest);
       const createResponsePromise = page.waitForResponse(
         (response) =>
           response.url() === saveUrl && response.request().method() === "POST",
@@ -156,19 +151,56 @@ test.describe("CRUD persistence and safe deletion", () => {
       expect(createResponse.request().postDataJSON()).toEqual({
         kaNlClase: null,
         scCodigo: disposableCode,
-        ssClase: className,
-        ndPorcentaje: initialPercentage,
+        ssClase: originalClass,
+        ndPorcentaje: originalPercentage,
         kaNlActividad: selectedActivityId,
       });
-      expect(createdRecord).toMatchObject({
-        scCodigo: disposableCode,
-        ssClase: className,
-        ndPorcentaje: initialPercentage,
-        kaNlActividad: selectedActivityId,
-      });
-      expect(saveRequests).toHaveLength(1);
 
-      // 2. Without clicking New, change only its percentage and click Save once while capturing the request.
+      const reloadedRowsResponsePromise = page.waitForResponse(
+        (response) =>
+          response.url() === rowsUrl && response.request().method() === "GET",
+      );
+      await page.reload();
+      const reloadedRowsResponse = await reloadedRowsResponsePromise;
+      expect(reloadedRowsResponse.ok()).toBe(true);
+
+      const originalDetailResponse = await page.request.get(
+        `${rowsUrl}/${createdRecord.kaNlClase}`,
+      );
+      expect(originalDetailResponse.ok()).toBe(true);
+      const originalDetail =
+        (await originalDetailResponse.json()) as RiskDetail;
+      expect(originalDetail).toMatchObject({
+        kaNlClase: createdRecord.kaNlClase,
+        scCodigo: disposableCode,
+        ssClase: originalClass,
+        ndPorcentaje: originalPercentage,
+        kaNlActividad: selectedActivityId,
+      });
+
+      await risksPage.pageSizeButton(100).click();
+      const editDetailResponsePromise = page.waitForResponse(
+        (response) =>
+          response.url() === `${rowsUrl}/${createdRecord.kaNlClase}` &&
+          response.request().method() === "GET",
+      );
+      await risksPage.riskRow(createdRecord.kaNlClase).dblclick();
+      const editDetailResponse = await editDetailResponsePromise;
+      expect(editDetailResponse.ok()).toBe(true);
+      expect((await editDetailResponse.json()) as RiskDetail).toEqual(
+        originalDetail,
+      );
+      await expect(risksPage.codeInput).toHaveValue(originalDetail.scCodigo);
+      await expect(risksPage.classInput).toHaveValue(originalDetail.ssClase);
+      await expect(risksPage.percentageInput).toHaveValue(
+        String(originalDetail.ndPorcentaje),
+      );
+      await expect(risksPage.activityInput).toHaveValue(
+        `${originalDetail.scCodActividad} - ${originalDetail.ssActividad}`,
+      );
+
+      // 2. Keep the code unchanged, modify class and percentage, save once, reload, and read the same ID through a fresh /rows/{id} response.
+      await risksPage.classInput.fill(updatedClass);
       await risksPage.percentageInput.fill(String(updatedPercentage));
 
       const updateResponsePromise = page.waitForResponse(
@@ -180,52 +212,43 @@ test.describe("CRUD persistence and safe deletion", () => {
       const updateResponse = await updateResponsePromise;
       expect(updateResponse.ok()).toBe(true);
       expect(updateResponse.request().postDataJSON()).toEqual({
-        kaNlClase: createdRecord.kaNlClase,
-        scCodigo: disposableCode,
-        ssClase: className,
+        kaNlClase: originalDetail.kaNlClase,
+        scCodigo: originalDetail.scCodigo,
+        ssClase: updatedClass,
         ndPorcentaje: updatedPercentage,
-        kaNlActividad: selectedActivityId,
+        kaNlActividad: originalDetail.kaNlActividad,
       });
 
-      const updatedRecord = (await updateResponse.json()) as RiskDetail;
-      expect(updatedRecord).toMatchObject({
-        kaNlClase: createdRecord.kaNlClase,
-        scCodigo: disposableCode,
-        ssClase: className,
+      const updatedSaveDetail = (await updateResponse.json()) as RiskDetail;
+      expect(updatedSaveDetail).toMatchObject({
+        kaNlClase: originalDetail.kaNlClase,
+        scCodigo: originalDetail.scCodigo,
+        ssClase: updatedClass,
         ndPorcentaje: updatedPercentage,
-        kaNlActividad: selectedActivityId,
+        kaNlActividad: originalDetail.kaNlActividad,
       });
-      expect(saveRequests).toHaveLength(2);
 
-      // 3. Reload, capture a fresh GET /rows response, and compare the test-owned record by ID and code.
-      const reloadedRowsResponsePromise = page.waitForResponse(
+      const updatedRowsResponsePromise = page.waitForResponse(
         (response) =>
           response.url() === rowsUrl && response.request().method() === "GET",
       );
       await page.reload();
-      const reloadedRowsResponse = await reloadedRowsResponsePromise;
-      expect(reloadedRowsResponse.ok()).toBe(true);
+      const updatedRowsResponse = await updatedRowsResponsePromise;
+      expect(updatedRowsResponse.ok()).toBe(true);
 
-      const reloadedRows = (await reloadedRowsResponse.json()) as RiskRow[];
-      const idAndCodeMatches = reloadedRows.filter(
-        (risk) =>
-          risk.kaNlClase === createdRecord.kaNlClase &&
-          risk.scCodigo === disposableCode,
+      const updatedDetailResponse = await page.request.get(
+        `${rowsUrl}/${originalDetail.kaNlClase}`,
       );
-      const codeMatches = reloadedRows.filter(
-        (risk) => risk.scCodigo === disposableCode,
-      );
-
-      expect(idAndCodeMatches).toHaveLength(1);
-      expect(codeMatches).toHaveLength(1);
-      expect(idAndCodeMatches[0]).toMatchObject({
-        ssClase: className,
+      expect(updatedDetailResponse.ok()).toBe(true);
+      expect((await updatedDetailResponse.json()) as RiskDetail).toMatchObject({
+        kaNlClase: originalDetail.kaNlClase,
+        scCodigo: originalDetail.scCodigo,
+        ssClase: updatedClass,
         ndPorcentaje: updatedPercentage,
+        kaNlActividad: originalDetail.kaNlActividad,
       });
     } finally {
-      page.off("request", recordSaveRequest);
-
-      // 4. Delete the disposable record and verify its ID is absent from a fresh /rows response.
+      // 3. Delete the disposable record and verify the final state through the API by ID.
       if (disposableCode !== undefined) {
         const currentRows = await readRows();
         for (const risk of currentRows) {

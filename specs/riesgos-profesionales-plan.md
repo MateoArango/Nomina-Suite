@@ -343,7 +343,7 @@ Implementation-readiness notes:
 
 **Implementation summary:** The test derives an unused worker-safe code and activity from runtime APIs, asserts the single create request and complete persisted detail by returned ID, then deletes only that ID while proving the delete payload excludes every baseline record. Focused Chromium verification passed: 1 test.
 
-#### ✅ RP-019: Save again without New updates the same record
+#### ✅ RP-019: A second Save updates the existing record without creating a duplicate
 
 **File:** `tests/riesgosProfesionales/repeated-save-updates-current-record.spec.ts`
 
@@ -361,7 +361,7 @@ Implementation-readiness notes:
 
 **Implementation summary:** The test creates one runtime-coded disposable record, saves a percentage change again without clicking New, and proves the second request targets the original `kaNlClase` while preserving its code, class, and activity. A fresh `/rows` response contains exactly one matching ID/code with the updated percentage, and failure-safe cleanup deletes every test-owned ID with no baseline ID in the payload. Focused Chromium verification passed: 1 test.
 
-#### RP-020: Edit with unchanged code persists other fields and can be restored
+#### ✅ RP-020: Edit with unchanged code persists other fields and can be restored
 
 **File:** `tests/riesgosProfesionales/edit-risk-keeping-code.spec.ts`
 
@@ -374,6 +374,8 @@ Implementation-readiness notes:
     - expect: No paginator total, range, order, or row-position assertion is made.
   3. Restore the captured values or delete the disposable record, then verify the final state through the API by ID.
     - expect: The test leaves no mutation behind.
+
+**Implementation summary:** The test creates one runtime-coded disposable record, reloads and captures its complete persisted detail, then opens the ID-scoped row and confirms the matching `/rows/{id}` response. It preserves the code while updating class and percentage, verifies the same ID and activity through the save payload and a fresh detail response, and performs failure-safe cleanup limited to non-baseline test-owned IDs. Focused Chromium verification passed: 1 test.
 
 #### RP-021: Edit to another record's code is rejected without overwriting either row
 
