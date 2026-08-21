@@ -325,7 +325,7 @@ Implementation-readiness notes:
 
 **Seed:** `tests/riesgosProfesionales/seed-test.spec.ts`
 
-#### RP-018: Create a complete record, verify persistence, and clean up
+#### ✅ RP-018: Create a complete record, verify persistence, and clean up
 
 **File:** `tests/riesgosProfesionales/create-risk-with-activity.spec.ts`
 
@@ -340,6 +340,8 @@ Implementation-readiness notes:
     - expect: No paginator total, range, order, or row-position assertion is made.
   4. Delete only the created ID and fetch /rows again.
     - expect: The disposable ID is absent and no baseline ID was targeted by this test's delete request.
+
+**Implementation summary:** The test derives an unused worker-safe code and activity from runtime APIs, asserts the single create request and complete persisted detail by returned ID, then deletes only that ID while proving the delete payload excludes every baseline record. Focused Chromium verification passed: 1 test.
 
 #### RP-019: Save again without New updates the same record
 
