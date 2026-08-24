@@ -412,7 +412,7 @@ Implementation-readiness notes:
 
 **Implementation summary:** The test creates one runtime-coded disposable record, reloads, and selects only its ID-scoped checkbox. It asserts exactly one successful `/actions/borrar` request with `{ ids: [createdId] }`, proves no baseline ID was targeted, and verifies the deleted ID is absent from the complete fresh `/rows` collection without paginator or row-position assertions. Failure-safe cleanup remains limited to the non-baseline test-owned ID. Focused Chromium verification passed: 1 test.
 
-#### RP-023: Delete multiple disposable records in one scoped operation
+#### ✅ RP-023: Delete multiple disposable records in one scoped operation
 
 **File:** `tests/riesgosProfesionales/delete-multiple-risks.spec.ts`
 
@@ -425,3 +425,5 @@ Implementation-readiness notes:
   3. Reload and capture a fresh GET /rows response.
     - expect: All disposable IDs are absent.
     - expect: The delete payload targeted no baseline ID; no global total or paginator assertion is made.
+
+**Implementation summary:** The test creates two runtime-coded disposable records, retains their returned IDs, reloads, and selects only those ID-scoped checkboxes. It asserts one successful batched `/actions/borrar` request whose ID set exactly equals the created IDs, proves no baseline ID was targeted, and verifies both disposable IDs are absent from a fresh complete `/rows` collection without total, paginator, order, or row-position assertions. Failure-safe cleanup remains limited to non-baseline records with the test-owned codes. Focused Chromium verification passed: 1 test.
