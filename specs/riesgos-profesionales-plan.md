@@ -395,7 +395,7 @@ Implementation-readiness notes:
 
 **Implementation summary:** The test creates two runtime-coded disposable records and captures their complete persisted details, then attempts to update the first ID with the second record's code. It asserts the live HTTP 409 `CONFLICT` response and exact duplicate feedback, reloads to prove both IDs and original details remain unchanged with exactly one row per owned code, and deletes only the two test-owned IDs in failure-safe cleanup. Focused Chromium verification passed: 1 test.
 
-#### RP-022: Delete one disposable record and verify request scope
+#### ✅ RP-022: Delete one disposable record and verify request scope
 
 **File:** `tests/riesgosProfesionales/delete-single-risk.spec.ts`
 
@@ -409,6 +409,8 @@ Implementation-readiness notes:
   3. Reload and capture a fresh GET /rows response.
     - expect: The deleted ID is absent and the request payload did not target any pre-existing ID.
     - expect: No paginator total, range, order, or row-position assertion is made.
+
+**Implementation summary:** The test creates one runtime-coded disposable record, reloads, and selects only its ID-scoped checkbox. It asserts exactly one successful `/actions/borrar` request with `{ ids: [createdId] }`, proves no baseline ID was targeted, and verifies the deleted ID is absent from the complete fresh `/rows` collection without paginator or row-position assertions. Failure-safe cleanup remains limited to the non-baseline test-owned ID. Focused Chromium verification passed: 1 test.
 
 #### RP-023: Delete multiple disposable records in one scoped operation
 
