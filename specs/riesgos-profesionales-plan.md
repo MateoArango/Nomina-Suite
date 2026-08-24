@@ -377,7 +377,7 @@ Implementation-readiness notes:
 
 **Implementation summary:** The test creates one runtime-coded disposable record, reloads and captures its complete persisted detail, then opens the ID-scoped row and confirms the matching `/rows/{id}` response. It preserves the code while updating class and percentage, verifies the same ID and activity through the save payload and a fresh detail response, and performs failure-safe cleanup limited to non-baseline test-owned IDs. Focused Chromium verification passed: 1 test.
 
-#### RP-021: Edit to another record's code is rejected without overwriting either row
+#### ✅ RP-021: Edit to another record's code is rejected without overwriting either row
 
 **File:** `tests/riesgosProfesionales/edit-risk-to-duplicate-code.spec.ts`
 
@@ -392,6 +392,8 @@ Implementation-readiness notes:
     - expect: No third record exists with either test-owned code and no paginator assertion is made.
   4. Delete both test-owned records and verify both IDs are absent from a fresh /rows response.
     - expect: Cleanup is ID-scoped and complete.
+
+**Implementation summary:** The test creates two runtime-coded disposable records and captures their complete persisted details, then attempts to update the first ID with the second record's code. It asserts the live HTTP 409 `CONFLICT` response and exact duplicate feedback, reloads to prove both IDs and original details remain unchanged with exactly one row per owned code, and deletes only the two test-owned IDs in failure-safe cleanup. Focused Chromium verification passed: 1 test.
 
 #### RP-022: Delete one disposable record and verify request scope
 
