@@ -4,16 +4,22 @@ export class LoginPage {
   private static readonly username = "SICOF";
   private static readonly password = "qa304";
 
+  readonly recoveryOpenLink: Locator;
   readonly usernameInput: Locator;
-  readonly continueButton: Locator;
   readonly passwordInput: Locator;
-  readonly signInButton: Locator;
+  readonly passwordVisibilityButton: Locator;
+  readonly primaryActionButton: Locator;
 
   constructor(readonly page: Page) {
-    this.usernameInput = page.getByRole("textbox", { name: "Usuario" });
-    this.continueButton = page.getByRole("button", { name: "Continuar" });
-    this.passwordInput = page.getByRole("textbox", { name: "Contraseña" });
-    this.signInButton = page.getByRole("button", { name: "Ingresar" });
+    this.recoveryOpenLink = page.getByTestId("login-recovery-open-link");
+    this.usernameInput = page.getByTestId("login-username-input");
+    this.passwordInput = page.getByTestId("login-password-input");
+    this.passwordVisibilityButton = page.getByTestId(
+      "login-password-visibility-button",
+    );
+    this.primaryActionButton = page.getByTestId(
+      "login-primary-action-button",
+    );
   }
 
   async goto(): Promise<void> {
@@ -22,9 +28,9 @@ export class LoginPage {
 
   async signIn(): Promise<void> {
     await this.usernameInput.fill(LoginPage.username);
-    await this.continueButton.click();
+    await this.primaryActionButton.click();
     await this.passwordInput.fill(LoginPage.password);
-    await this.signInButton.click();
+    await this.primaryActionButton.click();
     await this.page.waitForURL(url => !url.pathname.includes("/login"));
   }
 }
