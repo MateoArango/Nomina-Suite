@@ -108,6 +108,10 @@ export class AdministrativeUpdateConceptsPage {
     );
   }
 
+  emptyWorkingRow(): Locator {
+    return this.table.locator("tbody tr:not([data-testid]):visible");
+  }
+
   async readPagerRange(): Promise<PagerRange> {
     const summary = (await this.pagerSummary.textContent())?.trim() ?? "";
     const match = /^(\d+)-(\d+)\s+de\s+(\d+)$/.exec(summary);

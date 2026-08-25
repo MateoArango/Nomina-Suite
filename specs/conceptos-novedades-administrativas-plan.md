@@ -12,7 +12,7 @@ Execution rules: read-only, local-validation, modal-dismissal, and rejected-requ
 
 **Seed:** `tests/administrative-update-concepts/seed-test.spec.ts`
 
-#### 1.1. CNA-001: Load the grid from runtime API data
+#### 1.1. ✅ CNA-001: Load the grid from runtime API data
 
 **File:** `tests/administrative-update-concepts/initial-grid-state.spec.ts`
 
@@ -27,6 +27,8 @@ Execution rules: read-only, local-validation, modal-dismissal, and rejected-requ
   3. Inspect initial controls and derive pager state from the runtime total plus the empty working row contract.
     - expect: Recargar is enabled; Grabar and Borrar are disabled with no pending change or selection.
     - expect: Previous/Next states agree with the selected page size and runtime total.
+
+**Implementation summary:** The test captures the runtime rows response, validates the mapping fields and unique composite identities, maps every persisted visible row without hard-coded data or ordering, verifies the separate empty working row, and derives the initial pager and control states from the response. Focused Chromium verification passed: 1 test.
 
 #### 1.2. CNA-002: Recargar discards unsaved local changes without persistence
 
@@ -250,4 +252,3 @@ Execution rules: read-only, local-validation, modal-dismissal, and rejected-requ
   3. Reload and fetch rows.
     - expect: The owned identity is absent.
     - expect: No global total, ordering, pager, or fixed-position assertion is made.
-
