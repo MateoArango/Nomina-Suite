@@ -107,7 +107,7 @@ Execution rules: read-only, local-validation, modal-dismissal, and rejected-requ
 
 **Implementation summary:** The test captures the runtime concept lookup loaded with the page, validates unique `kaNlConcepto` identities, opens the empty-row picker, maps every visible Code and Name cell to its API record, derives the first-page range and control states from the runtime catalog, and closes without validation or save traffic. Focused Chromium verification passed: 1 test.
 
-#### 2.2. CNA-007: Concept search filters by code, name, and ID and restores the catalog
+#### 2.2. ✅ CNA-007: Concept search filters by code, name, and ID and restores the catalog
 
 **File:** `tests/administrative-update-concepts/concept-picker-search.spec.ts`
 
@@ -116,9 +116,11 @@ Execution rules: read-only, local-validation, modal-dismissal, and rejected-requ
     - expect: Every visible result matches the active term according to the confirmed client semantics.
     - expect: Rows remain distinguishable by stable concept ID when display values repeat.
     - expect: No additional catalog request is sent per keystroke if the current client-side-cache behavior remains.
-  2. Search for a generated absent value, then clear the search.
-    - expect: A clear empty result and valid zero/one-page pager state are shown.
+  2. Search for a generated absent value ('asdsadasd'), then clear the search.
+    - expect: A clear empty result and valid zero/one-page pager state are shown ('Sin resultados No hay conceptos para el filtro ingresado.').
     - expect: Clearing restores the runtime-derived first page and total.
+
+**Implementation summary:** The test derives selective code, name-fragment, and stable-ID terms from the runtime lookup, validates filtered rows by unique concept identity and field-specific client semantics, proves searches reuse the single catalog request, verifies the exact zero-result state with hidden pager controls, and confirms clearing restores the runtime-derived first page and total. Focused Chromium verification passed: 1 test.
 
 #### 2.3. CNA-008: Concept-picker page sizes and navigation boundaries
 
