@@ -59,10 +59,10 @@ Execution rules: read-only, local-validation, modal-dismissal, and rejected-requ
 
 **Implementation summary:** The test verifies the five exact live client-side labels and stable option test IDs, selects every option in a separately reloaded working-row state, proves only read requests occur, and compares each refreshed persisted identity set with the baseline. Focused Chromium verification passed: 1 test.
 
-#### 1.4. CNA-004: Main-grid page sizes and navigation boundaries
+#### 1.4. ✅ CNA-004: Main-grid page sizes and navigation boundaries
 
 **File:** `tests/administrative-update-concepts/main-grid-pagination.spec.ts`
-**current behavior**: The empty row always added to the runtime paginator total. You could create around 10 rows (5 novelties for 4 concepts, the half to avoid collisions) and so on reach the second page.
+**current behavior**: The empty row always added to the runtime paginator total.
 **Steps:**
   1. Capture runtime rows and exercise page sizes 10, 25, 50, and 100.
     - expect: Visible persisted rows plus the single empty working row match the correct runtime slice for each size.
@@ -72,7 +72,8 @@ Execution rules: read-only, local-validation, modal-dismissal, and rejected-requ
     - expect: Anterior is disabled only on the first page and Siguiente only on the last page.
   3. If current data cannot produce a second page, skip only the navigation branch with a precise reason.
     - expect: Page-size and first-page assertions still execute.
-  
+
+**Implementation summary:** The test derives every page range, persisted identity slice, empty-working-row position, and navigation boundary from the fresh `/rows` response. It exercises page sizes 10, 25, 50, and 100 without creating shared records; when the runtime total cannot reach a second page, it annotates only that unavailable branch. Focused Chromium verification passed: 1 test.
 
 #### 1.5. CNA-005: Row selection controls Borrar without deleting data
 
