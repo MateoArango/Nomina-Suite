@@ -45,22 +45,24 @@ Execution rules: read-only, local-validation, modal-dismissal, and rejected-requ
 
 **Implementation summary:** The test derives a valid local pair from fresh runtime rows, records save/delete traffic, waits for the concept side sheet and expandable search control, and proves Recargar restores one blank working row with unchanged persisted identities and zero mutation requests. Focused Chromium verification passed: 1 test.
 
-#### 1.3. CNA-003: Novelty options use the exact client-side catalog
+#### 1.3. ✅ CNA-003: Novelty options use the exact client-side catalog
 
 **File:** `tests/administrative-update-concepts/novelty-options.spec.ts`
 
 **Steps:**
   1. Open the novelty selector on the empty working row while observing requests to /w-conceptos-nov-ad.
-    - expect: The options are exactly Compensatorios, Permisos, Licencias Remuneradas, Vacaciones, and Cuidado de la Niñez.
+    - expect: The options are exactly Compensatorios, Permisos, Licencias Remuneradas, Vacaciones, and Cuidado de la Ninez.
     - expect: Opening and choosing an option sends no novelty-lookup request and no persistence request.
   2. Choose each option in an isolated local state, resetting with Recargar between cases.
     - expect: The selected value is displayed exactly.
     - expect: No case persists data or changes the runtime persisted identity set.
 
+**Implementation summary:** The test verifies the five exact live client-side labels and stable option test IDs, selects every option in a separately reloaded working-row state, proves only read requests occur, and compares each refreshed persisted identity set with the baseline. Focused Chromium verification passed: 1 test.
+
 #### 1.4. CNA-004: Main-grid page sizes and navigation boundaries
 
 **File:** `tests/administrative-update-concepts/main-grid-pagination.spec.ts`
-**current behavior**: The empty row always added to the runtime paginator total. You could create around 10 rows (5 novelties for 4 concepts) and so on reach the second page.
+**current behavior**: The empty row always added to the runtime paginator total. You could create around 10 rows (5 novelties for 4 concepts, the half to avoid collisions) and so on reach the second page.
 **Steps:**
   1. Capture runtime rows and exercise page sizes 10, 25, 50, and 100.
     - expect: Visible persisted rows plus the single empty working row match the correct runtime slice for each size.
