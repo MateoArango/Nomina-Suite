@@ -28,9 +28,16 @@ export class AdministrativeUpdateConceptsPage {
   readonly previousPageButton: Locator;
   readonly nextPageButton: Locator;
   readonly conceptPickerPanel: Locator;
+  readonly conceptPickerHeading: Locator;
   readonly conceptPickerCloseButton: Locator;
   readonly conceptPickerBackdrop: Locator;
+  readonly conceptPickerSearchControl: Locator;
   readonly conceptPickerSearchInput: Locator;
+  readonly conceptPickerTable: Locator;
+  readonly conceptPickerPager: Locator;
+  readonly conceptPickerPagerSummary: Locator;
+  readonly conceptPickerPreviousPageButton: Locator;
+  readonly conceptPickerNextPageButton: Locator;
 
   constructor(readonly page: Page) {
     const routeHost = page.getByTestId("app-shell-route-host");
@@ -65,6 +72,9 @@ export class AdministrativeUpdateConceptsPage {
     this.conceptPickerPanel = page.getByTestId(
       "conceptos-nov-ad-concept-picker-panel",
     );
+    this.conceptPickerHeading = this.conceptPickerPanel.getByRole("heading", {
+      name: "Seleccionar Concepto",
+    });
     this.conceptPickerCloseButton = page.getByTestId(
       "conceptos-nov-ad-concept-picker-close-button",
     );
@@ -73,6 +83,23 @@ export class AdministrativeUpdateConceptsPage {
     );
     this.conceptPickerSearchInput = page.getByTestId(
       "conceptos-nov-ad-concept-picker-search-input",
+    );
+    this.conceptPickerSearchControl =
+      this.conceptPickerSearchInput.locator("xpath=..");
+    this.conceptPickerTable = this.conceptPickerPanel.locator(
+      'table[data-testid-pager-prefix="conceptos-nov-ad-concept-picker-table-pager"]',
+    );
+    this.conceptPickerPreviousPageButton = page.getByTestId(
+      "conceptos-nov-ad-concept-picker-table-pager-previous-page-button",
+    );
+    this.conceptPickerNextPageButton = page.getByTestId(
+      "conceptos-nov-ad-concept-picker-table-pager-next-page-button",
+    );
+    this.conceptPickerPager = this.conceptPickerPreviousPageButton.locator(
+      'xpath=ancestor::div[contains(concat(" ", normalize-space(@class), " "), " erp-table-pager ")][1]',
+    );
+    this.conceptPickerPagerSummary = this.conceptPickerPager.locator(
+      ".erp-table-pager__summary",
     );
   }
 
@@ -122,8 +149,20 @@ export class AdministrativeUpdateConceptsPage {
     );
   }
 
+  conceptPickerPageSizeButton(size: PageSize): Locator {
+    return this.page.getByTestId(
+      `conceptos-nov-ad-concept-picker-table-pager-page-size-button--${size}`,
+    );
+  }
+
+  visibleConceptPickerRows(): Locator {
+    return this.conceptPickerTable.locator(
+      'tbody tr[data-testid^="conceptos-nov-ad-concept-picker-row--"]:visible',
+    );
+  }
+
   async searchConcept(conceptId: string | number): Promise<void> {
-    await this.conceptPickerSearchInput.locator("xpath=..").click();
+    await this.conceptPickerSearchControl.click();
     await this.conceptPickerSearchInput.fill(String(conceptId));
   }
 
@@ -155,6 +194,36 @@ export class AdministrativeUpdateConceptsPage {
     }
 
     throw new Error("No administrative-update-concepts page size is selected");
+  }
+
+  async readConceptPickerPagerRange(): Promise<PagerRange> {
+    const summary =
+      (await this.conceptPickerPagerSummary.textContent())?.trim() ?? "";
+    const match = /^(\d+)-(\d+)\s+de\s+(\d+)$/.exec(summary);
+
+    if (!match) {
+      throw new Error(`Unexpected concept-picker pager summary: "${summary}"`);
+    }
+
+    return {
+      start: Number(match[1]),
+      end: Number(match[2]),
+      total: Number(match[3]),
+    };
+  }
+
+  async selectedConceptPickerPageSize(): Promise<PageSize> {
+    for (const size of [10, 25, 50, 100] as const) {
+      if (
+        (await this.conceptPickerPageSizeButton(size).getAttribute(
+          "aria-pressed",
+        )) === "true"
+      ) {
+        return size;
+      }
+    }
+
+    throw new Error("No concept-picker page size is selected");
   }
 
   private resolveRowKey(rowKey: AdministrativeConceptRowKey): string {

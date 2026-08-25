@@ -75,7 +75,7 @@ Execution rules: read-only, local-validation, modal-dismissal, and rejected-requ
 
 **Implementation summary:** The test derives every page range, persisted identity slice, empty-working-row position, and navigation boundary from the fresh `/rows` response. It exercises page sizes 10, 25, 50, and 100 without creating shared records; when the runtime total cannot reach a second page, it annotates only that unavailable branch. Focused Chromium verification passed: 1 test.
 
-#### 1.5. CNA-005: Row selection controls Borrar without deleting data
+#### 1.5. ✅ CNA-005: Row selection controls Borrar without deleting data
 
 **File:** `tests/administrative-update-concepts/row-selection-state.spec.ts`
 
@@ -93,7 +93,7 @@ Execution rules: read-only, local-validation, modal-dismissal, and rejected-requ
 
 **Seed:** `tests/administrative-update-concepts/seed-test.spec.ts`
 
-#### 2.1. CNA-006: Concept picker maps the runtime catalog by stable concept ID
+#### 2.1. ✅ CNA-006: Concept picker maps the runtime catalog by stable concept ID
 
 **File:** `tests/administrative-update-concepts/concept-picker-initial-state.spec.ts`
 
@@ -104,6 +104,8 @@ Execution rules: read-only, local-validation, modal-dismissal, and rejected-requ
     - expect: Visible Code and Name values map to response records by stable concept ID; catalog size is runtime-derived rather than fixed at 352.
   2. Close the panel without choosing a concept.
     - expect: The empty row remains unchanged and no validation/save request is sent.
+
+**Implementation summary:** The test captures the runtime concept lookup loaded with the page, validates unique `kaNlConcepto` identities, opens the empty-row picker, maps every visible Code and Name cell to its API record, derives the first-page range and control states from the runtime catalog, and closes without validation or save traffic. Focused Chromium verification passed: 1 test.
 
 #### 2.2. CNA-007: Concept search filters by code, name, and ID and restores the catalog
 
