@@ -30,6 +30,7 @@ export class AdministrativeUpdateConceptsPage {
   readonly conceptPickerPanel: Locator;
   readonly conceptPickerCloseButton: Locator;
   readonly conceptPickerBackdrop: Locator;
+  readonly conceptPickerSearchInput: Locator;
 
   constructor(readonly page: Page) {
     const routeHost = page.getByTestId("app-shell-route-host");
@@ -69,6 +70,9 @@ export class AdministrativeUpdateConceptsPage {
     );
     this.conceptPickerBackdrop = page.getByTestId(
       "conceptos-nov-ad-concept-picker-backdrop",
+    );
+    this.conceptPickerSearchInput = page.getByTestId(
+      "conceptos-nov-ad-concept-picker-search-input",
     );
   }
 
@@ -110,6 +114,17 @@ export class AdministrativeUpdateConceptsPage {
 
   emptyWorkingRow(): Locator {
     return this.table.locator("tbody tr:not([data-testid]):visible");
+  }
+
+  conceptPickerRow(conceptId: string | number): Locator {
+    return this.page.getByTestId(
+      `conceptos-nov-ad-concept-picker-row--${conceptId}`,
+    );
+  }
+
+  async searchConcept(conceptId: string | number): Promise<void> {
+    await this.conceptPickerSearchInput.locator("xpath=..").click();
+    await this.conceptPickerSearchInput.fill(String(conceptId));
   }
 
   async readPagerRange(): Promise<PagerRange> {

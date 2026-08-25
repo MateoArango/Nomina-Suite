@@ -30,7 +30,7 @@ Execution rules: read-only, local-validation, modal-dismissal, and rejected-requ
 
 **Implementation summary:** The test captures the runtime rows response, validates the mapping fields and unique composite identities, maps every persisted visible row without hard-coded data or ordering, verifies the separate empty working row, and derives the initial pager and control states from the response. Focused Chromium verification passed: 1 test.
 
-#### 1.2. CNA-002: Recargar discards unsaved local changes without persistence
+#### 1.2. ✅ CNA-002: Recargar discards unsaved local changes without persistence
 
 **File:** `tests/administrative-update-concepts/reload-discards-unsaved-changes.spec.ts`
 
@@ -42,6 +42,8 @@ Execution rules: read-only, local-validation, modal-dismissal, and rejected-requ
     - expect: The unsaved values are discarded and the empty working row returns to blank.
     - expect: Grabar and Borrar return to their initial disabled states.
     - expect: The refreshed persisted identity set equals the pre-action identity set; no global-total assertion is used.
+
+**Implementation summary:** The test derives a valid local pair from fresh runtime rows, records save/delete traffic, waits for the concept side sheet and expandable search control, and proves Recargar restores one blank working row with unchanged persisted identities and zero mutation requests. Focused Chromium verification passed: 1 test.
 
 #### 1.3. CNA-003: Novelty options use the exact client-side catalog
 
@@ -58,7 +60,7 @@ Execution rules: read-only, local-validation, modal-dismissal, and rejected-requ
 #### 1.4. CNA-004: Main-grid page sizes and navigation boundaries
 
 **File:** `tests/administrative-update-concepts/main-grid-pagination.spec.ts`
-**current behavior**: The empty row always added to the runtime paginator total
+**current behavior**: The empty row always added to the runtime paginator total. You could create around 10 rows (5 novelties for 4 concepts) and so on reach the second page.
 **Steps:**
   1. Capture runtime rows and exercise page sizes 10, 25, 50, and 100.
     - expect: Visible persisted rows plus the single empty working row match the correct runtime slice for each size.
