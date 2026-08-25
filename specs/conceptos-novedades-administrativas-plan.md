@@ -87,6 +87,8 @@ Execution rules: read-only, local-validation, modal-dismissal, and rejected-requ
     - expect: Selection is identity-scoped and does not alter mapping values.
     - expect: Recargar clears selection and disables Borrar without any delete request.
 
+**Implementation summary:** The test selects runtime-derived persisted rows by stable identity, proves repeated clicks preserve one-way selection, verifies a second row transfers selection without changing mapping values, and confirms Recargar clears selection while sending zero `/actions/borrar` requests. Focused Chromium verification passed: 1 test.
+
 ### 2. Concept picker and validation contracts
 
 **Seed:** `tests/administrative-update-concepts/seed-test.spec.ts`
