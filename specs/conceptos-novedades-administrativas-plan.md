@@ -230,6 +230,8 @@ Execution rules: read-only, local-validation, modal-dismissal, and rejected-requ
   4. Delete the owned identity in finally and prove absence through a fresh rows response.
     - expect: No baseline identity is targeted and no owned record remains.
 
+**Implementation summary:** ✅ The serial test derives two unused pairs for one runtime-confirmed accepted concept, creates the source pair, edits that same owned row without reloading or selecting a baseline row, and proves the second full-grid Grabar request replaces the source pair with exactly one target pair while preserving every baseline identity. It reloads to verify persistence and non-duplication, then its `finally` cleanup deletes whichever owned pair remains and proves both are absent through a final fresh rows response. Focused Chromium verification passed: 1 test.
+
 #### 3.3. CNA-015: Duplicate pair creation is rejected without changing the owned original
 
 **File:** `tests/administrative-update-concepts/mutation-contracts.spec.ts`
