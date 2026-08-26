@@ -32,6 +32,8 @@ const saveUrl = `${apiBase}/actions/grabar`;
 const deleteUrl = `${apiBase}/actions/borrar`;
 const noveltyCodes = ["cmp", "per", "lrm", "vac", "lcn"] as const;
 const saveSuccessMessage = "Los registros se guardaron correctamente.";
+const duplicatePairMessage =
+  "No se permiten registros duplicados para concepto y novedad.";
 
 function persistedIdentity(
   concept: Pick<AdministrativeConcept, "kaNlConceptoContable" | "codigoNovedad">,
@@ -626,6 +628,307 @@ test.describe("Serialized disposable-data mutation contracts", () => {
           (await finalRowsResponse.json()) as AdministrativeConcept[];
         expect(identitySet(finalRows).has(sourceIdentity)).toBe(false);
         expect(identitySet(finalRows).has(targetIdentity)).toBe(false);
+        for (const baselineIdentity of baselineIdentitySet) {
+          expect(identitySet(finalRows).has(baselineIdentity)).toBe(true);
+        }
+      }
+    }
+  });
+
+  test("CNA-015: Duplicate pair creation is rejected without changing the owned original", async ({
+    page,
+  }) => {
+    test.setTimeout(90_000);
+
+    const conceptsPage = new AdministrativeUpdateConceptsPage(page);
+    let ownedPair: AdministrativeConcept | undefined;
+    let mutationAttempted = false;
+    let baselineIdentitySet = new Set<string>();
+
+    const initialRowsResponsePromise = page.waitForResponse(
+      response =>
+        response.url() === rowsUrl && response.request().method() === "GET",
+    );
+    const conceptLookupResponsePromise = page.waitForResponse(
+      response =>
+        response.url() === conceptLookupUrl &&
+        response.request().method() === "GET",
+    );
+
+    await page.goto("https://nomina-qa.adacsc.co/conceptos-nov-ad");
+    await expect(page).toHaveURL(/\/conceptos-nov-ad/);
+
+    const [initialRowsResponse, conceptLookupResponse] = await Promise.all([
+      initialRowsResponsePromise,
+      conceptLookupResponsePromise,
+    ]);
+    expect(initialRowsResponse.ok()).toBe(true);
+    expect(conceptLookupResponse.ok()).toBe(true);
+
+    const initialRows =
+      (await initialRowsResponse.json()) as AdministrativeConcept[];
+    const lookupConcepts =
+      (await conceptLookupResponse.json()) as LookupConcept[];
+    baselineIdentitySet = identitySet(initialRows);
+    const lookupById = new Map(
+      lookupConcepts.map(concept => [concept.kaNlConcepto, concept]),
+    );
+    const candidate = initialRows
+      .map(row => ({
+        concept: lookupById.get(row.kaNlConceptoContable),
+        noveltyCode: noveltyCodes.find(
+          noveltyCode =>
+            !baselineIdentitySet.has(
+              `${row.kaNlConceptoContable}-${noveltyCode}`,
+            ),
+        ),
+      }))
+      .find(
+        (
+          possibleCandidate,
+        ): possibleCandidate is {
+          concept: LookupConcept;
+          noveltyCode: (typeof noveltyCodes)[number];
+        } =>
+          possibleCandidate.concept !== undefined &&
+          typeof possibleCandidate.concept.ssConcepto === "string" &&
+          possibleCandidate.concept.ssConcepto.length > 0 &&
+          possibleCandidate.noveltyCode !== undefined,
+      );
+
+    test.skip(
+      !candidate,
+      "CNA-015 requires one runtime-confirmed accepted concept with an unused novelty pair",
+    );
+
+    ownedPair = {
+      kaNlConceptoContable: candidate!.concept.kaNlConcepto,
+      codigoNovedad: candidate!.noveltyCode.toUpperCase(),
+    };
+    const ownedIdentity = persistedIdentity(ownedPair);
+
+    // 1. Create and persist one disposable mapping, then use the new empty row to enter the same novelty/concept pair.
+    expect(baselineIdentitySet.has(ownedIdentity)).toBe(false);
+
+    try {
+      const workingRow = conceptsPage.emptyWorkingRow();
+      await workingRow.getByRole("combobox").click();
+      await page
+        .getByTestId(
+          `conceptos-nov-ad-novelty-option-${candidate!.noveltyCode}`,
+        )
+        .click();
+      await workingRow.getByRole("button", { name: "..." }).click();
+      await expect(conceptsPage.conceptPickerPanel).toBeInViewport();
+      await conceptsPage.searchConcept(candidate!.concept.kaNlConcepto);
+
+      const conceptRow = conceptsPage.conceptPickerRow(
+        candidate!.concept.kaNlConcepto,
+      );
+      await expect(conceptRow).toHaveCount(1);
+
+      const firstValidationResponsePromise = page.waitForResponse(
+        response =>
+          response.url() === validateConceptUrl &&
+          response.request().method() === "POST",
+      );
+      await conceptRow.dblclick();
+      const firstValidationResponse = await firstValidationResponsePromise;
+      expect(firstValidationResponse.status()).toBe(200);
+
+      const firstSaveResponsePromise = page.waitForResponse(
+        response =>
+          response.url() === saveUrl &&
+          response.request().method() === "POST",
+      );
+      mutationAttempted = true;
+      await conceptsPage.saveButton.click();
+      await page
+        .getByTestId(
+          "conceptos-nov-ad-dialog-save-confirmation-confirm-button",
+        )
+        .click();
+
+      const firstSaveResponse = await firstSaveResponsePromise;
+      expect(firstSaveResponse.status()).toBe(200);
+      const firstSaveRows =
+        (await firstSaveResponse.json()) as AdministrativeConcept[];
+      expect(
+        firstSaveRows.filter(row => persistedIdentity(row) === ownedIdentity),
+      ).toHaveLength(1);
+      for (const baselineIdentity of baselineIdentitySet) {
+        expect(identitySet(firstSaveRows).has(baselineIdentity)).toBe(true);
+      }
+      await expect(
+        page.getByText(saveSuccessMessage, { exact: true }),
+      ).toBeVisible();
+      await page
+        .getByTestId("conceptos-nov-ad-dialog-save-success-confirm-button")
+        .click();
+
+      const duplicateWorkingRow = conceptsPage.emptyWorkingRow();
+      await duplicateWorkingRow.getByRole("combobox").click();
+      await page
+        .getByTestId(
+          `conceptos-nov-ad-novelty-option-${candidate!.noveltyCode}`,
+        )
+        .click();
+      await duplicateWorkingRow.getByRole("button", { name: "..." }).click();
+      await expect(conceptsPage.conceptPickerPanel).toBeInViewport();
+      await conceptsPage.searchConcept(candidate!.concept.kaNlConcepto);
+      await expect(conceptRow).toHaveCount(1);
+
+      const duplicateValidationResponsePromise = page.waitForResponse(
+        response =>
+          response.url() === validateConceptUrl &&
+          response.request().method() === "POST",
+      );
+      await conceptRow.dblclick();
+      const duplicateValidationResponse =
+        await duplicateValidationResponsePromise;
+      expect(duplicateValidationResponse.status()).toBe(200);
+      await expect(conceptsPage.row(ownedIdentity)).toHaveCount(2);
+
+      const duplicateFeedback = page.getByText(duplicatePairMessage, {
+        exact: true,
+      });
+
+      // 2. Start request/response observation and click Grabar.
+      const duplicateSaveResponsePromise = page.waitForResponse(
+        response =>
+          response.url() === saveUrl &&
+          response.request().method() === "POST",
+      );
+      await conceptsPage.saveButton.click();
+      await page
+        .getByTestId(
+          "conceptos-nov-ad-dialog-save-confirmation-confirm-button",
+        )
+        .click();
+
+      const duplicateSaveResponse = await duplicateSaveResponsePromise;
+      const duplicateSavePayload =
+        duplicateSaveResponse.request().postDataJSON() as { rows: SavedRow[] };
+      const duplicateSaveBody = (await duplicateSaveResponse.json()) as {
+        code: string;
+        message: string;
+      };
+      const duplicateSubmittedRows = duplicateSavePayload.rows.filter(
+        (row): row is AdministrativeConcept =>
+          typeof row.kaNlConceptoContable === "number" &&
+          typeof row.codigoNovedad === "string",
+      );
+
+      expect(duplicateSaveResponse.status()).toBe(400);
+      expect(duplicateSaveBody).toEqual(
+        expect.objectContaining({
+          code: "BAD_REQUEST",
+          message: duplicatePairMessage,
+        }),
+      );
+      expect(duplicateSubmittedRows).toHaveLength(initialRows.length + 2);
+      expect(
+        duplicateSubmittedRows.filter(
+          row => persistedIdentity(row) === ownedIdentity,
+        ),
+      ).toHaveLength(2);
+      for (const baselineIdentity of baselineIdentitySet) {
+        expect(
+          duplicateSubmittedRows.filter(
+            row => persistedIdentity(row) === baselineIdentity,
+          ),
+        ).toHaveLength(1);
+      }
+      await expect(duplicateFeedback).toBeVisible();
+      await page.getByRole("button", { name: "Aceptar", exact: true }).click();
+      await expect(conceptsPage.conceptPickerPanel).not.toBeInViewport();
+
+      // 3. Reload and fetch rows, then clean up in finally.
+      const persistedRowsResponsePromise = page.waitForResponse(
+        response =>
+          response.url() === rowsUrl &&
+          response.request().method() === "GET",
+      );
+      await conceptsPage.reloadButton.click();
+
+      const persistedRowsResponse = await persistedRowsResponsePromise;
+      expect(persistedRowsResponse.ok()).toBe(true);
+      const persistedRows =
+        (await persistedRowsResponse.json()) as AdministrativeConcept[];
+      expect(
+        persistedRows.filter(row => persistedIdentity(row) === ownedIdentity),
+      ).toHaveLength(1);
+      expect(identitySet(persistedRows).size).toBe(persistedRows.length);
+      for (const baselineIdentity of baselineIdentitySet) {
+        expect(identitySet(persistedRows).has(baselineIdentity)).toBe(true);
+      }
+      await expect(conceptsPage.row(ownedIdentity)).toHaveCount(1);
+    } finally {
+      if (mutationAttempted && ownedPair) {
+        const visibleFeedbackButton = page.getByRole("button", {
+          name: "Aceptar",
+          exact: true,
+        });
+        if (await visibleFeedbackButton.isVisible()) {
+          await visibleFeedbackButton.click();
+        }
+        const visibleSaveConfirmationCancelButton = page.getByRole("button", {
+          name: "No",
+          exact: true,
+        });
+        if (await visibleSaveConfirmationCancelButton.isVisible()) {
+          await visibleSaveConfirmationCancelButton.click();
+        }
+
+        const cleanupRowsResponsePromise = page.waitForResponse(
+          response =>
+            response.url() === rowsUrl &&
+            response.request().method() === "GET",
+        );
+        await conceptsPage.reloadButton.click();
+
+        const cleanupRowsResponse = await cleanupRowsResponsePromise;
+        expect(cleanupRowsResponse.ok()).toBe(true);
+        const cleanupRows =
+          (await cleanupRowsResponse.json()) as AdministrativeConcept[];
+        const ownedRows = cleanupRows.filter(
+          row => persistedIdentity(row) === ownedIdentity,
+        );
+
+        if (ownedRows.length > 0) {
+          expect(ownedRows).toHaveLength(1);
+          expect(baselineIdentitySet.has(ownedIdentity)).toBe(false);
+          await conceptsPage.row(ownedIdentity).click();
+
+          const deleteResponsePromise = page.waitForResponse(
+            response =>
+              response.url() === deleteUrl &&
+              response.request().method() === "POST",
+          );
+          await conceptsPage.deleteButton.click();
+          await page
+            .getByTestId(
+              "conceptos-nov-ad-dialog-delete-confirmation-confirm-button",
+            )
+            .click();
+
+          const deleteResponse = await deleteResponsePromise;
+          expect(deleteResponse.status()).toBe(200);
+          expect(deleteResponse.request().postDataJSON()).toEqual(ownedPair);
+        }
+
+        const finalRowsResponsePromise = page.waitForResponse(
+          response =>
+            response.url() === rowsUrl &&
+            response.request().method() === "GET",
+        );
+        await conceptsPage.reloadButton.click();
+
+        const finalRowsResponse = await finalRowsResponsePromise;
+        expect(finalRowsResponse.ok()).toBe(true);
+        const finalRows =
+          (await finalRowsResponse.json()) as AdministrativeConcept[];
+        expect(identitySet(finalRows).has(ownedIdentity)).toBe(false);
         for (const baselineIdentity of baselineIdentitySet) {
           expect(identitySet(finalRows).has(baselineIdentity)).toBe(true);
         }

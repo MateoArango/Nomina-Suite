@@ -215,7 +215,7 @@ Execution rules: read-only, local-validation, modal-dismissal, and rejected-requ
 
 **Implementation summary:** The serial test derives an unused pair from fresh persisted rows and lookup data, validates and saves it once through the UI, captures the exact full-grid save contract and pair-based returned identity, then reloads to prove exactly one owned mapping persisted. Its `finally` cleanup reloads first, deletes only that owned pair with the exact pair-scoped payload, and proves absence through a final fresh rows response while preserving every baseline identity. Focused Chromium verification passed: 1 test.
 
-#### 3.2. CNA-014: A second Grabar updates the current owned mapping without duplication
+#### 3.2. ✅ CNA-014: A second Grabar updates the current owned mapping without duplication
 
 **File:** `tests/administrative-update-concepts/mutation-contracts.spec.ts`
 
@@ -232,7 +232,7 @@ Execution rules: read-only, local-validation, modal-dismissal, and rejected-requ
 
 **Implementation summary:** ✅ The serial test derives two unused pairs for one runtime-confirmed accepted concept, creates the source pair, edits that same owned row without reloading or selecting a baseline row, and proves the second full-grid Grabar request replaces the source pair with exactly one target pair while preserving every baseline identity. It reloads to verify persistence and non-duplication, then its `finally` cleanup deletes whichever owned pair remains and proves both are absent through a final fresh rows response. Focused Chromium verification passed: 1 test.
 
-#### 3.3. CNA-015: Duplicate pair creation is rejected without changing the owned original
+#### 3.3. ✅ CNA-015: Duplicate pair creation is rejected without changing the owned original
 
 **File:** `tests/administrative-update-concepts/mutation-contracts.spec.ts`
 
@@ -247,6 +247,8 @@ Execution rules: read-only, local-validation, modal-dismissal, and rejected-requ
     - expect: Exactly one owned original remains unchanged before cleanup.
     - expect: No second identity or duplicate pair persists.
     - expect: Only the owned original is deleted.
+
+**Implementation summary:** The serial test creates one runtime-derived disposable mapping, enters the same pair in the new working row, and confirms the duplicate full-grid save is rejected with HTTP 400, code `BAD_REQUEST`, and the exact message `No se permiten registros duplicados para concepto y novedad.` It reloads to prove exactly one unchanged owned original persisted while every baseline identity remained, then its `finally` cleanup deletes only the owned pair and verifies its absence. Focused Chromium verification passed: 1 test.
 
 #### 3.4. CNA-016: Editing one owned mapping to another owned pair is rejected without overwriting either
 
