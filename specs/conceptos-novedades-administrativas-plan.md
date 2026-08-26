@@ -162,7 +162,7 @@ Execution rules: read-only, local-validation, modal-dismissal, and rejected-requ
 
 **Implementation summary:** The test derives a runtime-confirmed accepted concept and an unused local novelty pair, double-clicks the stable-ID picker row, and captures the immediate validation contract as one POST with the selected `kaNlConcepto`, HTTP 200, and a response matching the runtime lookup record. It verifies the panel closes, the selected concept appears in the main grid, and Recargar restores the original persisted identity set with zero save requests. Focused Chromium verification passed: 1 test.
 
-#### 2.6. CNA-011: Invalid concept is rejected immediately without save
+#### 2.6. ✅ CNA-011: Invalid concept is rejected immediately without save
 
 **File:** `tests/administrative-update-concepts/invalid-concept-validation.spec.ts`
 
@@ -174,7 +174,9 @@ Execution rules: read-only, local-validation, modal-dismissal, and rejected-requ
   2. Dismiss feedback, reload, and inspect rows while observing /actions/grabar.
     - expect: No save request is sent and no mapping for the attempted pair is persisted.
 
-#### 2.7. CNA-012: Missing either field blocks save before the API
+**Implementation summary:** The test derives a runtime concept outside the currently accepted persisted concept IDs, selects it by stable ID, and captures one immediate POST validation with the selected `kaNlConcepto`. It verifies HTTP 400, code `BAD_REQUEST`, the exact invalid-salary-base message in both the response and UI, dismisses feedback, reloads fresh rows, and proves the attempted pair was not persisted with zero save requests. Focused Chromium verification passed: 1 test.
+
+#### 2.7. ✅ CNA-012: Missing either field blocks save before the API
 
 **File:** `tests/administrative-update-concepts/required-pair-validation.spec.ts`
 
@@ -185,6 +187,8 @@ Execution rules: read-only, local-validation, modal-dismissal, and rejected-requ
   2. Reset; apply only a valid Concepto Contable, leave Novedad blank, and click Grabar.
     - expect: The same exact message is shown.
     - expect: Zero save requests occur and no persisted identity is added.
+
+**Implementation summary:** The test derives a runtime-confirmed valid concept from persisted rows, exercises novelty-only and concept-only incomplete pairs in isolated local states, verifies the exact incomplete-row feedback in both branches, proves zero `/actions/grabar` requests, and compares fresh runtime identity sets after each reset. Focused Chromium verification passed: 1 test.
 
 ### 3. Serialized disposable-data mutation contracts
 
