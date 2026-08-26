@@ -194,7 +194,7 @@ Execution rules: read-only, local-validation, modal-dismissal, and rejected-requ
 
 **Seed:** `tests/administrative-update-concepts/seed-test.spec.ts`
 
-#### 3.1. CNA-013: Create a mapping, prove persistence, and clean it up by owned identity
+#### 3.1. ✅ CNA-013: Create a mapping, prove persistence, and clean it up by owned identity
 
 **File:** `tests/administrative-update-concepts/mutation-contracts.spec.ts`
 
@@ -212,6 +212,8 @@ Execution rules: read-only, local-validation, modal-dismissal, and rejected-requ
   4. In finally, select/delete only the owned identity, capture /actions/borrar, reload, and fetch rows again.
     - expect: The delete payload targets only the owned identity and excludes every baseline identity.
     - expect: The owned identity is absent after cleanup; cleanup failure is visible.
+
+**Implementation summary:** The serial test derives an unused pair from fresh persisted rows and lookup data, validates and saves it once through the UI, captures the exact full-grid save contract and pair-based returned identity, then reloads to prove exactly one owned mapping persisted. Its `finally` cleanup reloads first, deletes only that owned pair with the exact pair-scoped payload, and proves absence through a final fresh rows response while preserving every baseline identity. Focused Chromium verification passed: 1 test.
 
 #### 3.2. CNA-014: A second Grabar updates the current owned mapping without duplication
 
