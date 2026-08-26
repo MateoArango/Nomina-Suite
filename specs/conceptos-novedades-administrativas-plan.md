@@ -250,7 +250,7 @@ Execution rules: read-only, local-validation, modal-dismissal, and rejected-requ
 
 **Implementation summary:** The serial test creates one runtime-derived disposable mapping, enters the same pair in the new working row, and confirms the duplicate full-grid save is rejected with HTTP 400, code `BAD_REQUEST`, and the exact message `No se permiten registros duplicados para concepto y novedad.` It reloads to prove exactly one unchanged owned original persisted while every baseline identity remained, then its `finally` cleanup deletes only the owned pair and verifies its absence. Focused Chromium verification passed: 1 test.
 
-#### 3.4. CNA-016: Editing one owned mapping to another owned pair is rejected without overwriting either
+#### 3.4. ✅ CNA-016: Editing one owned mapping to another owned pair is rejected without overwriting either
 
 **File:** `tests/administrative-update-concepts/mutation-contracts.spec.ts`
 
@@ -265,6 +265,8 @@ Execution rules: read-only, local-validation, modal-dismissal, and rejected-requ
     - expect: Exactly one mapping exists for each owned pair.
   4. Delete both owned identities in finally and verify both are absent.
     - expect: The delete scope equals the two owned identities exactly, independent of array order.
+
+**Implementation summary:** The serial test derives one runtime-confirmed accepted concept with two unused novelty pairs, creates and retains both complete test-owned mappings, then edits the first row into the second pair and confirms the full-grid save is rejected with HTTP 400, code `BAD_REQUEST`, and the exact duplicate message. A fresh reload proves exactly one unchanged row remains for each owned pair while every baseline identity is preserved; `finally` deletes only the two owned payloads, compares cleanup scope independent of order, and verifies both are absent. Focused Chromium verification passed: 1 test.
 
 #### 3.5. CNA-017: Delete one owned mapping with exact request scope
 
