@@ -148,7 +148,7 @@ Execution rules: read-only, local-validation, modal-dismissal, and rejected-requ
 
 **Implementation summary:** The test opens the picker from a runtime-derived persisted row, single-clicks a runtime concept and verifies its local pending state, then proves header Close preserves the original Concepto Contable value, keeps Grabar disabled, and sends zero validation/save requests. Reopening confirms the discarded concept is no longer selected. Focused Chromium verification passed: 1 test.
 
-#### 2.5. CNA-010: Double-click applies a valid concept and validates immediately
+#### 2.5. ✅ CNA-010: Double-click applies a valid concept and validates immediately
 
 **File:** `tests/administrative-update-concepts/valid-concept-double-click.spec.ts`
 
@@ -159,6 +159,8 @@ Execution rules: read-only, local-validation, modal-dismissal, and rejected-requ
     - expect: The request method, payload identity fields, success status, and response shape are captured as the implementation contract.
   2. Reset with Recargar while observing /actions/grabar.
     - expect: No save request is sent and the runtime persisted identity set remains unchanged.
+
+**Implementation summary:** The test derives a runtime-confirmed accepted concept and an unused local novelty pair, double-clicks the stable-ID picker row, and captures the immediate validation contract as one POST with the selected `kaNlConcepto`, HTTP 200, and a response matching the runtime lookup record. It verifies the panel closes, the selected concept appears in the main grid, and Recargar restores the original persisted identity set with zero save requests. Focused Chromium verification passed: 1 test.
 
 #### 2.6. CNA-011: Invalid concept is rejected immediately without save
 
