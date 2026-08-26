@@ -122,7 +122,7 @@ Execution rules: read-only, local-validation, modal-dismissal, and rejected-requ
 
 **Implementation summary:** The test derives selective code, name-fragment, and stable-ID terms from the runtime lookup, validates filtered rows by unique concept identity and field-specific client semantics, proves searches reuse the single catalog request, verifies the exact zero-result state with hidden pager controls, and confirms clearing restores the runtime-derived first page and total. Focused Chromium verification passed: 1 test.
 
-#### 2.3. CNA-008: Concept-picker page sizes and navigation boundaries
+#### 2.3. ✅ CNA-008: Concept-picker page sizes and navigation boundaries
 
 **File:** `tests/administrative-update-concepts/concept-picker-pagination.spec.ts`
 
@@ -133,7 +133,9 @@ Execution rules: read-only, local-validation, modal-dismissal, and rejected-requ
   2. Return to the first page and close the picker.
     - expect: The main row remains unmodified and no persistence request occurs.
 
-#### 2.4. CNA-009: Close discards a pending concept selection
+**Implementation summary:** The test captures the complete runtime concept lookup, validates unique stable identities, exercises page sizes 10, 25, 50, and 100, and maps every forward and backward picker page to the corresponding runtime identity slice with derived pager boundaries. It returns to page one, closes from a persisted-row picker without applying a concept, and proves the original row values remain unchanged with zero save/delete requests. Focused Chromium verification passed: 1 test.
+
+#### 2.4. ✅ CNA-009: Close discards a pending concept selection
 
 **File:** `tests/administrative-update-concepts/concept-picker-close-discards-selection.spec.ts`
 
@@ -143,6 +145,8 @@ Execution rules: read-only, local-validation, modal-dismissal, and rejected-requ
     - expect: No validar-concepto or grabar request occurs unless the confirmed UI contract validates on single selection.
   2. Reopen the picker.
     - expect: The discarded pending selection is not applied or retained as an active choice.
+
+**Implementation summary:** The test opens the picker from a runtime-derived persisted row, single-clicks a runtime concept and verifies its local pending state, then proves header Close preserves the original Concepto Contable value, keeps Grabar disabled, and sends zero validation/save requests. Reopening confirms the discarded concept is no longer selected. Focused Chromium verification passed: 1 test.
 
 #### 2.5. CNA-010: Double-click applies a valid concept and validates immediately
 
