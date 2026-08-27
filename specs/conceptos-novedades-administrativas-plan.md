@@ -6,6 +6,9 @@ Validate the authenticated /conceptos-nov-ad grid and its concept picker using t
 
 Execution rules: read-only, local-validation, modal-dismissal, and rejected-request tests may run in parallel. All persistence tests belong in one serial mutation spec because valid persisted identity is drawn from a finite 5 novelty x 4 accepted-concept keyspace. Every mutating test must derive an unused candidate pair from fresh runtime rows, create it through the UI, retain the backend identity returned by save or a uniquely matching fresh rows response, and delete only that owned identity in finally. Baseline IDs/pairs are safety boundaries and must never be edited or deleted. Start waits before triggers, use no fixed sleeps, verify persistence/absence through fresh API reads after reload, and never assert global totals, ordering, paginator ranges, or fixed row positions in mutating tests. If no safe pair is available, skip with a precise prerequisite reason. Mutation tests require explicit shared-QA authorization before execution. Cleanup must fail visibly if any owned identity remains.
 
+## Expected baseLine
+- 2 records created (so the tests can read them)
+
 ## Test Scenarios
 
 ### 1. Runtime grid and local state
