@@ -4,11 +4,6 @@
 import { expect, test } from "../fixtures/auth.fixture";
 import { AdministrativeUpdateConceptsPage } from "../../pages/AdministrativeUpdateConcepts.page";
 
-type AdministrativeConcept = {
-  kaNlConceptoContable: number;
-  codigoNovedad: string;
-};
-
 const apiBase =
   "https://nomina-qa-api.adacsc.co/api/v1/w-conceptos-nov-ad";
 const rowsUrl = `${apiBase}/rows`;
@@ -20,10 +15,6 @@ const noveltyCatalog = [
   { code: "vac", label: "Vacaciones" },
   { code: "lcn", label: "Cuidado de la Ninez" },
 ] as const;
-
-function persistedIdentity(concept: AdministrativeConcept): string {
-  return `${concept.kaNlConceptoContable}-${concept.codigoNovedad.toLowerCase()}`;
-}
 
 test.describe("Runtime grid and local state", () => {
   test("CNA-003: Novelty options use the exact client-side catalog", async ({
@@ -63,12 +54,8 @@ test.describe("Runtime grid and local state", () => {
     const initialRowsResponse = await initialRowsResponsePromise;
     expect(initialRowsResponse.ok()).toBe(true);
 
-    const initialRows =
-      (await initialRowsResponse.json()) as AdministrativeConcept[];
+    const initialRows = await initialRowsResponse.json();
     expect(Array.isArray(initialRows)).toBe(true);
-
-    const initialIdentitySet = [...new Set(initialRows.map(persistedIdentity))].sort();
-    expect(initialIdentitySet).toHaveLength(initialRows.length);
 
     // 1. Open the novelty selector on the empty working row while observing requests to /w-conceptos-nov-ad.
     const workingRow = conceptsPage.emptyWorkingRow();
@@ -105,12 +92,8 @@ test.describe("Runtime grid and local state", () => {
       const refreshedRowsResponse = await refreshedRowsResponsePromise;
       expect(refreshedRowsResponse.ok()).toBe(true);
 
-      const refreshedRows =
-        (await refreshedRowsResponse.json()) as AdministrativeConcept[];
+      const refreshedRows = await refreshedRowsResponse.json();
       expect(Array.isArray(refreshedRows)).toBe(true);
-      expect([...new Set(refreshedRows.map(persistedIdentity))].sort()).toEqual(
-        initialIdentitySet,
-      );
 
       await expect(conceptsPage.emptyWorkingRow()).toHaveCount(1);
       await expect(

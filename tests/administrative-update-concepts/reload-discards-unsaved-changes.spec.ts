@@ -9,6 +9,12 @@ type AdministrativeConcept = {
   codigoNovedad: string;
 };
 
+type LookupConcept = {
+  kaNlConcepto: number;
+  ssCodigo: string;
+  ssConcepto: string | null;
+};
+
 const apiBase =
   "https://nomina-qa-api.adacsc.co/api/v1/w-conceptos-nov-ad";
 const rowsUrl = `${apiBase}/rows`;
@@ -16,6 +22,19 @@ const conceptLookupUrl = `${apiBase}/lookups/conceptos`;
 
 function persistedIdentity(concept: AdministrativeConcept): string {
   return `${concept.kaNlConceptoContable}-${concept.codigoNovedad.toLowerCase()}`;
+}
+
+function conceptSearchMatchCount(
+  lookupConcepts: LookupConcept[],
+  searchTerm: string | number,
+): number {
+  const normalizedTerm = String(searchTerm).toLowerCase();
+
+  return lookupConcepts.filter(concept =>
+    [concept.kaNlConcepto, concept.ssCodigo, concept.ssConcepto]
+      .filter(value => value !== null)
+      .some(value => String(value).toLowerCase().includes(normalizedTerm)),
+  ).length;
 }
 
 test.describe("Runtime grid and local state", () => {
@@ -57,7 +76,10 @@ test.describe("Runtime grid and local state", () => {
 
     const initialRows =
       (await initialRowsResponse.json()) as AdministrativeConcept[];
+    const lookupConcepts =
+      (await conceptLookupResponse.json()) as LookupConcept[];
     expect(Array.isArray(initialRows)).toBe(true);
+    expect(Array.isArray(lookupConcepts)).toBe(true);
 
     test.skip(
       initialRows.length === 0,
@@ -72,6 +94,22 @@ test.describe("Runtime grid and local state", () => {
       }),
     );
     expect(sourcePair.codigoNovedad).not.toBe("");
+
+    const sourceConcept = lookupConcepts.find(
+      concept => concept.kaNlConcepto === sourcePair.kaNlConceptoContable,
+    );
+    expect(sourceConcept).toBeDefined();
+    const conceptSearchTerm = [
+      sourceConcept!.kaNlConcepto,
+      sourceConcept!.ssCodigo,
+      sourceConcept!.ssConcepto ?? "",
+    ]
+      .filter(searchTerm => String(searchTerm).length > 0)
+      .sort(
+        (left, right) =>
+          conceptSearchMatchCount(lookupConcepts, left) -
+          conceptSearchMatchCount(lookupConcepts, right),
+      )[0];
 
     const initialIdentitySet = new Set(initialRows.map(persistedIdentity));
     const workingRow = conceptsPage.emptyWorkingRow();
@@ -110,13 +148,20 @@ test.describe("Runtime grid and local state", () => {
       )
       .toBeLessThanOrEqual(viewport!.width - pickerWidth! + 1);
 
-    await conceptsPage.searchConcept(sourcePair.kaNlConceptoContable);
+    await conceptsPage.searchConcept(conceptSearchTerm);
     await expect(conceptsPage.conceptPickerSearchInput).toBeVisible();
 
     const conceptRow = conceptsPage.conceptPickerRow(
       sourcePair.kaNlConceptoContable,
     );
     await expect(conceptRow).toHaveCount(1);
+    while (!(await conceptRow.isVisible())) {
+      await expect(
+        conceptsPage.conceptPickerNextPageButton,
+      ).toBeEnabled();
+      await conceptsPage.conceptPickerNextPageButton.click();
+    }
+    await expect(conceptRow).toBeInViewport();
 
     const validationResponsePromise = page.waitForResponse(
       response =>

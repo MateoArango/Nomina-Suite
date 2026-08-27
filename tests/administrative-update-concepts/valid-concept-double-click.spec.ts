@@ -28,6 +28,19 @@ function persistedIdentity(concept: AdministrativeConcept): string {
   return `${concept.kaNlConceptoContable}-${concept.codigoNovedad.toLowerCase()}`;
 }
 
+function conceptSearchMatchCount(
+  lookupConcepts: LookupConcept[],
+  searchTerm: string | number,
+): number {
+  const normalizedTerm = String(searchTerm).toLowerCase();
+
+  return lookupConcepts.filter(concept =>
+    [concept.kaNlConcepto, concept.ssCodigo, concept.ssConcepto]
+      .filter(value => value !== null)
+      .some(value => String(value).toLowerCase().includes(normalizedTerm)),
+  ).length;
+}
+
 test.describe("Concept picker and validation contracts", () => {
   test("CNA-010: Double-click applies a valid concept and validates immediately", async ({
     page,
@@ -111,6 +124,15 @@ test.describe("Concept picker and validation contracts", () => {
 
     const selectedConcept = localCandidate!.concept;
     const selectedNoveltyCode = localCandidate!.noveltyCode;
+    const conceptSearchTerm = [
+      selectedConcept.kaNlConcepto,
+      selectedConcept.ssCodigo,
+      selectedConcept.ssConcepto!,
+    ].sort(
+      (left, right) =>
+        conceptSearchMatchCount(lookupConcepts, left) -
+        conceptSearchMatchCount(lookupConcepts, right),
+    )[0];
     const appliedRowKey =
       `${selectedConcept.kaNlConcepto}-${selectedNoveltyCode}`;
     const workingRow = conceptsPage.emptyWorkingRow();
@@ -127,11 +149,18 @@ test.describe("Concept picker and validation contracts", () => {
     await workingRow.getByRole("button", { name: "..." }).click();
     await expect(conceptsPage.conceptPickerPanel).toBeInViewport();
 
-    await conceptsPage.searchConcept(selectedConcept.kaNlConcepto);
+    await conceptsPage.searchConcept(conceptSearchTerm);
     const conceptRow = conceptsPage.conceptPickerRow(
       selectedConcept.kaNlConcepto,
     );
     await expect(conceptRow).toHaveCount(1);
+    while (!(await conceptRow.isVisible())) {
+      await expect(
+        conceptsPage.conceptPickerNextPageButton,
+      ).toBeEnabled();
+      await conceptsPage.conceptPickerNextPageButton.click();
+    }
+    await expect(conceptRow).toBeInViewport();
 
     const validationResponsePromise = page.waitForResponse(
       response =>

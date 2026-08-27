@@ -49,20 +49,23 @@ test.describe("Concept picker and validation contracts", () => {
       (await initialRowsResponse.json()) as AdministrativeConcept[];
     const initialIdentitySet = [...new Set(initialRows.map(persistedIdentity))].sort();
 
-    test.skip(
-      initialRows.length === 0,
-      "CNA-012 requires one persisted runtime row to supply a valid concept",
-    );
     expect(initialIdentitySet).toHaveLength(initialRows.length);
 
-    const sourcePair = initialRows[0];
+    const sourcePair = initialRows.find(
+      row =>
+        row.kaNlConceptoContable > 0 && row.codigoNovedad.trim() !== "",
+    );
+    test.skip(
+      !sourcePair,
+      "CNA-012 requires one persisted runtime row to supply a valid concept",
+    );
     expect(sourcePair).toEqual(
       expect.objectContaining({
         kaNlConceptoContable: expect.any(Number),
         codigoNovedad: expect.any(String),
       }),
     );
-    expect(sourcePair.codigoNovedad).not.toBe("");
+    expect(sourcePair!.codigoNovedad).not.toBe("");
 
     const feedbackMessage = page.getByText(incompleteRowMessage, {
       exact: true,
@@ -77,7 +80,7 @@ test.describe("Concept picker and validation contracts", () => {
     await noveltyOnlyRow.getByRole("combobox").click();
     await page
       .getByTestId(
-        `conceptos-nov-ad-novelty-option-${sourcePair.codigoNovedad.toLowerCase()}`,
+        `conceptos-nov-ad-novelty-option-${sourcePair!.codigoNovedad.toLowerCase()}`,
       )
       .click();
 
@@ -123,12 +126,20 @@ test.describe("Concept picker and validation contracts", () => {
     }
 
     await expect(conceptsPage.conceptPickerPanel).toBeInViewport();
-    await conceptsPage.searchConcept(sourcePair.kaNlConceptoContable);
+    await conceptsPage.searchConcept(sourcePair!.kaNlConceptoContable);
 
     const conceptRow = conceptsPage.conceptPickerRow(
-      sourcePair.kaNlConceptoContable,
+      sourcePair!.kaNlConceptoContable,
     );
     await expect(conceptRow).toHaveCount(1);
+    while (!(await conceptRow.isVisible())) {
+      await expect(
+        conceptsPage.conceptPickerNextPageButton,
+      ).toBeEnabled();
+      await conceptsPage.conceptPickerNextPageButton.click();
+    }
+    await conceptRow.scrollIntoViewIfNeeded();
+    await expect(conceptRow).toBeInViewport();
     const selectedConceptName = await conceptRow.locator("td").nth(2).innerText();
 
     const validationResponsePromise = page.waitForResponse(
