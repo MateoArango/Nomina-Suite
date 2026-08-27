@@ -39,9 +39,18 @@ test.describe("CRUD persistence and safe deletion", () => {
     const baselineIds = new Set<number>();
     const testOwnedIds = new Set<number>();
     let disposableCode: string | undefined;
+    let authorization: string | undefined;
 
     const readRows = async (): Promise<RiskRow[]> => {
-      const response = await page.request.get(rowsUrl);
+      if (!authorization) {
+        throw new Error(
+          "The authenticated browser request did not provide an authorization header.",
+        );
+      }
+
+      const response = await page.request.get(rowsUrl, {
+        headers: { authorization },
+      });
       expect(response.ok()).toBe(true);
       return (await response.json()) as RiskRow[];
     };
@@ -88,6 +97,12 @@ test.describe("CRUD persistence and safe deletion", () => {
       await page.goto(pageUrl);
       const initialRowsResponse = await initialRowsResponsePromise;
       expect(initialRowsResponse.ok()).toBe(true);
+      authorization = (await initialRowsResponse.request().allHeaders())
+        .authorization;
+      expect(
+        authorization,
+        "The initial browser /rows request must be authenticated.",
+      ).toBeTruthy();
 
       const initialRows = (await initialRowsResponse.json()) as RiskRow[];
       initialRows.forEach((risk) => baselineIds.add(risk.kaNlClase));
@@ -166,6 +181,7 @@ test.describe("CRUD persistence and safe deletion", () => {
 
       const originalDetailResponse = await page.request.get(
         `${rowsUrl}/${createdRecord.kaNlClase}`,
+        { headers: { authorization: authorization! } },
       );
       expect(originalDetailResponse.ok()).toBe(true);
       const originalDetail =
@@ -238,6 +254,7 @@ test.describe("CRUD persistence and safe deletion", () => {
 
       const updatedDetailResponse = await page.request.get(
         `${rowsUrl}/${originalDetail.kaNlClase}`,
+        { headers: { authorization: authorization! } },
       );
       expect(updatedDetailResponse.ok()).toBe(true);
       expect((await updatedDetailResponse.json()) as RiskDetail).toMatchObject({
@@ -249,7 +266,7 @@ test.describe("CRUD persistence and safe deletion", () => {
       });
     } finally {
       // 3. Delete the disposable record and verify the final state through the API by ID.
-      if (disposableCode !== undefined) {
+      if (authorization && disposableCode !== undefined) {
         const currentRows = await readRows();
         for (const risk of currentRows) {
           if (

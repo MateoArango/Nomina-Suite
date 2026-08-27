@@ -36,9 +36,18 @@ test.describe("CRUD persistence and safe deletion", () => {
     const testOwnedIds = new Set<number>();
     const disposableCodes: string[] = [];
     const capturedDetails: RiskDetail[] = [];
+    let authorization: string | undefined;
 
     const readRows = async (): Promise<RiskRow[]> => {
-      const response = await page.request.get(rowsUrl);
+      if (!authorization) {
+        throw new Error(
+          "The authenticated browser request did not provide an authorization header.",
+        );
+      }
+
+      const response = await page.request.get(rowsUrl, {
+        headers: { authorization },
+      });
       expect(response.ok()).toBe(true);
       return (await response.json()) as RiskRow[];
     };
@@ -85,6 +94,12 @@ test.describe("CRUD persistence and safe deletion", () => {
       await page.goto(pageUrl);
       const initialRowsResponse = await initialRowsResponsePromise;
       expect(initialRowsResponse.ok()).toBe(true);
+      authorization = (await initialRowsResponse.request().allHeaders())
+        .authorization;
+      expect(
+        authorization,
+        "The initial browser /rows request must be authenticated.",
+      ).toBeTruthy();
 
       const initialRows = (await initialRowsResponse.json()) as RiskRow[];
       initialRows.forEach((risk) => baselineIds.add(risk.kaNlClase));
@@ -133,9 +148,7 @@ test.describe("CRUD persistence and safe deletion", () => {
         await risksPage.createButton.click();
         await risksPage.codeInput.fill(recordInput.code);
         await risksPage.classInput.fill(recordInput.className);
-        await risksPage.percentageInput.fill(
-          String(recordInput.percentage),
-        );
+        await risksPage.percentageInput.fill(String(recordInput.percentage));
         await risksPage.openActivityModalButton.click();
 
         const firstVisibleActivityRow = risksPage.activityModal
@@ -178,6 +191,7 @@ test.describe("CRUD persistence and safe deletion", () => {
 
         const detailResponse = await page.request.get(
           `${rowsUrl}/${savedDetail.kaNlClase}`,
+          { headers: { authorization: authorization! } },
         );
         expect(detailResponse.ok()).toBe(true);
         const persistedDetail = (await detailResponse.json()) as RiskDetail;
@@ -201,8 +215,7 @@ test.describe("CRUD persistence and safe deletion", () => {
       await risksPage.pageSizeButton(100).click();
       const firstDetailResponsePromise = page.waitForResponse(
         (response) =>
-          response.url() ===
-            `${rowsUrl}/${capturedDetails[0].kaNlClase}` &&
+          response.url() === `${rowsUrl}/${capturedDetails[0].kaNlClase}` &&
           response.request().method() === "GET",
       );
       await risksPage.riskRow(capturedDetails[0].kaNlClase).dblclick();
@@ -217,8 +230,7 @@ test.describe("CRUD persistence and safe deletion", () => {
 
       const duplicateResponsePromise = page.waitForResponse(
         (response) =>
-          response.url() === saveUrl &&
-          response.request().method() === "POST",
+          response.url() === saveUrl && response.request().method() === "POST",
       );
       await risksPage.saveButton.click();
 
@@ -271,6 +283,7 @@ test.describe("CRUD persistence and safe deletion", () => {
 
         const detailResponse = await page.request.get(
           `${rowsUrl}/${capturedDetail.kaNlClase}`,
+          { headers: { authorization: authorization! } },
         );
         expect(detailResponse.ok()).toBe(true);
         expect((await detailResponse.json()) as RiskDetail).toEqual(
@@ -285,7 +298,7 @@ test.describe("CRUD persistence and safe deletion", () => {
       }
     } finally {
       // 4. Delete both test-owned records and verify both IDs are absent from a fresh /rows response.
-      if (disposableCodes.length > 0) {
+      if (authorization && disposableCodes.length > 0) {
         const currentRows = await readRows();
         for (const risk of currentRows) {
           if (
@@ -305,8 +318,7 @@ test.describe("CRUD persistence and safe deletion", () => {
       if (testOwnedIds.size > 0) {
         const cleanupRowsResponsePromise = page.waitForResponse(
           (response) =>
-            response.url() === rowsUrl &&
-            response.request().method() === "GET",
+            response.url() === rowsUrl && response.request().method() === "GET",
         );
         await page.reload();
         await cleanupRowsResponsePromise;

@@ -30,9 +30,18 @@ test.describe("Validation and backend error contracts", () => {
     const risksPage = new RiesgosProfesionalesPage(page);
     const createdIds = new Set<number>();
     const createdCodes = new Set<string>();
+    let authorization: string | undefined;
 
     const readRows = async (): Promise<RiskRecord[]> => {
-      const response = await page.request.get(rowsUrl);
+      if (!authorization) {
+        throw new Error(
+          "The authenticated browser request did not provide an authorization header.",
+        );
+      }
+
+      const response = await page.request.get(rowsUrl, {
+        headers: { authorization },
+      });
       expect(response.ok()).toBe(true);
       return (await response.json()) as RiskRecord[];
     };
@@ -76,20 +85,25 @@ test.describe("Validation and backend error contracts", () => {
     try {
       // 1. For each value 0, 0.522, and 99.999, choose an unused three-character code from the runtime dataset, create a disposable record, and capture POST /actions/grabar.
       const initialRowsResponsePromise = page.waitForResponse(
-        response =>
+        (response) =>
           response.url() === rowsUrl && response.request().method() === "GET",
       );
       await page.goto("https://nomina-qa.adacsc.co/riesgos-profesionales");
 
       const initialRowsResponse = await initialRowsResponsePromise;
       expect(initialRowsResponse.ok()).toBe(true);
+      authorization = (await initialRowsResponse.request().allHeaders())
+        .authorization;
+      expect(
+        authorization,
+        "The initial browser /rows request must be authenticated.",
+      ).toBeTruthy();
       const initialRows = (await initialRowsResponse.json()) as RiskRecord[];
       const usedCodes = new Set(
-        initialRows.map(risk => String(risk.scCodigo).toUpperCase()),
+        initialRows.map((risk) => String(risk.scCodigo).toUpperCase()),
       );
       const candidateOffset =
-        (Date.now() + testInfo.workerIndex * boundaryValues.length) %
-        (36 * 36);
+        (Date.now() + testInfo.workerIndex * boundaryValues.length) % (36 * 36);
       const disposableCodes: string[] = [];
 
       for (let attempt = 0; attempt < 36 * 36; attempt += 1) {
@@ -123,7 +137,7 @@ test.describe("Validation and backend error contracts", () => {
         await risksPage.percentageInput.fill(String(percentage));
 
         const saveResponsePromise = page.waitForResponse(
-          response =>
+          (response) =>
             response.url() === saveUrl &&
             response.request().method() === "POST",
         );
@@ -142,7 +156,7 @@ test.describe("Validation and backend error contracts", () => {
         });
 
         const matchingRows = (await readRows()).filter(
-          risk => risk.scCodigo === code,
+          (risk) => risk.scCodigo === code,
         );
         expect(matchingRows).toHaveLength(1);
         expect(matchingRows[0].ndPorcentaje).toBe(percentage);
@@ -152,7 +166,7 @@ test.describe("Validation and backend error contracts", () => {
 
       // 2. Reload, capture a fresh GET /rows response, and locate each created record by its returned ID and unique code.
       const reloadedRowsResponsePromise = page.waitForResponse(
-        response =>
+        (response) =>
           response.url() === rowsUrl && response.request().method() === "GET",
       );
       await page.reload();
@@ -164,7 +178,7 @@ test.describe("Validation and backend error contracts", () => {
       for (const [index, percentage] of boundaryValues.entries()) {
         const code = disposableCodes[index];
         const matchingRows = reloadedRows.filter(
-          risk => createdIds.has(risk.kaNlClase) && risk.scCodigo === code,
+          (risk) => createdIds.has(risk.kaNlClase) && risk.scCodigo === code,
         );
 
         expect(matchingRows).toHaveLength(1);
@@ -172,7 +186,7 @@ test.describe("Validation and backend error contracts", () => {
       }
     } finally {
       // 3. Delete only the records created by this test, fetch /rows again, and verify their IDs are absent.
-      const currentRows = await readRows();
+      const currentRows = authorization ? await readRows() : [];
       for (const risk of currentRows) {
         if (createdCodes.has(risk.scCodigo)) {
           createdIds.add(risk.kaNlClase);
@@ -181,20 +195,19 @@ test.describe("Validation and backend error contracts", () => {
 
       if (createdIds.size > 0) {
         const cleanupRowsResponsePromise = page.waitForResponse(
-          response =>
-            response.url() === rowsUrl &&
-            response.request().method() === "GET",
+          (response) =>
+            response.url() === rowsUrl && response.request().method() === "GET",
         );
         await page.reload();
         await cleanupRowsResponsePromise;
         await locateAndSelectCreatedRows();
 
         const deleteResponsePromise = page.waitForResponse(
-          response =>
+          (response) =>
             response.url() === deleteUrl &&
             response.request().method() === "POST",
         );
-        page.once("dialog", dialog => dialog.accept());
+        page.once("dialog", (dialog) => dialog.accept());
         await risksPage.deleteButton.click();
 
         const optionalConfirmation = page
@@ -207,7 +220,10 @@ test.describe("Validation and backend error contracts", () => {
           })
           .last();
         try {
-          await optionalConfirmation.waitFor({ state: "visible", timeout: 1_000 });
+          await optionalConfirmation.waitFor({
+            state: "visible",
+            timeout: 1_000,
+          });
           await optionalConfirmation
             .getByRole("button", { name: "Si", exact: true })
             .click();
@@ -224,7 +240,7 @@ test.describe("Validation and backend error contracts", () => {
 
         const remainingRows = await readRows();
         expect(
-          remainingRows.filter(risk => createdIds.has(risk.kaNlClase)),
+          remainingRows.filter((risk) => createdIds.has(risk.kaNlClase)),
         ).toHaveLength(0);
       }
     }

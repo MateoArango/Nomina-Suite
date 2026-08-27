@@ -29,20 +29,26 @@ test.describe("Validation and backend error contracts", () => {
 
     // 1. Read an existing code from the runtime rows response, click New, enter that exact code with otherwise valid fields, and start waiting for the save response.
     const initialRowsResponsePromise = page.waitForResponse(
-      response =>
+      (response) =>
         response.url() === rowsUrl && response.request().method() === "GET",
     );
     await page.goto("https://nomina-qa.adacsc.co/riesgos-profesionales");
 
     const initialRowsResponse = await initialRowsResponsePromise;
     expect(initialRowsResponse.ok()).toBe(true);
+    const authorization = (await initialRowsResponse.request().allHeaders())
+      .authorization;
+    expect(
+      authorization,
+      "The initial browser /rows request must be authenticated.",
+    ).toBeTruthy();
     const initialRows = (await initialRowsResponse.json()) as RiskRecord[];
     const duplicateRisk = initialRows.find(
-      risk =>
+      (risk) =>
         Number(risk.kaNlClase) > 0 &&
         typeof risk.scCodigo === "string" &&
         risk.scCodigo.length > 0 &&
-        initialRows.filter(candidate => candidate.scCodigo === risk.scCodigo)
+        initialRows.filter((candidate) => candidate.scCodigo === risk.scCodigo)
           .length === 1,
     );
 
@@ -53,7 +59,7 @@ test.describe("Validation and backend error contracts", () => {
 
     const duplicateCode = duplicateRisk!.scCodigo;
     const initialMatchingRows = initialRows.filter(
-      risk => risk.scCodigo === duplicateCode,
+      (risk) => risk.scCodigo === duplicateCode,
     );
     expect(initialMatchingRows).toHaveLength(1);
 
@@ -63,7 +69,7 @@ test.describe("Validation and backend error contracts", () => {
     await risksPage.percentageInput.fill("1");
 
     const saveResponsePromise = page.waitForResponse(
-      response =>
+      (response) =>
         response.url() === saveUrl && response.request().method() === "POST",
     );
 
@@ -90,17 +96,19 @@ test.describe("Validation and backend error contracts", () => {
       "Ya existe un registro con esos datos.",
     );
 
-    const rowsAfterRejectedSaveResponse = await page.request.get(rowsUrl);
+    const rowsAfterRejectedSaveResponse = await page.request.get(rowsUrl, {
+      headers: { authorization: authorization! },
+    });
     expect(rowsAfterRejectedSaveResponse.ok()).toBe(true);
     const rowsAfterRejectedSave =
       (await rowsAfterRejectedSaveResponse.json()) as RiskRecord[];
     expect(
-      rowsAfterRejectedSave.filter(risk => risk.scCodigo === duplicateCode),
+      rowsAfterRejectedSave.filter((risk) => risk.scCodigo === duplicateCode),
     ).toHaveLength(1);
 
     // 3. Reload the page and re-read /rows.
     const reloadedRowsResponsePromise = page.waitForResponse(
-      response =>
+      (response) =>
         response.url() === rowsUrl && response.request().method() === "GET",
     );
     await page.reload();
@@ -109,7 +117,7 @@ test.describe("Validation and backend error contracts", () => {
     expect(reloadedRowsResponse.ok()).toBe(true);
     const reloadedRows = (await reloadedRowsResponse.json()) as RiskRecord[];
     const persistedMatches = reloadedRows.filter(
-      risk => risk.scCodigo === duplicateCode,
+      (risk) => risk.scCodigo === duplicateCode,
     );
 
     expect(persistedMatches).toHaveLength(1);
