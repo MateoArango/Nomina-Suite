@@ -45,12 +45,27 @@ function identitySet(rows: AdministrativeConcept[]): Set<string> {
   return new Set(rows.map(persistedIdentity));
 }
 
+function conceptSearchMatchCount(
+  lookupConcepts: LookupConcept[],
+  conceptId: number,
+): number {
+  const term = String(conceptId).toLowerCase();
+
+  return lookupConcepts.filter(concept =>
+    [concept.kaNlConcepto, concept.ssCodigo, concept.ssConcepto]
+      .filter(value => value !== null)
+      .some(value => String(value).toLowerCase().includes(term)),
+  ).length;
+}
+
 test.describe("Serialized disposable-data mutation contracts", () => {
   test.describe.configure({ mode: "serial" });
 
   test("CNA-013: Create a mapping, prove persistence, and clean it up by owned identity", async ({
     page,
   }) => {
+    test.setTimeout(90_000);
+
     const conceptsPage = new AdministrativeUpdateConceptsPage(page);
     const saveRequests: Array<{
       method: string;
@@ -98,32 +113,79 @@ test.describe("Serialized disposable-data mutation contracts", () => {
     const lookupConcepts =
       (await conceptLookupResponse.json()) as LookupConcept[];
     const baselineIdentitySet = identitySet(initialRows);
-    const lookupById = new Map(
-      lookupConcepts.map(concept => [concept.kaNlConcepto, concept]),
+    const acceptedConceptIds = new Set(
+      initialRows.map(row => row.kaNlConceptoContable),
     );
-
-    candidate = initialRows
-      .map(row => ({
-        concept: lookupById.get(row.kaNlConceptoContable),
-        noveltyCode: noveltyCodes.find(
-          noveltyCode =>
-            !baselineIdentitySet.has(
-              `${row.kaNlConceptoContable}-${noveltyCode}`,
-            ),
-        ),
-      }))
-      .find(
-        (
-          possibleCandidate,
-        ): possibleCandidate is {
-          concept: LookupConcept;
-          noveltyCode: (typeof noveltyCodes)[number];
-        } =>
-          possibleCandidate.concept !== undefined &&
-          typeof possibleCandidate.concept.ssConcepto === "string" &&
-          possibleCandidate.concept.ssConcepto.length > 0 &&
-          possibleCandidate.noveltyCode !== undefined,
+    const authorization =
+      (await initialRowsResponse.request().allHeaders())["authorization"];
+    const candidateConcepts = lookupConcepts
+      .filter(
+        concept =>
+          typeof concept.ssConcepto === "string" &&
+          concept.ssConcepto.length > 0,
+      )
+      .sort(
+        (left, right) =>
+          Number(acceptedConceptIds.has(right.kaNlConcepto)) -
+            Number(acceptedConceptIds.has(left.kaNlConcepto)) ||
+          conceptSearchMatchCount(lookupConcepts, left.kaNlConcepto) -
+            conceptSearchMatchCount(lookupConcepts, right.kaNlConcepto),
       );
+    const unconfirmedCandidates: Array<{
+      concept: LookupConcept;
+      noveltyCode: (typeof noveltyCodes)[number];
+    }> = [];
+
+    for (const concept of candidateConcepts) {
+      const noveltyCode = noveltyCodes.find(
+        possibleNoveltyCode =>
+          !baselineIdentitySet.has(
+            `${concept.kaNlConcepto}-${possibleNoveltyCode}`,
+          ),
+      );
+
+      if (!noveltyCode) {
+        continue;
+      }
+
+      if (acceptedConceptIds.has(concept.kaNlConcepto)) {
+        candidate = { concept, noveltyCode };
+        break;
+      }
+
+      unconfirmedCandidates.push({ concept, noveltyCode });
+    }
+
+    if (!candidate && authorization) {
+      const validationBatchSize = 10;
+
+      for (
+        let batchStart = 0;
+        batchStart < unconfirmedCandidates.length;
+        batchStart += validationBatchSize
+      ) {
+        const batch = unconfirmedCandidates.slice(
+          batchStart,
+          batchStart + validationBatchSize,
+        );
+        const validationProbes = await Promise.all(
+          batch.map(({ concept }) =>
+            page.request.post(validateConceptUrl, {
+              data: { kaNlConcepto: concept.kaNlConcepto },
+              headers: { authorization },
+            }),
+          ),
+        );
+        const acceptedIndex = validationProbes.findIndex(
+          validationProbe => validationProbe.status() === 200,
+        );
+
+        if (acceptedIndex >= 0) {
+          candidate = batch[acceptedIndex];
+          break;
+        }
+      }
+    }
 
     test.skip(
       !candidate,
@@ -160,6 +222,13 @@ test.describe("Serialized disposable-data mutation contracts", () => {
         candidate!.concept.kaNlConcepto,
       );
       await expect(conceptRow).toHaveCount(1);
+      while (!(await conceptRow.isVisible())) {
+        await expect(
+          conceptsPage.conceptPickerNextPageButton,
+        ).toBeEnabled();
+        await conceptsPage.conceptPickerNextPageButton.click();
+      }
+      await expect(conceptRow).toBeInViewport();
 
       const validationResponsePromise = page.waitForResponse(
         response =>
@@ -296,7 +365,7 @@ test.describe("Serialized disposable-data mutation contracts", () => {
         if (ownedRowsBeforeCleanup.length > 0) {
           expect(ownedRowsBeforeCleanup).toHaveLength(1);
           await expect(conceptsPage.row(ownedIdentity)).toHaveCount(1);
-          await conceptsPage.row(ownedIdentity).click();
+          await conceptsPage.row(ownedIdentity).locator("td").nth(1).click();
           await expect(conceptsPage.deleteButton).toBeEnabled();
 
           const deleteResponsePromise = page.waitForResponse(
@@ -355,6 +424,8 @@ test.describe("Serialized disposable-data mutation contracts", () => {
   test("CNA-014: A second Grabar updates the current owned mapping without duplication", async ({
     page,
   }) => {
+    test.setTimeout(90_000);
+
     const conceptsPage = new AdministrativeUpdateConceptsPage(page);
     let sourcePair: AdministrativeConcept | undefined;
     let targetPair: AdministrativeConcept | undefined;
@@ -386,28 +457,85 @@ test.describe("Serialized disposable-data mutation contracts", () => {
     const lookupConcepts =
       (await conceptLookupResponse.json()) as LookupConcept[];
     baselineIdentitySet = identitySet(initialRows);
-    const lookupById = new Map(
-      lookupConcepts.map(concept => [concept.kaNlConcepto, concept]),
+    const acceptedConceptIds = new Set(
+      initialRows.map(row => row.kaNlConceptoContable),
     );
-    const candidate = initialRows
-      .map(row => {
-        const concept = lookupById.get(row.kaNlConceptoContable);
-        const unusedNoveltyCodes = noveltyCodes.filter(
-          noveltyCode =>
-            !baselineIdentitySet.has(
-              `${row.kaNlConceptoContable}-${noveltyCode}`,
-            ),
+    const authorization =
+      (await initialRowsResponse.request().allHeaders())["authorization"];
+    const candidateConcepts = lookupConcepts
+      .filter(
+        concept =>
+          typeof concept.ssConcepto === "string" &&
+          concept.ssConcepto.length > 0,
+      )
+      .sort(
+        (left, right) =>
+          Number(acceptedConceptIds.has(right.kaNlConcepto)) -
+            Number(acceptedConceptIds.has(left.kaNlConcepto)) ||
+          conceptSearchMatchCount(lookupConcepts, left.kaNlConcepto) -
+            conceptSearchMatchCount(lookupConcepts, right.kaNlConcepto),
+      );
+    let candidate:
+      | {
+          concept: LookupConcept;
+          unusedNoveltyCodes: (typeof noveltyCodes)[number][];
+        }
+      | undefined;
+    const unconfirmedCandidates: Array<{
+      concept: LookupConcept;
+      unusedNoveltyCodes: (typeof noveltyCodes)[number][];
+    }> = [];
+
+    for (const concept of candidateConcepts) {
+      const unusedNoveltyCodes = noveltyCodes.filter(
+        noveltyCode =>
+          !baselineIdentitySet.has(
+            `${concept.kaNlConcepto}-${noveltyCode}`,
+          ),
+      );
+
+      if (unusedNoveltyCodes.length < 2) {
+        continue;
+      }
+
+      if (acceptedConceptIds.has(concept.kaNlConcepto)) {
+        candidate = { concept, unusedNoveltyCodes };
+        break;
+      }
+
+      unconfirmedCandidates.push({ concept, unusedNoveltyCodes });
+    }
+
+    if (!candidate && authorization) {
+      const validationBatchSize = 10;
+
+      for (
+        let batchStart = 0;
+        batchStart < unconfirmedCandidates.length;
+        batchStart += validationBatchSize
+      ) {
+        const batch = unconfirmedCandidates.slice(
+          batchStart,
+          batchStart + validationBatchSize,
+        );
+        const validationProbes = await Promise.all(
+          batch.map(({ concept }) =>
+            page.request.post(validateConceptUrl, {
+              data: { kaNlConcepto: concept.kaNlConcepto },
+              headers: { authorization },
+            }),
+          ),
+        );
+        const acceptedIndex = validationProbes.findIndex(
+          validationProbe => validationProbe.status() === 200,
         );
 
-        return { concept, unusedNoveltyCodes };
-      })
-      .find(
-        possibleCandidate =>
-          possibleCandidate.concept !== undefined &&
-          typeof possibleCandidate.concept.ssConcepto === "string" &&
-          possibleCandidate.concept.ssConcepto.length > 0 &&
-          possibleCandidate.unusedNoveltyCodes.length >= 2,
-      );
+        if (acceptedIndex >= 0) {
+          candidate = batch[acceptedIndex];
+          break;
+        }
+      }
+    }
 
     test.skip(
       !candidate,
@@ -446,6 +574,13 @@ test.describe("Serialized disposable-data mutation contracts", () => {
         candidate!.concept!.kaNlConcepto,
       );
       await expect(conceptRow).toHaveCount(1);
+      while (!(await conceptRow.isVisible())) {
+        await expect(
+          conceptsPage.conceptPickerNextPageButton,
+        ).toBeEnabled();
+        await conceptsPage.conceptPickerNextPageButton.click();
+      }
+      await expect(conceptRow).toBeInViewport();
 
       const validationResponsePromise = page.waitForResponse(
         response =>
@@ -595,7 +730,11 @@ test.describe("Serialized disposable-data mutation contracts", () => {
             cleanupRows.some(row => persistedIdentity(row) === ownedIdentity)
           ) {
             expect(baselineIdentitySet.has(ownedIdentity)).toBe(false);
-            await conceptsPage.row(ownedIdentity).click();
+            await conceptsPage
+              .row(ownedIdentity)
+              .locator("td")
+              .nth(1)
+              .click();
 
             const deleteResponsePromise = page.waitForResponse(
               response =>
@@ -670,31 +809,85 @@ test.describe("Serialized disposable-data mutation contracts", () => {
     const lookupConcepts =
       (await conceptLookupResponse.json()) as LookupConcept[];
     baselineIdentitySet = identitySet(initialRows);
-    const lookupById = new Map(
-      lookupConcepts.map(concept => [concept.kaNlConcepto, concept]),
+    const acceptedConceptIds = new Set(
+      initialRows.map(row => row.kaNlConceptoContable),
     );
-    const candidate = initialRows
-      .map(row => ({
-        concept: lookupById.get(row.kaNlConceptoContable),
-        noveltyCode: noveltyCodes.find(
-          noveltyCode =>
-            !baselineIdentitySet.has(
-              `${row.kaNlConceptoContable}-${noveltyCode}`,
-            ),
-        ),
-      }))
-      .find(
-        (
-          possibleCandidate,
-        ): possibleCandidate is {
+    const authorization =
+      (await initialRowsResponse.request().allHeaders())["authorization"];
+    const candidateConcepts = lookupConcepts
+      .filter(
+        concept =>
+          typeof concept.ssConcepto === "string" &&
+          concept.ssConcepto.length > 0,
+      )
+      .sort(
+        (left, right) =>
+          Number(acceptedConceptIds.has(right.kaNlConcepto)) -
+            Number(acceptedConceptIds.has(left.kaNlConcepto)) ||
+          conceptSearchMatchCount(lookupConcepts, left.kaNlConcepto) -
+            conceptSearchMatchCount(lookupConcepts, right.kaNlConcepto),
+      );
+    let candidate:
+      | {
           concept: LookupConcept;
           noveltyCode: (typeof noveltyCodes)[number];
-        } =>
-          possibleCandidate.concept !== undefined &&
-          typeof possibleCandidate.concept.ssConcepto === "string" &&
-          possibleCandidate.concept.ssConcepto.length > 0 &&
-          possibleCandidate.noveltyCode !== undefined,
+        }
+      | undefined;
+    const unconfirmedCandidates: Array<{
+      concept: LookupConcept;
+      noveltyCode: (typeof noveltyCodes)[number];
+    }> = [];
+
+    for (const concept of candidateConcepts) {
+      const noveltyCode = noveltyCodes.find(
+        possibleNoveltyCode =>
+          !baselineIdentitySet.has(
+            `${concept.kaNlConcepto}-${possibleNoveltyCode}`,
+          ),
       );
+
+      if (!noveltyCode) {
+        continue;
+      }
+
+      if (acceptedConceptIds.has(concept.kaNlConcepto)) {
+        candidate = { concept, noveltyCode };
+        break;
+      }
+
+      unconfirmedCandidates.push({ concept, noveltyCode });
+    }
+
+    if (!candidate && authorization) {
+      const validationBatchSize = 10;
+
+      for (
+        let batchStart = 0;
+        batchStart < unconfirmedCandidates.length;
+        batchStart += validationBatchSize
+      ) {
+        const batch = unconfirmedCandidates.slice(
+          batchStart,
+          batchStart + validationBatchSize,
+        );
+        const validationProbes = await Promise.all(
+          batch.map(({ concept }) =>
+            page.request.post(validateConceptUrl, {
+              data: { kaNlConcepto: concept.kaNlConcepto },
+              headers: { authorization },
+            }),
+          ),
+        );
+        const acceptedIndex = validationProbes.findIndex(
+          validationProbe => validationProbe.status() === 200,
+        );
+
+        if (acceptedIndex >= 0) {
+          candidate = batch[acceptedIndex];
+          break;
+        }
+      }
+    }
 
     test.skip(
       !candidate,
@@ -726,6 +919,13 @@ test.describe("Serialized disposable-data mutation contracts", () => {
         candidate!.concept.kaNlConcepto,
       );
       await expect(conceptRow).toHaveCount(1);
+      while (!(await conceptRow.isVisible())) {
+        await expect(
+          conceptsPage.conceptPickerNextPageButton,
+        ).toBeEnabled();
+        await conceptsPage.conceptPickerNextPageButton.click();
+      }
+      await expect(conceptRow).toBeInViewport();
 
       const firstValidationResponsePromise = page.waitForResponse(
         response =>
@@ -777,6 +977,13 @@ test.describe("Serialized disposable-data mutation contracts", () => {
       await expect(conceptsPage.conceptPickerPanel).toBeInViewport();
       await conceptsPage.searchConcept(candidate!.concept.kaNlConcepto);
       await expect(conceptRow).toHaveCount(1);
+      while (!(await conceptRow.isVisible())) {
+        await expect(
+          conceptsPage.conceptPickerNextPageButton,
+        ).toBeEnabled();
+        await conceptsPage.conceptPickerNextPageButton.click();
+      }
+      await expect(conceptRow).toBeInViewport();
 
       const duplicateValidationResponsePromise = page.waitForResponse(
         response =>
@@ -898,7 +1105,11 @@ test.describe("Serialized disposable-data mutation contracts", () => {
         if (ownedRows.length > 0) {
           expect(ownedRows).toHaveLength(1);
           expect(baselineIdentitySet.has(ownedIdentity)).toBe(false);
-          await conceptsPage.row(ownedIdentity).click();
+          await conceptsPage
+            .row(ownedIdentity)
+            .locator("td")
+            .nth(1)
+            .click();
 
           const deleteResponsePromise = page.waitForResponse(
             response =>
@@ -970,25 +1181,85 @@ test.describe("Serialized disposable-data mutation contracts", () => {
     const lookupConcepts =
       (await conceptLookupResponse.json()) as LookupConcept[];
     const baselineIdentitySet = identitySet(initialRows);
-    const lookupById = new Map(
-      lookupConcepts.map(concept => [concept.kaNlConcepto, concept]),
+    const acceptedConceptIds = new Set(
+      initialRows.map(row => row.kaNlConceptoContable),
     );
-    const candidate = initialRows
-      .map(row => ({
-        concept: lookupById.get(row.kaNlConceptoContable),
-        unusedNoveltyCodes: noveltyCodes.filter(
-          noveltyCode =>
-            !baselineIdentitySet.has(
-              `${row.kaNlConceptoContable}-${noveltyCode}`,
-            ),
-        ),
-      }))
-      .find(
-        possibleCandidate =>
-          typeof possibleCandidate.concept?.ssConcepto === "string" &&
-          possibleCandidate.concept.ssConcepto.length > 0 &&
-          possibleCandidate.unusedNoveltyCodes.length >= 2,
+    const authorization =
+      (await initialRowsResponse.request().allHeaders())["authorization"];
+    const candidateConcepts = lookupConcepts
+      .filter(
+        concept =>
+          typeof concept.ssConcepto === "string" &&
+          concept.ssConcepto.length > 0,
+      )
+      .sort(
+        (left, right) =>
+          Number(acceptedConceptIds.has(right.kaNlConcepto)) -
+            Number(acceptedConceptIds.has(left.kaNlConcepto)) ||
+          conceptSearchMatchCount(lookupConcepts, left.kaNlConcepto) -
+            conceptSearchMatchCount(lookupConcepts, right.kaNlConcepto),
       );
+    let candidate:
+      | {
+          concept: LookupConcept;
+          unusedNoveltyCodes: (typeof noveltyCodes)[number][];
+        }
+      | undefined;
+    const unconfirmedCandidates: Array<{
+      concept: LookupConcept;
+      unusedNoveltyCodes: (typeof noveltyCodes)[number][];
+    }> = [];
+
+    for (const concept of candidateConcepts) {
+      const unusedNoveltyCodes = noveltyCodes.filter(
+        noveltyCode =>
+          !baselineIdentitySet.has(
+            `${concept.kaNlConcepto}-${noveltyCode}`,
+          ),
+      );
+
+      if (unusedNoveltyCodes.length < 2) {
+        continue;
+      }
+
+      if (acceptedConceptIds.has(concept.kaNlConcepto)) {
+        candidate = { concept, unusedNoveltyCodes };
+        break;
+      }
+
+      unconfirmedCandidates.push({ concept, unusedNoveltyCodes });
+    }
+
+    if (!candidate && authorization) {
+      const validationBatchSize = 10;
+
+      for (
+        let batchStart = 0;
+        batchStart < unconfirmedCandidates.length;
+        batchStart += validationBatchSize
+      ) {
+        const batch = unconfirmedCandidates.slice(
+          batchStart,
+          batchStart + validationBatchSize,
+        );
+        const validationProbes = await Promise.all(
+          batch.map(({ concept }) =>
+            page.request.post(validateConceptUrl, {
+              data: { kaNlConcepto: concept.kaNlConcepto },
+              headers: { authorization },
+            }),
+          ),
+        );
+        const acceptedIndex = validationProbes.findIndex(
+          validationProbe => validationProbe.status() === 200,
+        );
+
+        if (acceptedIndex >= 0) {
+          candidate = batch[acceptedIndex];
+          break;
+        }
+      }
+    }
 
     test.skip(
       !candidate,
@@ -1020,6 +1291,14 @@ test.describe("Serialized disposable-data mutation contracts", () => {
         pair.kaNlConceptoContable,
       );
       await expect(conceptRow).toHaveCount(1);
+      while (!(await conceptRow.isVisible())) {
+        await expect(
+          conceptsPage.conceptPickerNextPageButton,
+        ).toBeEnabled();
+        await conceptsPage.conceptPickerNextPageButton.click();
+      }
+      await expect(conceptRow).toBeInViewport();
+
       const validationResponsePromise = page.waitForResponse(
         response =>
           response.url() === validateConceptUrl &&
@@ -1171,6 +1450,11 @@ test.describe("Serialized disposable-data mutation contracts", () => {
       }
     } finally {
       // 4. Delete both owned identities in finally and verify both are absent.
+      if (await conceptsPage.conceptPickerBackdrop.isVisible()) {
+        await conceptsPage.conceptPickerBackdrop.click();
+        await expect(conceptsPage.conceptPickerPanel).not.toBeInViewport();
+      }
+
       const visibleFeedbackButton = page.getByRole("button", {
         name: "Aceptar",
         exact: true,
@@ -1195,7 +1479,7 @@ test.describe("Serialized disposable-data mutation contracts", () => {
 
         if (cleanupRows.some(row => persistedIdentity(row) === ownedIdentity)) {
           expect(baselineIdentitySet.has(ownedIdentity)).toBe(false);
-          await conceptsPage.row(ownedIdentity).click();
+          await conceptsPage.row(ownedIdentity).locator("td").nth(1).click();
 
           const deleteResponsePromise = page.waitForResponse(
             response =>
@@ -1244,6 +1528,8 @@ test.describe("Serialized disposable-data mutation contracts", () => {
   test("CNA-017: Delete one owned mapping with exact request scope", async ({
     page,
   }) => {
+    test.setTimeout(60_000);
+
     const conceptsPage = new AdministrativeUpdateConceptsPage(page);
     let ownedPair: AdministrativeConcept | undefined;
     let ownedIdentity: string | undefined;
@@ -1287,7 +1573,9 @@ test.describe("Serialized disposable-data mutation contracts", () => {
       .sort(
         (left, right) =>
           Number(acceptedConceptIds.has(right.kaNlConcepto)) -
-          Number(acceptedConceptIds.has(left.kaNlConcepto)),
+            Number(acceptedConceptIds.has(left.kaNlConcepto)) ||
+          conceptSearchMatchCount(lookupConcepts, left.kaNlConcepto) -
+            conceptSearchMatchCount(lookupConcepts, right.kaNlConcepto),
       );
     let candidate:
       | {
@@ -1295,6 +1583,10 @@ test.describe("Serialized disposable-data mutation contracts", () => {
           noveltyCode: (typeof noveltyCodes)[number];
         }
       | undefined;
+    const unconfirmedCandidates: Array<{
+      concept: LookupConcept;
+      noveltyCode: (typeof noveltyCodes)[number];
+    }> = [];
 
     for (const concept of candidateConcepts) {
       const noveltyCode = noveltyCodes.find(
@@ -1313,14 +1605,35 @@ test.describe("Serialized disposable-data mutation contracts", () => {
         break;
       }
 
-      if (authorization) {
-        const validationProbe = await page.request.post(validateConceptUrl, {
-          data: { kaNlConcepto: concept.kaNlConcepto },
-          headers: { authorization },
-        });
+      unconfirmedCandidates.push({ concept, noveltyCode });
+    }
 
-        if (validationProbe.status() === 200) {
-          candidate = { concept, noveltyCode };
+    if (!candidate && authorization) {
+      const validationBatchSize = 10;
+
+      for (
+        let batchStart = 0;
+        batchStart < unconfirmedCandidates.length;
+        batchStart += validationBatchSize
+      ) {
+        const batch = unconfirmedCandidates.slice(
+          batchStart,
+          batchStart + validationBatchSize,
+        );
+        const validationProbes = await Promise.all(
+          batch.map(({ concept }) =>
+            page.request.post(validateConceptUrl, {
+              data: { kaNlConcepto: concept.kaNlConcepto },
+              headers: { authorization },
+            }),
+          ),
+        );
+        const acceptedIndex = validationProbes.findIndex(
+          validationProbe => validationProbe.status() === 200,
+        );
+
+        if (acceptedIndex >= 0) {
+          candidate = batch[acceptedIndex];
           break;
         }
       }
@@ -1354,6 +1667,15 @@ test.describe("Serialized disposable-data mutation contracts", () => {
       const conceptRow = conceptsPage.conceptPickerRow(
         candidate!.concept.kaNlConcepto,
       );
+      await expect(conceptRow).toHaveCount(1);
+      while (!(await conceptRow.isVisible())) {
+        await expect(
+          conceptsPage.conceptPickerNextPageButton,
+        ).toBeEnabled();
+        await conceptsPage.conceptPickerNextPageButton.click();
+      }
+      await expect(conceptRow).toBeInViewport();
+
       const validationResponsePromise = page.waitForResponse(
         response =>
           response.url() === validateConceptUrl &&
