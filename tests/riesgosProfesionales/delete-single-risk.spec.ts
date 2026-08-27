@@ -37,9 +37,18 @@ test.describe("CRUD persistence and safe deletion", () => {
     let disposableCode: string | undefined;
     let createdId: number | undefined;
     let deletionCompleted = false;
+    let authorization: string | undefined;
 
     const readRows = async (): Promise<RiskRow[]> => {
-      const response = await page.request.get(rowsUrl);
+      if (!authorization) {
+        throw new Error(
+          "The authenticated browser request did not provide an authorization header.",
+        );
+      }
+
+      const response = await page.request.get(rowsUrl, {
+        headers: { authorization },
+      });
       expect(response.ok()).toBe(true);
       return (await response.json()) as RiskRow[];
     };
@@ -95,6 +104,12 @@ test.describe("CRUD persistence and safe deletion", () => {
       await page.goto(pageUrl);
       const initialRowsResponse = await initialRowsResponsePromise;
       expect(initialRowsResponse.ok()).toBe(true);
+      authorization = (await initialRowsResponse.request().allHeaders())
+        .authorization;
+      expect(
+        authorization,
+        "The initial browser /rows request must be authenticated.",
+      ).toBeTruthy();
 
       const initialRows = (await initialRowsResponse.json()) as RiskRow[];
       initialRows.forEach((risk) => baselineIds.add(risk.kaNlClase));
@@ -213,9 +228,7 @@ test.describe("CRUD persistence and safe deletion", () => {
         ids?: number[];
       };
       expect(deletePayload.ids).toEqual([createdId]);
-      expect(
-        deletePayload.ids?.some((id) => baselineIds.has(id)),
-      ).toBe(false);
+      expect(deletePayload.ids?.some((id) => baselineIds.has(id))).toBe(false);
       deletionCompleted = true;
       page.off("request", recordDeleteRequest);
 
@@ -233,13 +246,11 @@ test.describe("CRUD persistence and safe deletion", () => {
         finalRows.filter((risk) => risk.kaNlClase === createdId),
       ).toHaveLength(0);
       expect(deletePayload.ids).toEqual([createdId]);
-      expect(
-        deletePayload.ids?.some((id) => baselineIds.has(id)),
-      ).toBe(false);
+      expect(deletePayload.ids?.some((id) => baselineIds.has(id))).toBe(false);
     } finally {
       page.off("request", recordDeleteRequest);
 
-      if (!deletionCompleted && disposableCode !== undefined) {
+      if (!deletionCompleted && authorization && disposableCode !== undefined) {
         const currentRows = await readRows();
         const remainingTestOwnedIds = new Set(
           currentRows

@@ -36,9 +36,18 @@ test.describe("CRUD persistence and safe deletion", () => {
     const disposableCodes: string[] = [];
     const createdIds = new Set<number>();
     let deletionCompleted = false;
+    let authorization: string | undefined;
 
     const readRows = async (): Promise<RiskRow[]> => {
-      const response = await page.request.get(rowsUrl);
+      if (!authorization) {
+        throw new Error(
+          "The authenticated browser request did not provide an authorization header.",
+        );
+      }
+
+      const response = await page.request.get(rowsUrl, {
+        headers: { authorization },
+      });
       expect(response.ok()).toBe(true);
       return (await response.json()) as RiskRow[];
     };
@@ -103,6 +112,12 @@ test.describe("CRUD persistence and safe deletion", () => {
       await page.goto(pageUrl);
       const initialRowsResponse = await initialRowsResponsePromise;
       expect(initialRowsResponse.ok()).toBe(true);
+      authorization = (await initialRowsResponse.request().allHeaders())
+        .authorization;
+      expect(
+        authorization,
+        "The initial browser /rows request must be authenticated.",
+      ).toBeTruthy();
 
       const initialRows = (await initialRowsResponse.json()) as RiskRow[];
       initialRows.forEach((risk) => baselineIds.add(risk.kaNlClase));
@@ -269,7 +284,7 @@ test.describe("CRUD persistence and safe deletion", () => {
     } finally {
       page.off("request", recordDeleteRequest);
 
-      if (!deletionCompleted && disposableCodes.length > 0) {
+      if (!deletionCompleted && authorization && disposableCodes.length > 0) {
         const currentRows = await readRows();
         const codeSet = new Set(disposableCodes);
         const remainingTestOwnedIds = new Set(

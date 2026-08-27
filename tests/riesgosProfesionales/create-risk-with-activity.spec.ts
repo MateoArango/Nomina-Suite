@@ -47,9 +47,18 @@ test.describe("CRUD persistence and safe deletion", () => {
     const createdIds = new Set<number>();
     let disposableCode: string | undefined;
     let saveSucceeded = false;
+    let authorization: string | undefined;
 
     const readRows = async (): Promise<RiskRow[]> => {
-      const response = await page.request.get(rowsUrl);
+      if (!authorization) {
+        throw new Error(
+          "The authenticated browser request did not provide an authorization header.",
+        );
+      }
+
+      const response = await page.request.get(rowsUrl, {
+        headers: { authorization },
+      });
       expect(response.ok()).toBe(true);
       return (await response.json()) as RiskRow[];
     };
@@ -101,6 +110,12 @@ test.describe("CRUD persistence and safe deletion", () => {
       ]);
       expect(initialRowsResponse.ok()).toBe(true);
       expect(activitiesResponse.ok()).toBe(true);
+      authorization = (await initialRowsResponse.request().allHeaders())
+        .authorization;
+      expect(
+        authorization,
+        "The initial browser /rows request must be authenticated.",
+      ).toBeTruthy();
 
       const initialRows = (await initialRowsResponse.json()) as RiskRow[];
       const activities = (await activitiesResponse.json()) as Activity[];
@@ -200,7 +215,9 @@ test.describe("CRUD persistence and safe deletion", () => {
       // 3. Reload, capture a fresh GET /rows response, locate the record by its returned/runtime ID and code, and read /rows/{id} when detail verification is necessary.
       await page.reload();
 
-      const reloadedRowsResponse = await page.request.get(rowsUrl);
+      const reloadedRowsResponse = await page.request.get(rowsUrl, {
+        headers: { authorization: authorization! },
+      });
       expect(reloadedRowsResponse.ok()).toBe(true);
       const reloadedRows = (await reloadedRowsResponse.json()) as RiskRow[];
       const matchingRows = reloadedRows.filter(
@@ -216,6 +233,7 @@ test.describe("CRUD persistence and safe deletion", () => {
 
       const detailResponse = await page.request.get(
         `${rowsUrl}/${savedRecord.kaNlClase}`,
+        { headers: { authorization: authorization! } },
       );
       expect(detailResponse.ok()).toBe(true);
       expect((await detailResponse.json()) as RiskDetail).toMatchObject({
@@ -231,7 +249,8 @@ test.describe("CRUD persistence and safe deletion", () => {
       page.off("request", recordSaveRequest);
 
       // 4. Delete only the created ID and fetch /rows again.
-      const currentRows = await readRows();
+      const currentRows =
+        authorization && disposableCode !== undefined ? await readRows() : [];
       if (saveSucceeded && disposableCode !== undefined) {
         for (const risk of currentRows) {
           if (

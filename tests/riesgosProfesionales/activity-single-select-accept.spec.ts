@@ -122,8 +122,14 @@ test.describe("Activity lookup and modal behavior", () => {
     page.on("request", recordSaveRequest);
 
     await risksPage.cancelButton.click();
+    await expect(risksPage.activityInput).toHaveValue("N/A");
 
-    const rowsAfterCancelResponse = await page.request.get(rowsUrl);
+    const rowsAfterCancelResponsePromise = page.waitForResponse(
+      response =>
+        response.url() === rowsUrl && response.request().method() === "GET",
+    );
+    await page.reload();
+    const rowsAfterCancelResponse = await rowsAfterCancelResponsePromise;
     expect(rowsAfterCancelResponse.ok()).toBe(true);
     const risksAfterCancel = (await rowsAfterCancelResponse.json()) as Risk[];
 
@@ -133,7 +139,6 @@ test.describe("Activity lookup and modal behavior", () => {
     ).toEqual(
       baselineRisks.map(risk => risk.kaNlClase).sort((a, b) => a - b),
     );
-    await expect(risksPage.activityInput).toHaveValue("N/A");
 
     page.off("request", recordSaveRequest);
   });
