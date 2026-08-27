@@ -1240,4 +1240,269 @@ test.describe("Serialized disposable-data mutation contracts", () => {
       );
     }
   });
+
+  test("CNA-017: Delete one owned mapping with exact request scope", async ({
+    page,
+  }) => {
+    const conceptsPage = new AdministrativeUpdateConceptsPage(page);
+    let ownedPair: AdministrativeConcept | undefined;
+    let ownedIdentity: string | undefined;
+    let mappingCreated = false;
+    let mappingDeleted = false;
+
+    const initialRowsResponsePromise = page.waitForResponse(
+      response =>
+        response.url() === rowsUrl && response.request().method() === "GET",
+    );
+    const conceptLookupResponsePromise = page.waitForResponse(
+      response =>
+        response.url() === conceptLookupUrl &&
+        response.request().method() === "GET",
+    );
+    await page.goto("https://nomina-qa.adacsc.co/conceptos-nov-ad");
+
+    const [initialRowsResponse, conceptLookupResponse] = await Promise.all([
+      initialRowsResponsePromise,
+      conceptLookupResponsePromise,
+    ]);
+    expect(initialRowsResponse.ok()).toBe(true);
+    expect(conceptLookupResponse.ok()).toBe(true);
+
+    const initialRows =
+      (await initialRowsResponse.json()) as AdministrativeConcept[];
+    const lookupConcepts =
+      (await conceptLookupResponse.json()) as LookupConcept[];
+    const baselineIdentitySet = identitySet(initialRows);
+    const acceptedConceptIds = new Set(
+      initialRows.map(row => row.kaNlConceptoContable),
+    );
+    const authorization =
+      (await initialRowsResponse.request().allHeaders())["authorization"];
+    const candidateConcepts = lookupConcepts
+      .filter(
+        concept =>
+          typeof concept.ssConcepto === "string" &&
+          concept.ssConcepto.length > 0,
+      )
+      .sort(
+        (left, right) =>
+          Number(acceptedConceptIds.has(right.kaNlConcepto)) -
+          Number(acceptedConceptIds.has(left.kaNlConcepto)),
+      );
+    let candidate:
+      | {
+          concept: LookupConcept;
+          noveltyCode: (typeof noveltyCodes)[number];
+        }
+      | undefined;
+
+    for (const concept of candidateConcepts) {
+      const noveltyCode = noveltyCodes.find(
+        possibleNoveltyCode =>
+          !baselineIdentitySet.has(
+            `${concept.kaNlConcepto}-${possibleNoveltyCode}`,
+          ),
+      );
+
+      if (!noveltyCode) {
+        continue;
+      }
+
+      if (acceptedConceptIds.has(concept.kaNlConcepto)) {
+        candidate = { concept, noveltyCode };
+        break;
+      }
+
+      if (authorization) {
+        const validationProbe = await page.request.post(validateConceptUrl, {
+          data: { kaNlConcepto: concept.kaNlConcepto },
+          headers: { authorization },
+        });
+
+        if (validationProbe.status() === 200) {
+          candidate = { concept, noveltyCode };
+          break;
+        }
+      }
+    }
+
+    test.skip(
+      !candidate,
+      "CNA-017 requires one runtime-confirmed accepted concept with an unused novelty pair",
+    );
+
+    ownedPair = {
+      kaNlConceptoContable: candidate!.concept.kaNlConcepto,
+      codigoNovedad: candidate!.noveltyCode.toUpperCase(),
+    };
+    ownedIdentity = persistedIdentity(ownedPair);
+
+    try {
+      // 1. Create one disposable mapping, reload, and select only its stable owned row.
+      expect(baselineIdentitySet.has(ownedIdentity)).toBe(false);
+      const workingRow = conceptsPage.emptyWorkingRow();
+      await workingRow.getByRole("combobox").click();
+      await page
+        .getByTestId(
+          `conceptos-nov-ad-novelty-option-${candidate!.noveltyCode}`,
+        )
+        .click();
+      await workingRow.getByRole("button", { name: "..." }).click();
+      await expect(conceptsPage.conceptPickerPanel).toBeInViewport();
+      await conceptsPage.searchConcept(candidate!.concept.kaNlConcepto);
+
+      const conceptRow = conceptsPage.conceptPickerRow(
+        candidate!.concept.kaNlConcepto,
+      );
+      const validationResponsePromise = page.waitForResponse(
+        response =>
+          response.url() === validateConceptUrl &&
+          response.request().method() === "POST",
+      );
+      await conceptRow.dblclick();
+      expect((await validationResponsePromise).status()).toBe(200);
+
+      const saveResponsePromise = page.waitForResponse(
+        response =>
+          response.url() === saveUrl &&
+          response.request().method() === "POST",
+      );
+      await conceptsPage.saveButton.click();
+      await page
+        .getByTestId(
+          "conceptos-nov-ad-dialog-save-confirmation-confirm-button",
+        )
+        .click();
+      expect((await saveResponsePromise).status()).toBe(200);
+      mappingCreated = true;
+      await page
+        .getByTestId("conceptos-nov-ad-dialog-save-success-confirm-button")
+        .click();
+
+      const persistedRowsResponsePromise = page.waitForResponse(
+        response =>
+          response.url() === rowsUrl &&
+          response.request().method() === "GET",
+      );
+      await conceptsPage.reloadButton.click();
+      const persistedRows =
+        (await (await persistedRowsResponsePromise).json()) as AdministrativeConcept[];
+      expect(
+        persistedRows.filter(row => persistedIdentity(row) === ownedIdentity),
+      ).toHaveLength(1);
+
+      const ownedRow = conceptsPage.row(ownedIdentity);
+      await ownedRow.locator("td").nth(1).click();
+      await expect(ownedRow).toHaveClass(/\bdata-row--selected\b/);
+      await expect(
+        conceptsPage.table.locator("tbody tr.data-row--selected"),
+      ).toHaveCount(1);
+      await expect(conceptsPage.deleteButton).toBeEnabled();
+
+      // 2. Start waiting for /actions/borrar, click Borrar, and handle confirmation only according to the live confirmed UI.
+      const deleteRequests: Array<{ method: string; payload: unknown }> = [];
+      const observeDeleteRequest = (request: {
+        url(): string;
+        method(): string;
+        postDataJSON(): unknown;
+      }) => {
+        if (request.url() === deleteUrl) {
+          deleteRequests.push({
+            method: request.method(),
+            payload: request.postDataJSON(),
+          });
+        }
+      };
+      page.on("request", observeDeleteRequest);
+
+      try {
+        const deleteResponsePromise = page.waitForResponse(
+          response =>
+            response.url() === deleteUrl &&
+            response.request().method() === "POST",
+        );
+        await conceptsPage.deleteButton.click();
+        const confirmDeleteButton = page.getByTestId(
+          "conceptos-nov-ad-dialog-delete-confirmation-confirm-button",
+        );
+        await expect(confirmDeleteButton).toBeVisible();
+        await confirmDeleteButton.click();
+
+        const deleteResponse = await deleteResponsePromise;
+        expect(deleteResponse.status()).toBe(200);
+        expect(deleteResponse.request().postDataJSON()).toEqual(ownedPair);
+        await expect.poll(() => deleteRequests.length).toBe(1);
+        expect(deleteRequests).toEqual([
+          { method: "POST", payload: ownedPair },
+        ]);
+        expect(
+          baselineIdentitySet.has(
+            persistedIdentity(
+              deleteRequests[0].payload as AdministrativeConcept,
+            ),
+          ),
+        ).toBe(false);
+        mappingDeleted = true;
+      } finally {
+        page.off("request", observeDeleteRequest);
+      }
+
+      // 3. Reload and fetch rows.
+      const finalRowsResponsePromise = page.waitForResponse(
+        response =>
+          response.url() === rowsUrl && response.request().method() === "GET",
+      );
+      await conceptsPage.reloadButton.click();
+      const finalRows =
+        (await (await finalRowsResponsePromise).json()) as AdministrativeConcept[];
+      expect(
+        finalRows.filter(row => persistedIdentity(row) === ownedIdentity),
+      ).toHaveLength(0);
+      await expect(conceptsPage.row(ownedIdentity)).toHaveCount(0);
+    } finally {
+      if (mappingCreated && !mappingDeleted && ownedPair && ownedIdentity) {
+        const saveSuccessButton = page.getByTestId(
+          "conceptos-nov-ad-dialog-save-success-confirm-button",
+        );
+        if (await saveSuccessButton.isVisible()) {
+          await saveSuccessButton.click();
+        }
+
+        const cleanupRowsResponsePromise = page.waitForResponse(
+          response =>
+            response.url() === rowsUrl &&
+            response.request().method() === "GET",
+        );
+        await conceptsPage.reloadButton.click();
+        const cleanupRows =
+          (await (await cleanupRowsResponsePromise).json()) as AdministrativeConcept[];
+
+        if (
+          cleanupRows.some(row => persistedIdentity(row) === ownedIdentity)
+        ) {
+          await conceptsPage
+            .row(ownedIdentity)
+            .locator("td")
+            .nth(1)
+            .click();
+          const cleanupDeleteResponsePromise = page.waitForResponse(
+            response =>
+              response.url() === deleteUrl &&
+              response.request().method() === "POST",
+          );
+          await conceptsPage.deleteButton.click();
+          await page
+            .getByTestId(
+              "conceptos-nov-ad-dialog-delete-confirmation-confirm-button",
+            )
+            .click();
+          const cleanupDeleteResponse = await cleanupDeleteResponsePromise;
+          expect(cleanupDeleteResponse.status()).toBe(200);
+          expect(cleanupDeleteResponse.request().postDataJSON()).toEqual(
+            ownedPair,
+          );
+        }
+      }
+    }
+  });
 });
