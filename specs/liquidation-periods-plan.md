@@ -23,7 +23,9 @@ Plan the authenticated /periodos-liq module with stable data-testid locators, ru
     - expect: The lookup contains M with 30 days and Q with 15 days.
     - expect: The visible choices map to those runtime records using stable option test IDs.
 
-#### 1.2. LP-002: Monthly and fortnightly selections load the matching runtime grid
+    **Implementation summary:** The test captures the initial context and lookup requests, asserts that no rows request is sent until a type is selected, and validates the runtime lookup values and stable test IDs without hard-coded assumptions about order or content.
+
+#### 1.2. ✅ LP-002: Monthly and fortnightly selections load the matching runtime grid
 
 **File:** `tests/liquidationPeriods/period-type-loading.spec.ts`
 
@@ -38,6 +40,8 @@ Plan the authenticated /periodos-liq module with stable data-testid locators, ru
   3. Repeat from a fresh state for fortnightly (Q / visible value 15).
     - expect: Exactly one GET request is sent with tipoPeriodo=Q and succeeds.
     - expect: Every returned record has the fortnightly type and every visible row maps to its runtime record by ID.
+
+**Implementation summary:** The test captures exactly one runtime rows response for each period type, validates every record's `scDiasLiquidacion` and stable `kaNlPeriodo`, and maps the visible API slice by ID to the period and nullable date inputs without hard-coded totals, ordering, or values. Focused Chromium verification passed: 1 test.
 
 #### 1.3. LP-003: Switching type replaces the grid without mixing identities
 
