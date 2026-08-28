@@ -62,7 +62,7 @@ Plan the authenticated /periodos-liq module with stable data-testid locators, ru
 
 **Seed:** `tests/liquidationPeriods/seed-test.spec.ts`
 
-#### 2.1. LP-004: New appends one selected empty working row without a request
+#### 2.1. ✅ LP-004: New appends one selected empty working row without a request
 
 **File:** `tests/liquidationPeriods/client-state.spec.ts`
 
@@ -74,6 +74,8 @@ Plan the authenticated /periodos-liq module with stable data-testid locators, ru
   2. Reload the page without saving.
     - expect: The type returns to blank, the grid is empty, and the client-only row is gone.
     - expect: No mutation request was sent.
+
+    **Implementation summary:** The test captures the selected type's runtime response and visible baseline values, clicks New exactly once, verifies one selected ID-less row with three empty inputs, confirms the runtime pager total increases by one while persisted rows remain unchanged, and proves no additional rows or mutation request is sent before reload clears all client-only state. Focused Chromium verification passed: 1 test.
 
 #### 2.2. LP-005: Repeated New clicks append distinct client-only rows
 
