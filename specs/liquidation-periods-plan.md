@@ -43,7 +43,7 @@ Plan the authenticated /periodos-liq module with stable data-testid locators, ru
 
 **Implementation summary:** The test captures exactly one runtime rows response for each period type, validates every record's `scDiasLiquidacion` and stable `kaNlPeriodo`, and maps the visible API slice by ID to the period and nullable date inputs without hard-coded totals, ordering, or values. Focused Chromium verification passed: 1 test.
 
-#### 1.3. LP-003: Switching type replaces the grid without mixing identities
+#### 1.3. ✅ LP-003: Switching type replaces the grid without mixing identities
 
 **File:** `tests/liquidationPeriods/period-type-switch.spec.ts`
 
@@ -55,6 +55,8 @@ Plan the authenticated /periodos-liq module with stable data-testid locators, ru
   2. Switch back and compare the fresh response with the remounted grid.
     - expect: The original type is requested again.
     - expect: The UI is rebuilt from the latest response rather than from stale client state.
+
+**Implementation summary:** The test captures the runtime M, Q, and fresh M responses in sequence, maps each visible grid slice to its current response by `kaNlPeriodo`, proves identities unique to the previous type are removed, and verifies the enabled New/Save and disabled Delete states. Focused Chromium verification passed: 1 test.
 
 ### 2. Client-only row and selection behavior
 
