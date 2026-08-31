@@ -123,7 +123,7 @@ Plan the authenticated /periodos-liq module with stable data-testid locators, ru
 
 **Seed:** `tests/liquidationPeriods/seed-test.spec.ts`
 
-#### 3.1. LP-008: Page sizes and navigation follow the current runtime total
+#### 3.1. ✅ LP-008: Page sizes and navigation follow the current runtime total
 
 **File:** `tests/liquidationPeriods/pagination.spec.ts`
 
@@ -136,6 +136,8 @@ Plan the authenticated /periodos-liq module with stable data-testid locators, ru
     - expect: Previous is disabled only on the first page and Next only on the final page.
     - expect: Each page maps to the expected runtime ID slice.
     - expect: If runtime data cannot create a second page, only the navigation branch is skipped with a precise prerequisite reason.
+
+    **Implementation summary:** The test exercises all four stable page-size controls, maps each visible row to the API-ordered runtime ID slice, and derives the pager range and navigation state from the current total. When more than one page exists, it walks forward to the final page and back to the first; otherwise it annotates only that branch with the precise runtime prerequisite. Focused Chromium verification passed: 1 test.
 
 #### 3.2. LP-009: Page size persists across a type switch and resets on reload
 
