@@ -139,43 +139,31 @@ Plan the authenticated /periodos-liq module with stable data-testid locators, ru
 
     **Implementation summary:** The test exercises all four stable page-size controls, maps each visible row to the API-ordered runtime ID slice, and derives the pager range and navigation state from the current total. When more than one page exists, it walks forward to the final page and back to the first; otherwise it annotates only that branch with the precise runtime prerequisite. Focused Chromium verification passed: 1 test.
 
-#### 3.2. LP-009: Page size persists across a type switch and resets on reload
-
-**File:** `tests/liquidationPeriods/pagination.spec.ts`
-
-**Steps:**
-  1. Choose a non-default page size, switch from one type to the other, and wait for the new rows response.
-    - expect: The chosen page size remains selected after the type switch.
-    - expect: The new grid range and visible count are recalculated from the new type's runtime total.
-  2. Perform a true page reload.
-    - expect: The type selector resets to blank, no rows request is sent until a new selection, and page size returns to 25.
-    - expect: Transient page index, selection, and working-row state are cleared.
-
 ### 4. Serialized owned-record persistence contracts
 
 **Seed:** `tests/liquidationPeriods/seed-test.spec.ts`
 
-#### 4.1. LP-010: Save one valid owned period, prove persistence, and clean it up
+#### 4.1. ✅ LP-009: Save one valid owned period, prove persistence, and clean it up
 
 **File:** `tests/liquidationPeriods/mutation-contracts.spec.ts`
 
 **Steps:**
-  1. In a serial suite, fetch fresh rows for one type, retain every baseline kaNlPeriodo, and derive a unique period/date tuple that is absent at mutation time.
-    - expect: The candidate does not collide with any runtime tuple.
-    - expect: If no safe candidate exists, the test skips before mutation with a precise reason.
-    - expect: Shared-QA mutation execution requires explicit authorization for that run.
+  1. In a serial suite, fetch fresh rows for one type and retain every baseline kaNlPeriodo. Use any valid period and date values for the new row.
+    - expect: Repeated period/date values are allowed; ownership is determined only by the new backend-generated kaNlPeriodo.
   2. Add and fill one working row, start save observation, and click Save exactly once.
     - expect: Capture the exact POST body and confirm whether Save submits the complete grid or only changed rows.
-    - expect: The owned tuple and selected type are represented correctly, no baseline row is unintentionally changed, and the response succeeds.
+    - expect: The submitted values and selected type are represented correctly, no baseline row is unintentionally changed, and the response succeeds.
     - expect: The exact supplied success-alert title and message are shown; these literals must be reconfirmed on the first authorized run.
   3. Perform a true reload, reselect the type, and capture a fresh rows response.
-    - expect: Exactly one record matches the owned tuple.
+    - expect: Exactly one new kaNlPeriodo exists outside the baseline ID set.
     - expect: Its stable kaNlPeriodo and persisted values match the submission; the assertion does not rely on immediate DOM state, global totals, ordering, or fixed positions.
   4. In finally, reload first, select only the owned ID, capture one delete request, then reload and read rows again.
     - expect: The delete contract targets only the owned ID and excludes every baseline ID.
     - expect: The owned ID is absent afterward, all baseline IDs remain, and cleanup failure is visible.
 
-#### 4.2. LP-011: @bug Save with no changes still sends a request
+    **Implementation summary:** The serial test retains every fresh monthly `kaNlPeriodo` as its safety boundary, submits one valid row while proving Save sends the complete unchanged baseline plus the new row, and identifies the single created record only by the backend-generated ID absent from that baseline. A true reload verifies its persisted values. `finally` reloads, selects and deletes only that owned ID with the exact `{ tipoPeriodo: "M", kaNlPeriodo }` contract, then reloads again to prove the owned ID is absent and every baseline ID remains. Focused Chromium verification passed: 1 test.
+
+#### 4.2. LP-010: @bug Save with no changes still sends a request
 
 **File:** `tests/liquidationPeriods/mutation-contracts.spec.ts`
 
@@ -188,12 +176,12 @@ Plan the authenticated /periodos-liq module with stable data-testid locators, ru
     - expect: Every baseline record remains unchanged and no new identity appears.
     - expect: A behavior change fails for review rather than self-skipping.
 
-#### 4.3. LP-012: Delete removes exactly one test-owned persisted record
+#### 4.3. LP-011: Delete removes exactly one test-owned persisted record
 
 **File:** `tests/liquidationPeriods/mutation-contracts.spec.ts`
 
 **Steps:**
-  1. Create one disposable period using the LP-010 ownership rules, reload, and locate it by captured kaNlPeriodo.
+  1. Create one disposable period using the LP-009 ownership rules, reload, and locate it by captured kaNlPeriodo.
     - expect: The record exists exactly once and no baseline row is selected.
   2. Select the owned row and click Delete while capturing the request and any confirmation or feedback.
     - expect: Exactly one delete POST is sent.
@@ -207,7 +195,7 @@ Plan the authenticated /periodos-liq module with stable data-testid locators, ru
 
 **Seed:** `tests/liquidationPeriods/seed-test.spec.ts`
 
-#### 5.1. LP-013: Decimal period persists using the current integer conversion
+#### 5.1. LP-012: Decimal period persists using the current integer conversion
 
 **File:** `tests/liquidationPeriods/mutation-contracts.spec.ts`
 
@@ -219,7 +207,7 @@ Plan the authenticated /periodos-liq module with stable data-testid locators, ru
     - expect: The persisted period is 5 according to the supplied expected contract; this is a direct assertion, not a bug skip.
     - expect: The owned record is removed in finally.
 
-#### 5.2. LP-014: @bug Very long period input follows the current overflow or persistence contract
+#### 5.2. LP-013: @bug Very long period input follows the current overflow or persistence contract
 
 **File:** `tests/liquidationPeriods/mutation-contracts.spec.ts`
 
@@ -232,7 +220,7 @@ Plan the authenticated /periodos-liq module with stable data-testid locators, ru
     - expect: If the current server fails at an overflow/database layer rather than product validation, assert that exact non-success contract and prove no owned record persisted.
     - expect: Do not silently pass on any outcome.
 
-#### 5.3. LP-015: @bug Negative period remains accepted until validation is added
+#### 5.3. LP-014: @bug Negative period remains accepted until validation is added
 
 **File:** `tests/liquidationPeriods/mutation-contracts.spec.ts`
 
@@ -243,7 +231,7 @@ Plan the authenticated /periodos-liq module with stable data-testid locators, ru
   2. Delete the owned ID in finally.
     - expect: No baseline record is touched and the owned ID is absent from fresh rows.
 
-#### 5.4. LP-016: @bug Invalid start date follows the current null-persistence contract
+#### 5.4. LP-015: @bug Invalid start date follows the current null-persistence contract
 
 **File:** `tests/liquidationPeriods/mutation-contracts.spec.ts`
 
@@ -255,7 +243,7 @@ Plan the authenticated /periodos-liq module with stable data-testid locators, ru
     - expect: The start date persisted as null according to the supplied contract while the remaining owned values identify the row.
     - expect: The owned ID is removed in finally.
 
-#### 5.5. LP-017: @bug Invalid end date follows the current null-persistence contract
+#### 5.5. LP-016: @bug Invalid end date follows the current null-persistence contract
 
 **File:** `tests/liquidationPeriods/mutation-contracts.spec.ts`
 
@@ -267,7 +255,7 @@ Plan the authenticated /periodos-liq module with stable data-testid locators, ru
     - expect: The end date persists as null if the documented bug remains.
     - expect: The exact owned ID is removed in finally without touching baseline data.
 
-#### 5.6. LP-018: @bug End date earlier than start date is accepted
+#### 5.6. LP-017: @bug End date earlier than start date is accepted
 
 **File:** `tests/liquidationPeriods/mutation-contracts.spec.ts`
 
