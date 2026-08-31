@@ -163,7 +163,7 @@ Plan the authenticated /periodos-liq module with stable data-testid locators, ru
 
     **Implementation summary:** The serial test retains every fresh monthly `kaNlPeriodo` as its safety boundary, submits one valid row while proving Save sends the complete unchanged baseline plus the new row, and identifies the single created record only by the backend-generated ID absent from that baseline. A true reload verifies its persisted values. `finally` reloads, selects and deletes only that owned ID with the exact `{ tipoPeriodo: "M", kaNlPeriodo }` contract, then reloads again to prove the owned ID is absent and every baseline ID remains. Focused Chromium verification passed: 1 test.
 
-#### 4.2. LP-010: @bug Save with no changes still sends a request
+#### 4.2. ✅ LP-010: @bug Save with no changes still sends a request
 
 **File:** `tests/liquidationPeriods/mutation-contracts.spec.ts`
 
@@ -175,6 +175,8 @@ Plan the authenticated /periodos-liq module with stable data-testid locators, ru
   2. Reload, reselect the type, and compare fresh rows by stable ID and complete values.
     - expect: Every baseline record remains unchanged and no new identity appears.
     - expect: A behavior change fails for review rather than self-skipping.
+
+    **Implementation summary:** The test captures the complete fresh monthly baseline, confirms there is no client-only working row, clicks Save exactly once, and locks the current bug contract to one successful POST whose exact body is `{ tipoPeriodo: "M", rows: baselineRows }`. It also asserts the observed `Grabar periodo` success feedback, performs a true reload, and compares every complete record after sorting by stable `kaNlPeriodo`, proving no identity or value changed. Focused Chromium verification passed: 1 test.
 
 #### 4.3. LP-011: Delete removes exactly one test-owned persisted record
 

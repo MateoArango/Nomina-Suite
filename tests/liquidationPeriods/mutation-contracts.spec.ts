@@ -274,4 +274,75 @@ test.describe("Serialized owned-record persistence contracts", () => {
       }
     }
   });
+
+  test("LP-010: @bug Save with no changes still sends a request", async ({
+    page,
+  }) => {
+    test.setTimeout(60_000);
+
+    const periodsPage = new LiquidationPeriodsPage(page);
+    const saveRequests: Request[] = [];
+
+    const recordSaveRequest = (request: Request): void => {
+      if (request.method() === "POST" && request.url() === saveUrl) {
+        saveRequests.push(request);
+      }
+    };
+
+    const selectTypeAndReadRows = async (): Promise<
+      LiquidationPeriodRecord[]
+    > => {
+      const rowsResponsePromise = page.waitForResponse(response =>
+        response.request().method() === "GET" && isRowsResponse(response.url()),
+      );
+      await periodsPage.periodTypeSelect.click();
+      await page.getByTestId("periodos-liq-type-option-m").click();
+      const response = await rowsResponsePromise;
+      expect(response.ok()).toBe(true);
+      return (await response.json()) as LiquidationPeriodRecord[];
+    };
+
+    // 1. Load a type, retain the complete baseline response, make no edits and add no rows, then click Save while observing the save endpoint.
+    await page.goto(applicationUrl);
+    const baselineRows = await selectTypeAndReadRows();
+    expect(rowIds(baselineRows).size).toBe(baselineRows.length);
+    await expect(periodsPage.emptyWorkingRow()).toHaveCount(0);
+
+    page.on("request", recordSaveRequest);
+    const saveResponsePromise = page.waitForResponse(
+      response =>
+        response.url() === saveUrl && response.request().method() === "POST",
+    );
+    await periodsPage.saveButton.click();
+
+    const saveResponse = await saveResponsePromise;
+    expect(saveResponse.ok()).toBe(true);
+    expect(saveRequests).toHaveLength(1);
+    expect(saveResponse.request().postDataJSON()).toEqual({
+      tipoPeriodo: periodType,
+      rows: baselineRows,
+    });
+
+    const successDialog = page.getByRole("dialog");
+    await expect(successDialog).toBeVisible();
+    await expect(
+      successDialog.getByRole("heading", { name: "Grabar periodo" }),
+    ).toBeVisible();
+    await expect(successDialog).toContainText(
+      "La informacion se guardo correctamente.",
+    );
+    await successDialog
+      .getByTestId("periodos-liq-dialog-save-success-confirm-button")
+      .click();
+    page.off("request", recordSaveRequest);
+
+    // 2. Reload, reselect the type, and compare fresh rows by stable ID and complete values.
+    await page.reload();
+    const freshRows = await selectTypeAndReadRows();
+    const byStableId = (rows: LiquidationPeriodRecord[]) =>
+      [...rows].sort((left, right) => left.kaNlPeriodo - right.kaNlPeriodo);
+
+    expect(byStableId(freshRows)).toEqual(byStableId(baselineRows));
+  });
+
 });
