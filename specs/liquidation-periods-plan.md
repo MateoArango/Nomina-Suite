@@ -178,7 +178,7 @@ Plan the authenticated /periodos-liq module with stable data-testid locators, ru
 
     **Implementation summary:** The test captures the complete fresh monthly baseline, confirms there is no client-only working row, clicks Save exactly once, and locks the current bug contract to one successful POST whose exact body is `{ tipoPeriodo: "M", rows: baselineRows }`. It also asserts the observed `Grabar periodo` success feedback, performs a true reload, and compares every complete record after sorting by stable `kaNlPeriodo`, proving no identity or value changed. Focused Chromium verification passed: 1 test.
 
-#### 4.3. LP-011: Delete removes exactly one test-owned persisted record
+#### 4.3. ✅ LP-011: Delete removes exactly one test-owned persisted record
 
 **File:** `tests/liquidationPeriods/mutation-contracts.spec.ts`
 
@@ -192,6 +192,8 @@ Plan the authenticated /periodos-liq module with stable data-testid locators, ru
   3. Reload and capture fresh rows in the test body and again in failure-safe cleanup.
     - expect: The owned ID is absent and all baseline IDs remain.
     - expect: Finally cleanup is idempotent and removes only the owned record if the primary delete did not complete.
+
+    **Implementation summary:** The test creates one disposable monthly period, identifies it only by the single backend-generated `kaNlPeriodo` outside the fresh baseline, reloads with no selected baseline row, and captures exactly one delete POST with `{ tipoPeriodo: "M", kaNlPeriodo }`. It reloads to prove the owned ID is absent while every baseline ID remains, and an idempotent `finally` cleanup deletes only that owned ID if needed. Focused Chromium verification passed: 1 test.
 
 ### 5. Serialized field contracts and documented validation gaps
 

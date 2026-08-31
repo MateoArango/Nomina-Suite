@@ -345,4 +345,187 @@ test.describe("Serialized owned-record persistence contracts", () => {
     expect(byStableId(freshRows)).toEqual(byStableId(baselineRows));
   });
 
+  test("LP-011: Delete removes exactly one test-owned persisted record", async ({
+    page,
+  }) => {
+    test.setTimeout(90_000);
+
+    const periodsPage = new LiquidationPeriodsPage(page);
+    const deleteRequests: Request[] = [];
+    let authorization: string | undefined;
+    let baselineIds = new Set<number>();
+    let ownedId: number | undefined;
+
+    const recordDeleteRequest = (request: Request): void => {
+      if (request.method() === "POST" && request.url() === deleteUrl) {
+        deleteRequests.push(request);
+      }
+    };
+
+    const readRows = async (): Promise<LiquidationPeriodRecord[]> => {
+      if (!authorization) {
+        throw new Error(
+          "The authenticated rows request did not provide an authorization header.",
+        );
+      }
+
+      const response = await page.request.get(
+        `${apiBase}/rows?tipoPeriodo=${periodType}`,
+        { headers: { authorization } },
+      );
+      expect(response.ok()).toBe(true);
+      return (await response.json()) as LiquidationPeriodRecord[];
+    };
+
+    const reloadAndSelectType = async (): Promise<
+      LiquidationPeriodRecord[]
+    > => {
+      await page.reload();
+      const rowsResponsePromise = page.waitForResponse(response =>
+        response.request().method() === "GET" && isRowsResponse(response.url()),
+      );
+      await periodsPage.periodTypeSelect.click();
+      await page.getByTestId("periodos-liq-type-option-m").click();
+      const response = await rowsResponsePromise;
+      expect(response.ok()).toBe(true);
+      return (await response.json()) as LiquidationPeriodRecord[];
+    };
+
+    const deleteSelectedOwnedRecord = async (
+      periodId: number,
+    ): Promise<void> => {
+      const deleteResponsePromise = page.waitForResponse(
+        response =>
+          response.url() === deleteUrl &&
+          response.request().method() === "POST",
+      );
+      await periodsPage.deleteButton.click();
+
+      const confirmationDialog = page.getByRole("dialog");
+      await expect(confirmationDialog).toBeVisible();
+      await confirmationDialog
+        .getByTestId(
+          "periodos-liq-dialog-delete-confirmation-confirm-button",
+        )
+        .click();
+
+      const deleteResponse = await deleteResponsePromise;
+      expect(deleteResponse.ok()).toBe(true);
+      expect(deleteResponse.request().postDataJSON()).toEqual({
+        tipoPeriodo: periodType,
+        kaNlPeriodo: periodId,
+      });
+
+      const successDialog = page.getByRole("dialog");
+      await expect(
+        successDialog.getByRole("heading", { name: "Eliminar periodo" }),
+      ).toBeVisible();
+      await expect(successDialog).toContainText(
+        "El periodo fue borrado correctamente.",
+      );
+    };
+
+    try {
+      // 1. Create one disposable period using the LP-009 ownership rules, reload, and locate it by captured kaNlPeriodo.
+      await page.goto(applicationUrl);
+      const initialRowsResponsePromise = page.waitForResponse(response =>
+        response.request().method() === "GET" && isRowsResponse(response.url()),
+      );
+      await periodsPage.periodTypeSelect.click();
+      await page.getByTestId("periodos-liq-type-option-m").click();
+
+      const initialRowsResponse = await initialRowsResponsePromise;
+      expect(initialRowsResponse.ok()).toBe(true);
+      const baselineRows =
+        (await initialRowsResponse.json()) as LiquidationPeriodRecord[];
+      baselineIds = rowIds(baselineRows);
+      authorization = (await initialRowsResponse.request().allHeaders())
+        .authorization;
+      expect(authorization).toBeTruthy();
+      expect(baselineIds.size).toBe(baselineRows.length);
+
+      await periodsPage.newButton.click();
+      const workingInputs = periodsPage.emptyWorkingRow().locator("input");
+      await workingInputs.nth(0).fill(String(submittedValues.scPeriodo));
+      await workingInputs.nth(1).fill(submittedValues.fechaInicial);
+      await workingInputs.nth(2).fill(submittedValues.fechaFinal);
+
+      const saveResponsePromise = page.waitForResponse(
+        response =>
+          response.url() === saveUrl &&
+          response.request().method() === "POST",
+      );
+      await periodsPage.saveButton.click();
+      const saveResponse = await saveResponsePromise;
+      expect(saveResponse.ok()).toBe(true);
+      await page
+        .getByTestId("periodos-liq-dialog-save-success-confirm-button")
+        .click();
+
+      const persistedRows = await reloadAndSelectType();
+      const ownedRows = persistedRows.filter(
+        row => !baselineIds.has(row.kaNlPeriodo),
+      );
+      expect(ownedRows).toHaveLength(1);
+      ownedId = ownedRows[0].kaNlPeriodo;
+      await periodsPage.pageSizeButton(100).click();
+      await expect(periodsPage.row(ownedId)).toHaveCount(1);
+      await expect(periodsPage.table.locator("tbody tr.selected")).toHaveCount(
+        0,
+      );
+
+      // 2. Select the owned row and click Delete while capturing the request and any confirmation or feedback.
+      page.on("request", recordDeleteRequest);
+      await periodsPage.row(ownedId).click();
+      await expect(periodsPage.table.locator("tbody tr.selected")).toHaveCount(
+        1,
+      );
+      await deleteSelectedOwnedRecord(ownedId);
+      page.off("request", recordDeleteRequest);
+      expect(deleteRequests).toHaveLength(1);
+      expect(deleteRequests[0].postDataJSON()).toEqual({
+        tipoPeriodo: periodType,
+        kaNlPeriodo: ownedId,
+      });
+      expect(baselineIds.has(ownedId)).toBe(false);
+
+      // 3. Reload and capture fresh rows in the test body and again in failure-safe cleanup.
+      const rowsAfterDelete = await reloadAndSelectType();
+      expect(rowsAfterDelete.some(row => row.kaNlPeriodo === ownedId)).toBe(
+        false,
+      );
+      for (const baselineId of baselineIds) {
+        expect(
+          rowsAfterDelete.some(row => row.kaNlPeriodo === baselineId),
+        ).toBe(true);
+      }
+    } finally {
+      page.off("request", recordDeleteRequest);
+      if (authorization) {
+        const rowsBeforeCleanup = await readRows();
+        const ownedRecordStillExists =
+          ownedId !== undefined &&
+          rowsBeforeCleanup.some(row => row.kaNlPeriodo === ownedId);
+
+        if (ownedRecordStillExists) {
+          await reloadAndSelectType();
+          await periodsPage.pageSizeButton(100).click();
+          await expect(periodsPage.row(ownedId)).toBeVisible();
+          await periodsPage.row(ownedId).click();
+          await deleteSelectedOwnedRecord(ownedId);
+        }
+
+        const finalRows = await readRows();
+        if (ownedId !== undefined) {
+          expect(finalRows.some(row => row.kaNlPeriodo === ownedId)).toBe(false);
+        }
+        for (const baselineId of baselineIds) {
+          expect(finalRows.some(row => row.kaNlPeriodo === baselineId)).toBe(
+            true,
+          );
+        }
+      }
+    }
+  });
+
 });
