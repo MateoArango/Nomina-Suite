@@ -91,17 +91,19 @@ Plan the authenticated /periodos-liq module with stable data-testid locators, ru
 
     **Implementation summary:** The test clicks New three times as separate completed actions, verifies each click adds exactly one distinct ID-less row with three empty inputs, and confirms the 100-row visible slice and runtime pager total include every working row while persisted IDs and module request counts remain unchanged. Reload discards all working rows without any mutation request. Focused Chromium verification passed: 1 test.
 
-#### 2.3. LP-006: @bug Delete is a no-op for an unsaved selected row
+#### 2.3. ✅ LP-006: Delete removes an unsaved selected row locally without a request
 
 **File:** `tests/liquidationPeriods/client-state.spec.ts`
 
 **Steps:**
-  1. Load a type, click New once, and observe the delete endpoint while clicking Delete on the selected unsaved row.
-    - expect: Zero delete requests are sent.
-    - expect: The unsaved row remains selected and present; current behavior is a client-side no-op.
-    - expect: This is a hard regression lock: a behavior change fails for human review rather than self-skipping.
-  2. Reload the page.
-    - expect: The unsaved row disappears without persistence and baseline IDs remain unchanged.
+  1. Load a runtime period type and record the baseline persisted IDs, pager state, and module network traffic.
+  2. Click New once and verify exactly one selected ID-less empty row is added.
+  3. Observe module mutation traffic, click Delete once, and confirm with Yes.
+    - expect: Zero mutation requests are sent.
+    - expect: The ID-less working row is removed from the grid.
+    - expect: The paginator, visible rows, and persisted IDs return to their baseline state.
+
+    **Implementation summary:** The test creates one selected ID-less empty row, clicks Delete, confirms with Yes, and proves the row is removed entirely on the client while zero module mutation requests are sent. The paginator, visible persisted IDs, and row count return to their exact runtime baseline without reload or cleanup. Focused Chromium verification passed: 1 test.
 
 #### 2.4. LP-007: Persisted-row selection enables only single-record deletion
 

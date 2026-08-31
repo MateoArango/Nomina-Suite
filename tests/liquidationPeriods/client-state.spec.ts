@@ -278,4 +278,101 @@ test.describe("Client-only row and selection behavior", () => {
     ).toHaveLength(1);
     expect(mutationRequests).toHaveLength(0);
   });
+
+  test("LP-006: Delete removes an unsaved selected row locally without a request", async ({
+    page,
+  }) => {
+    const liquidationPeriodsPage = new LiquidationPeriodsPage(page);
+    const mutationRequests: string[] = [];
+
+    page.on("request", request => {
+      const url = new URL(request.url());
+
+      if (isMutationRequest(request.method(), url)) {
+        mutationRequests.push(`${request.method()} ${request.url()}`);
+      }
+    });
+
+    await page.goto(applicationUrl);
+
+    // 1. Load a runtime period type and record the baseline persisted IDs, pager state, and module network traffic.
+    const rowsResponsePromise = page.waitForResponse(response => {
+      const url = new URL(response.url());
+
+      return (
+        response.request().method() === "GET" &&
+        isRowsRequest(url) &&
+        url.searchParams.get("tipoPeriodo") === "M"
+      );
+    });
+
+    await liquidationPeriodsPage.periodTypeSelect.click();
+    await page.getByTestId("periodos-liq-type-option-m").click();
+
+    const rowsResponse = await rowsResponsePromise;
+    const baselineRecords =
+      (await rowsResponse.json()) as LiquidationPeriodRecord[];
+    const baselineIds = await visiblePersistedIds(liquidationPeriodsPage);
+    const baselinePager = await liquidationPeriodsPage.readPagerRange();
+    const baselineVisibleCount =
+      await liquidationPeriodsPage.visibleRows().count();
+
+    expect(rowsResponse.ok()).toBe(true);
+    expect(Array.isArray(baselineRecords)).toBe(true);
+    expect(baselinePager.total).toBe(baselineRecords.length);
+    expect(mutationRequests).toHaveLength(0);
+
+    // 2. Click New once and verify exactly one selected ID-less empty row is added.
+    await liquidationPeriodsPage.newButton.click();
+
+    const workingRow = liquidationPeriodsPage.emptyWorkingRow();
+
+    await expect(workingRow).toHaveCount(1);
+    await expect(workingRow).toHaveClass(/\bselected\b/);
+    await expect(workingRow.locator("input")).toHaveCount(3);
+
+    for (const input of await workingRow.locator("input").all()) {
+      await expect(input).toHaveValue("");
+    }
+
+    expect((await liquidationPeriodsPage.readPagerRange()).total).toBe(
+      baselinePager.total + 1,
+    );
+    expect(mutationRequests).toHaveLength(0);
+
+    // 3. Observe module mutation traffic, click Delete once, and confirm with Yes.
+    const mutationObservation = page
+      .waitForRequest(
+        request => {
+          const url = new URL(request.url());
+
+          return isMutationRequest(request.method(), url);
+        },
+        { timeout: 1_000 },
+      )
+      .catch(() => null);
+
+    await liquidationPeriodsPage.deleteButton.click();
+
+    const confirmDeleteButton = page.getByTestId(
+      "periodos-liq-dialog-delete-confirmation-confirm-button",
+    );
+
+    await expect(confirmDeleteButton).toBeVisible();
+    await confirmDeleteButton.click();
+
+    expect(await mutationObservation).toBeNull();
+    expect(mutationRequests).toHaveLength(0);
+    await expect(liquidationPeriodsPage.emptyWorkingRow()).toHaveCount(0);
+    await expect(liquidationPeriodsPage.visibleRows()).toHaveCount(
+      baselineVisibleCount,
+    );
+    expect(await visiblePersistedIds(liquidationPeriodsPage)).toEqual(
+      baselineIds,
+    );
+    expect(await liquidationPeriodsPage.readPagerRange()).toEqual(
+      baselinePager,
+    );
+  });
+
 });
