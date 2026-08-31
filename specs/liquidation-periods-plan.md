@@ -77,7 +77,7 @@ Plan the authenticated /periodos-liq module with stable data-testid locators, ru
 
     **Implementation summary:** The test captures the selected type's runtime response and visible baseline values, clicks New exactly once, verifies one selected ID-less row with three empty inputs, confirms the runtime pager total increases by one while persisted rows remain unchanged, and proves no additional rows or mutation request is sent before reload clears all client-only state. Focused Chromium verification passed: 1 test.
 
-#### 2.2. LP-005: Repeated New clicks append distinct client-only rows
+#### 2.2. ✅ LP-005: Repeated New clicks append distinct client-only rows
 
 **File:** `tests/liquidationPeriods/client-state.spec.ts`
 
@@ -88,6 +88,8 @@ Plan the authenticated /periodos-liq module with stable data-testid locators, ru
     - expect: The paginator total and visible slice account for all working rows without changing persisted IDs.
   2. Reload without saving.
     - expect: All working rows are discarded and no mutation remains.
+
+    **Implementation summary:** The test clicks New three times as separate completed actions, verifies each click adds exactly one distinct ID-less row with three empty inputs, and confirms the 100-row visible slice and runtime pager total include every working row while persisted IDs and module request counts remain unchanged. Reload discards all working rows without any mutation request. Focused Chromium verification passed: 1 test.
 
 #### 2.3. LP-006: @bug Delete is a no-op for an unsaved selected row
 
