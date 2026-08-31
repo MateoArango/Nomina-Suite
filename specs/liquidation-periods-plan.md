@@ -105,7 +105,7 @@ Plan the authenticated /periodos-liq module with stable data-testid locators, ru
 
     **Implementation summary:** The test creates one selected ID-less empty row, clicks Delete, confirms with Yes, and proves the row is removed entirely on the client while zero module mutation requests are sent. The paginator, visible persisted IDs, and row count return to their exact runtime baseline without reload or cleanup. Focused Chromium verification passed: 1 test.
 
-#### 2.4. LP-007: Persisted-row selection enables only single-record deletion
+#### 2.4. ✅ LP-007: Persisted-row selection enables only single-record deletion
 
 **File:** `tests/liquidationPeriods/row-selection.spec.ts`
 
@@ -113,9 +113,11 @@ Plan the authenticated /periodos-liq module with stable data-testid locators, ru
   1. Load a type with at least one runtime record and select one row by kaNlPeriodo without clicking Delete.
     - expect: Exactly one row has selected state and Delete becomes enabled.
     - expect: Selection alone sends no mutation request.
-  2. Inspect the complete module for multi-select or batch-delete controls.
-    - expect: There are no checkboxes, select-all control, or delete-selected control.
-    - expect: Only the single Delete action is available; no baseline record is deleted during this test.
+  2. Try to select another row while the first remains selected.
+    - expect: The first row is deselected and the second row becomes selected;
+    - expect: Delete remains enabled and no mutation request is sent.
+
+    **Implementation summary:** The test derives two persisted `kaNlPeriodo` values from the runtime monthly response, proves selection moves exclusively from the first row to the second, and verifies Delete remains enabled while zero mutation requests are sent. Focused Chromium verification passed: 1 test.
 
 ### 3. Runtime-derived pagination
 
