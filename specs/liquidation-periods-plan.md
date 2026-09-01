@@ -254,7 +254,7 @@ Plan the authenticated /periodos-liq module with stable data-testid locators, ru
 
     **Implementation summary:** The serialized owned-record test enters `32/02/2026` through normal keyboard input and clicks Save before evaluating the contract, because the invalid UI entry becomes null during submission. It verifies after reload that the uniquely identified record persisted with a null start date, and failure-safe cleanup deletes only the captured owned ID while preserving every baseline ID. Focused Chromium verification passed: 1 test.
 
-#### 5.5. LP-016: @bug Invalid end date follows the current null-persistence contract
+#### 5.5. ✅ LP-016: @bug Invalid end date follows the current null-persistence contract
 
 **File:** `tests/liquidationPeriods/mutation-contracts.spec.ts`
 
@@ -266,7 +266,9 @@ Plan the authenticated /periodos-liq module with stable data-testid locators, ru
     - expect: The end date persists as null if the documented bug remains.
     - expect: The exact owned ID is removed in finally without touching baseline data.
 
-#### 5.6. LP-017: @bug End date earlier than start date is accepted
+    **Implementation summary:** The serialized owned-record test enters `32/02/2026` in the end-date field through normal keyboard input and clicks Save before evaluating the contract. It verifies the request and reloaded owned record contain a valid start date with a null end date, and failure-safe cleanup deletes only the captured owned ID while preserving every baseline ID. Focused Chromium verification passed: 1 test.
+
+#### 5.6. ✅ LP-017: @bug End date earlier than start date is accepted
 
 **File:** `tests/liquidationPeriods/mutation-contracts.spec.ts`
 
@@ -278,3 +280,5 @@ Plan the authenticated /periodos-liq module with stable data-testid locators, ru
     - expect: The reversed date range persists unchanged for the owned ID.
     - expect: If the behavior changes, the test fails for deliberate human review.
     - expect: The owned ID is removed in finally.
+
+    **Implementation summary:** The serialized owned-record test fills a valid start date later than its valid end date, clicks Save exactly once, and hard-fails if the save request is rejected or blocked. It verifies the reversed dates in the submitted payload and fresh post-reload rows, then deletes only the captured owned ID in failure-safe cleanup while preserving every baseline ID. Focused Chromium verification passed: 1 test.
