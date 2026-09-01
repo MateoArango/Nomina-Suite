@@ -1027,4 +1027,192 @@ test.describe("Serialized owned-record persistence contracts", () => {
     }
   });
 
+  test("LP-015: @bug Invalid start date follows the current null-persistence contract", async ({
+    page,
+  }) => {
+    test.setTimeout(90_000);
+
+    const periodsPage = new LiquidationPeriodsPage(page);
+    const impossibleStartDate = "32/02/2026";
+    let authorization: string | undefined;
+    let ownedId: number | undefined;
+    let ownedValues:
+      | { scPeriodo: number; fechaFinal: string }
+      | undefined;
+    let baselineIds = new Set<number>();
+
+    const readRows = async (): Promise<LiquidationPeriodRecord[]> => {
+      if (!authorization) {
+        throw new Error(
+          "The authenticated rows request did not provide an authorization header.",
+        );
+      }
+
+      const response = await page.request.get(
+        `${apiBase}/rows?tipoPeriodo=${periodType}`,
+        { headers: { authorization } },
+      );
+      expect(response.ok()).toBe(true);
+      return (await response.json()) as LiquidationPeriodRecord[];
+    };
+
+    const reloadAndSelectType = async (): Promise<
+      LiquidationPeriodRecord[]
+    > => {
+      await page.reload();
+      const rowsResponsePromise = page.waitForResponse(response =>
+        response.request().method() === "GET" && isRowsResponse(response.url()),
+      );
+      await periodsPage.periodTypeSelect.click();
+      await page.getByTestId("periodos-liq-type-option-m").click();
+      const response = await rowsResponsePromise;
+      expect(response.ok()).toBe(true);
+      return (await response.json()) as LiquidationPeriodRecord[];
+    };
+
+    const isOwnedTuple = (row: LiquidationPeriodRecord): boolean =>
+      ownedValues !== undefined &&
+      row.scDiasLiquidacion === periodType &&
+      row.scPeriodo === ownedValues.scPeriodo &&
+      row.fechaInicial === null &&
+      inputDate(row.fechaFinal) === ownedValues.fechaFinal;
+
+    try {
+      // 1. Using user-like date entry only, attempt an impossible calendar start date on a uniquely identifiable row, then Save and reload.
+      await page.goto(applicationUrl);
+      const initialRowsResponsePromise = page.waitForResponse(response =>
+        response.request().method() === "GET" && isRowsResponse(response.url()),
+      );
+      await periodsPage.periodTypeSelect.click();
+      await page.getByTestId("periodos-liq-type-option-m").click();
+
+      const initialRowsResponse = await initialRowsResponsePromise;
+      expect(initialRowsResponse.ok()).toBe(true);
+      const initialRows =
+        (await initialRowsResponse.json()) as LiquidationPeriodRecord[];
+      baselineIds = rowIds(initialRows);
+      authorization = (await initialRowsResponse.request().allHeaders())
+        .authorization;
+      expect(authorization).toBeTruthy();
+
+      const candidates = Array.from({ length: 20 }, (_, index) => ({
+        scPeriodo: 91500 + index,
+        fechaFinal: `2026-12-${String(index + 1).padStart(2, "0")}`,
+      }));
+      ownedValues = candidates.find(
+        candidate =>
+          !initialRows.some(
+            row =>
+              row.scPeriodo === candidate.scPeriodo &&
+              row.fechaInicial === null &&
+              inputDate(row.fechaFinal) === candidate.fechaFinal,
+          ),
+      );
+      expect(
+        ownedValues,
+        "LP-015 requires one unused period/end-date tuple.",
+      ).toBeTruthy();
+
+      await periodsPage.newButton.click();
+      const workingInputs = periodsPage.emptyWorkingRow().locator("input");
+      await workingInputs.nth(0).fill(String(ownedValues!.scPeriodo));
+      const startDateInput = workingInputs.nth(1);
+      await startDateInput.click();
+      await startDateInput.pressSequentially(impossibleStartDate);
+      await startDateInput.press("Tab");
+      await workingInputs.nth(2).fill(ownedValues!.fechaFinal);
+
+      const saveResponsePromise = page.waitForResponse(
+        response =>
+          response.url() === saveUrl &&
+          response.request().method() === "POST",
+      );
+      await periodsPage.saveButton.click();
+      const saveResponse = await saveResponsePromise;
+      if (!saveResponse.ok()) {
+        const rejectionBody = await saveResponse.text();
+        test.skip(
+          true,
+          `LP-015 gap appears closed: the API rejected the impossible start date with HTTP ${saveResponse.status()} (${rejectionBody}); replace this bug test with a rejection assertion.`,
+        );
+      }
+
+      const savePayload = saveResponse.request().postDataJSON() as {
+        tipoPeriodo?: PeriodType;
+        rows?: SubmittedPeriod[];
+      };
+      expect(savePayload.tipoPeriodo).toBe(periodType);
+      const submittedOwnedRows = (savePayload.rows ?? []).filter(
+        row =>
+          row.kaNlPeriodo === null &&
+          row.scDiasLiquidacion === periodType &&
+          row.scPeriodo === ownedValues!.scPeriodo,
+      );
+      expect(submittedOwnedRows).toHaveLength(1);
+      expect(submittedOwnedRows[0]).toMatchObject({
+        fechaInicial: null,
+        fechaFinal: ownedValues!.fechaFinal,
+      });
+      await page
+        .getByTestId("periodos-liq-dialog-save-success-confirm-button")
+        .click();
+
+      // 2. When the current bug remains reproducible, locate the owned record after reload.
+      const persistedRows = await reloadAndSelectType();
+      const ownedRows = persistedRows.filter(
+        row => !baselineIds.has(row.kaNlPeriodo) && isOwnedTuple(row),
+      );
+      expect(ownedRows).toHaveLength(1);
+      ownedId = ownedRows[0].kaNlPeriodo;
+      expect(ownedRows[0].fechaInicial).toBeNull();
+      await periodsPage.pageSizeButton(100).click();
+      await expect(periodsPage.row(ownedId)).toHaveCount(1);
+      await expect(periodsPage.startDateInput(ownedId)).toHaveValue("");
+    } finally {
+      if (authorization && ownedValues) {
+        const currentRows = await readRows();
+        const ownedRows = currentRows.filter(
+          row => !baselineIds.has(row.kaNlPeriodo) && isOwnedTuple(row),
+        );
+        expect(
+          ownedRows,
+          "LP-015 cleanup must never target more than one owned tuple.",
+        ).toHaveLength(ownedRows.length > 0 ? 1 : 0);
+        ownedId ??= ownedRows[0]?.kaNlPeriodo;
+
+        if (ownedId !== undefined) {
+          expect(baselineIds.has(ownedId)).toBe(false);
+          await reloadAndSelectType();
+          await periodsPage.pageSizeButton(100).click();
+          await periodsPage.row(ownedId).click();
+          const deleteResponsePromise = page.waitForResponse(
+            response =>
+              response.url() === deleteUrl &&
+              response.request().method() === "POST",
+          );
+          await periodsPage.deleteButton.click();
+          await page
+            .getByTestId(
+              "periodos-liq-dialog-delete-confirmation-confirm-button",
+            )
+            .click();
+          const deleteResponse = await deleteResponsePromise;
+          expect(deleteResponse.ok()).toBe(true);
+          expect(deleteResponse.request().postDataJSON()).toEqual({
+            tipoPeriodo: periodType,
+            kaNlPeriodo: ownedId,
+          });
+
+          const finalRows = await readRows();
+          expect(finalRows.some(row => row.kaNlPeriodo === ownedId)).toBe(false);
+          for (const baselineId of baselineIds) {
+            expect(finalRows.some(row => row.kaNlPeriodo === baselineId)).toBe(
+              true,
+            );
+          }
+        }
+      }
+    }
+  });
+
 });

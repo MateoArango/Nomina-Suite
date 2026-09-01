@@ -240,7 +240,7 @@ Plan the authenticated /periodos-liq module with stable data-testid locators, ru
 
     **Implementation summary:** The serialized owned-record test dynamically selects an unused monthly date tuple, proves the input and outgoing request retain `-5`, and reloads to assert exactly one new record persisted with period `-5`. Failure-safe cleanup deletes only the captured owned ID, preserves every baseline ID, and confirms the owned ID is absent from fresh rows.
 
-#### 5.4. LP-015: @bug Invalid start date follows the current null-persistence contract
+#### 5.4. ✅ LP-015: @bug Invalid start date follows the current null-persistence contract
 
 **File:** `tests/liquidationPeriods/mutation-contracts.spec.ts`
 
@@ -251,6 +251,8 @@ Plan the authenticated /periodos-liq module with stable data-testid locators, ru
   2. When the current bug remains reproducible, locate the owned record after reload.
     - expect: The start date persisted as null according to the supplied contract while the remaining owned values identify the row.
     - expect: The owned ID is removed in finally.
+
+    **Implementation summary:** The serialized owned-record test enters `32/02/2026` through normal keyboard input and clicks Save before evaluating the contract, because the invalid UI entry becomes null during submission. It verifies after reload that the uniquely identified record persisted with a null start date, and failure-safe cleanup deletes only the captured owned ID while preserving every baseline ID. Focused Chromium verification passed: 1 test.
 
 #### 5.5. LP-016: @bug Invalid end date follows the current null-persistence contract
 
