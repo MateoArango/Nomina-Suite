@@ -9,7 +9,7 @@ type PeriodType = "M" | "Q";
 type LiquidationPeriodRecord = {
   kaNlPeriodo: number;
   scDiasLiquidacion: PeriodType;
-  scPeriodo: number;
+  scPeriodo: number | null;
   fechaInicial: string | null;
   fechaFinal: string | null;
 };
@@ -25,6 +25,10 @@ function isRowsRequest(url: URL, periodType: PeriodType): boolean {
 
 function inputDate(value: string | null): string {
   return value?.slice(0, 10) ?? "";
+}
+
+function inputPeriod(value: number | null): string {
+  return value === null ? "" : String(value);
 }
 
 test.describe("Initial state and period-type loading", () => {
@@ -91,7 +95,7 @@ test.describe("Initial state and period-type loading", () => {
       await expect(liquidationPeriodsPage.row(periodId)).toBeVisible();
       await expect(
         liquidationPeriodsPage.periodInput(periodId),
-      ).toHaveValue(String(record.scPeriodo));
+      ).toHaveValue(inputPeriod(record.scPeriodo));
       await expect(
         liquidationPeriodsPage.startDateInput(periodId),
       ).toHaveValue(inputDate(record.fechaInicial));
@@ -148,7 +152,7 @@ test.describe("Initial state and period-type loading", () => {
       await expect(liquidationPeriodsPage.row(periodId)).toBeVisible();
       await expect(
         liquidationPeriodsPage.periodInput(periodId),
-      ).toHaveValue(String(record.scPeriodo));
+      ).toHaveValue(inputPeriod(record.scPeriodo));
       await expect(
         liquidationPeriodsPage.startDateInput(periodId),
       ).toHaveValue(inputDate(record.fechaInicial));

@@ -6,7 +6,7 @@ import { LiquidationPeriodsPage } from "../../pages/LiquidationPeriods.page";
 
 type LiquidationPeriodRecord = {
   kaNlPeriodo: number;
-  scPeriodo: number;
+  scPeriodo: number | null;
   fechaInicial: string | null;
   fechaFinal: string | null;
 };
@@ -24,6 +24,10 @@ function isMutationRequest(method: string, url: URL): boolean {
 
 function inputDate(value: string | null): string {
   return value?.slice(0, 10) ?? "";
+}
+
+function inputPeriod(value: number | null): string {
+  return value === null ? "" : String(value);
 }
 
 async function visiblePersistedIds(
@@ -128,7 +132,7 @@ test.describe("Client-only row and selection behavior", () => {
 
       await expect(liquidationPeriodsPage.row(periodId)).toBeVisible();
       await expect(liquidationPeriodsPage.periodInput(periodId)).toHaveValue(
-        String(record.scPeriodo),
+        inputPeriod(record.scPeriodo),
       );
       await expect(
         liquidationPeriodsPage.startDateInput(periodId),
