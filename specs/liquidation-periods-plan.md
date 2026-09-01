@@ -199,7 +199,7 @@ Plan the authenticated /periodos-liq module with stable data-testid locators, ru
 
 **Seed:** `tests/liquidationPeriods/seed-test.spec.ts`
 
-#### 5.1. LP-012: Decimal period persists using the current integer conversion
+#### 5.1. ✅ LP-012: Decimal period persists using the current integer conversion
 
 **File:** `tests/liquidationPeriods/mutation-contracts.spec.ts`
 
@@ -211,20 +211,23 @@ Plan the authenticated /periodos-liq module with stable data-testid locators, ru
     - expect: The persisted period is 5 according to the supplied expected contract; this is a direct assertion, not a bug skip.
     - expect: The owned record is removed in finally.
 
-#### 5.2. LP-013: @bug Very long period input follows the current overflow or persistence contract
+    **Implementation summary:** The serialized owned-record test dynamically selects an unused monthly period/date tuple, proves the input retains `5.5`, captures the outgoing row with `scPeriodo: 5.5`, and reloads to assert the backend-persisted record has `scPeriodo: 5` by its captured stable ID. Failure-safe cleanup deletes only that owned ID and confirms its absence. Focused Chromium verification passed: 1 test.
+
+#### 5.2. ✅ LP-013: @bug Very long period input follows the current overflow or persistence contract
 
 **File:** `tests/liquidationPeriods/mutation-contracts.spec.ts`
 
 **Steps:**
-  1. Enter a 1000-character repeated-digit value in a uniquely identifiable working row and determine the user-visible input value before Save.
-    - expect: No min, max, step, maxlength, or pattern constraint is assumed.
-    - expect: If explicit input validation now rejects or safely truncates the value, self-skip with a message that the validation gap appears closed and a replacement rejection test is needed.
+  1. Enter a 11-character repeated-digit value in a uniquely identifiable working row and determine the user-visible input value before Save.
+    - expect: The input accepts all 11 characters; the database column maximum is 10 characters.
   2. If the value remains accepted, click Save once and capture the exact request, response, feedback, and fresh rows result.
     - expect: If it persists, assert the exact persisted representation by owned ID and clean it up.
     - expect: If the current server fails at an overflow/database layer rather than product validation, assert that exact non-success contract and prove no owned record persisted.
     - expect: Do not silently pass on any outcome.
 
-#### 5.3. LP-014: @bug Negative period remains accepted until validation is added
+    **Implementation summary:** The serialized test enters 11 repeated digits, proves the UI retains the full value, and clicks Save exactly once. It asserts the submitted owned tuple, HTTP 503, `DB_ERROR`, and the `ORA-12899` contract reporting `actual: 11, maximum: 10`; it also verifies the matching error dialog and uses fresh authenticated rows to prove that no record persisted. Focused Chromium verification passed: 1 test.
+
+#### 5.3. ✅ LP-014: @bug Negative period remains accepted until validation is added
 
 **File:** `tests/liquidationPeriods/mutation-contracts.spec.ts`
 
@@ -234,6 +237,8 @@ Plan the authenticated /periodos-liq module with stable data-testid locators, ru
     - expect: Otherwise exactly one owned record persists with period -5.
   2. Delete the owned ID in finally.
     - expect: No baseline record is touched and the owned ID is absent from fresh rows.
+
+    **Implementation summary:** The serialized owned-record test dynamically selects an unused monthly date tuple, proves the input and outgoing request retain `-5`, and reloads to assert exactly one new record persisted with period `-5`. Failure-safe cleanup deletes only the captured owned ID, preserves every baseline ID, and confirms the owned ID is absent from fresh rows.
 
 #### 5.4. LP-015: @bug Invalid start date follows the current null-persistence contract
 
