@@ -10,7 +10,7 @@ Plan the authenticated /mae-historico-salario-minimo module with the existing Mi
 
 **Seed:** `tests/minimumWageHistory/seed-test.spec.ts`
 
-#### 1.1. MWH-001: Initial list state maps every visible row to the runtime rows response
+#### 1.1. ✅ MWH-001: Initial list state maps every visible row to the runtime rows response
 
 **File:** `tests/minimumWageHistory/initial-list-state.spec.ts`
 
@@ -24,7 +24,9 @@ Plan the authenticated /mae-historico-salario-minimo module with the existing Mi
     - expect: Every visible row maps by vigencia to the corresponding response object in API order.
     - expect: Displayed numeric values match the runtime record using the page's locale formatting.
 
-#### 1.2. MWH-002: Column order and nullable numeric rendering remain stable
+**Implementation summary:** The test captures the fresh runtime rows response, validates non-empty unique numeric `vigencia` identities, confirms the initial tab and action-button states, derives the pager range and visible count from the selected page size and current total, and maps all five visible cells to each API-ordered row through its stable test ID using the page's locale formatting. Focused Chromium verification passed: 1 test.
+
+#### 1.2. ✅ MWH-002: Column order and nullable numeric rendering remain stable
 
 **File:** `tests/minimumWageHistory/initial-list-state.spec.ts`
 
@@ -35,6 +37,8 @@ Plan the authenticated /mae-historico-salario-minimo module with the existing Mi
     - expect: Null values render as an empty cell.
     - expect: Numeric zero renders as 0 and is not confused with null.
     - expect: No cell displays undefined, null, or NaN as literal UI text.
+
+**Implementation summary:** The test asserts the exact five-column header order, maps every visible row to the fresh runtime response by stable `vigencia`, formats `ndSubsidioAlimentacion` and `ndIpc` with the page locale, and explicitly proves that visible null values render blank while numeric zero renders as `0` without any literal `undefined`, `null`, or `NaN` text. Focused Chromium verification passed: 1 test.
 
 #### 1.3. MWH-003: Page-size controls and navigation follow the runtime total
 

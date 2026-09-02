@@ -102,4 +102,104 @@ test.describe("Runtime list view and pagination", () => {
       ]);
     }
   });
+
+  test("MWH-002: Column order and nullable numeric rendering remain stable", async ({
+    page,
+  }) => {
+    const minimumWageHistoryPage = new MinimumWageHistoryPage(page);
+
+    // 1. Load the runtime grid and inspect the table header.
+    const rowsResponsePromise = page.waitForResponse(response => {
+      const url = new URL(response.url());
+
+      return (
+        url.pathname === rowsPath && response.request().method() === "GET"
+      );
+    });
+
+    await page.goto(
+      "https://nomina-qa.adacsc.co/mae-historico-salario-minimo",
+    );
+
+    const rowsResponse = await rowsResponsePromise;
+    expect(rowsResponse.ok()).toBe(true);
+
+    const rows = (await rowsResponse.json()) as MinimumWageHistoryRow[];
+    expect(Array.isArray(rows)).toBe(true);
+    expect(rows.length).toBeGreaterThan(0);
+
+    await expect(minimumWageHistoryPage.columnHeaders).toHaveText([
+      "Vigencia",
+      "Salario Mínimo Gobierno",
+      "Subsidio de Transporte",
+      "Subsidio Alimentación",
+      "IPC",
+    ]);
+
+    // 2. For every visible runtime row, compare ndSubsidioAlimentacion and ndIpc with their cells, including records containing null and numeric zero.
+    const selectedPageSize =
+      await minimumWageHistoryPage.selectedPageSize();
+    const visibleRows = minimumWageHistoryPage.visibleRows();
+    const expectedVisibleCount = Math.min(selectedPageSize, rows.length);
+
+    await expect(visibleRows).toHaveCount(expectedVisibleCount);
+
+    const pageLocale =
+      (await page.locator("html").getAttribute("lang")) || "en-US";
+    const numericFormatter = new Intl.NumberFormat(pageLocale, {
+      maximumFractionDigits: 20,
+    });
+    const formatNullableNumeric = (value: number | null): string =>
+      value === null ? "" : numericFormatter.format(value);
+
+    let sawNull = false;
+    let sawZero = false;
+
+    for (const visibleRow of await visibleRows.all()) {
+      const testId = await visibleRow.getAttribute("data-testid");
+      const year = Number(testId?.split("--").at(-1));
+      const runtimeRow = rows.find(row => row.vigencia === year);
+
+      expect(
+        runtimeRow,
+        `Visible year ${year} was not returned by the rows endpoint`,
+      ).toBeDefined();
+
+      if (!runtimeRow) {
+        throw new Error(
+          `Visible year ${year} was not returned by the rows endpoint`,
+        );
+      }
+
+      const cells = visibleRow.locator("td");
+      const nullableValues = [
+        runtimeRow.ndSubsidioAlimentacion,
+        runtimeRow.ndIpc,
+      ] as const;
+
+      await expect(cells).toHaveCount(5);
+
+      for (let index = 0; index < nullableValues.length; index += 1) {
+        const runtimeValue = nullableValues[index];
+        const cell = cells.nth(index + 3);
+
+        sawNull ||= runtimeValue === null;
+        sawZero ||= Object.is(runtimeValue, 0);
+
+        await expect(cell).toHaveText(formatNullableNumeric(runtimeValue));
+
+        const renderedValue = (await cell.textContent())?.trim() ?? "";
+        expect(["undefined", "null", "NaN"]).not.toContain(renderedValue);
+      }
+    }
+
+    expect(
+      sawNull,
+      "MWH-002 requires at least one visible runtime null value",
+    ).toBe(true);
+    expect(
+      sawZero,
+      "MWH-002 requires at least one visible runtime numeric zero",
+    ).toBe(true);
+  });
 });
