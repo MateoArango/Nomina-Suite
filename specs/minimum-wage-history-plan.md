@@ -80,7 +80,7 @@ Plan the authenticated /mae-historico-salario-minimo module with the existing Mi
 
 **Seed:** `tests/minimumWageHistory/seed-test.spec.ts`
 
-#### 3.1. MWH-005: Double-click shows the year-specific tipo=2 blocking dialog
+#### 3.1. ✅ MWH-005: Double-click shows the year-specific tipo=2 blocking dialog
 
 **File:** `tests/minimumWageHistory/double-click-validation.spec.ts`
 
@@ -93,7 +93,9 @@ Plan the authenticated /mae-historico-salario-minimo module with the existing Mi
     - expect: The same message pattern substitutes the selected year and the dialog offers Aceptar.
     - expect: No year-specific movement counter is hard-coded.
 
-#### 3.2. MWH-006: Accepting the double-click dialog does not open Encabezado
+**Implementation summary:** The test derives the immediately prior and oldest years from the fresh rows response, expands the page size so both runtime rows are addressable, and double-clicks each applicable row through its stable test ID. For every sample it proves that the interaction captures a tipo=1 request and exactly one successful tipo=2 request for the selected vigencia, validates the complete blocking response with dynamic numeric counters, and asserts the visible dialog heading, exact response message, and Aceptar action. Focused Chromium verification passed: 1 test.
+
+#### 3.2. ✅ MWH-006: Accepting the double-click dialog does not open Encabezado
 
 **File:** `tests/minimumWageHistory/double-click-validation.spec.ts`
 
@@ -102,6 +104,8 @@ Plan the authenticated /mae-historico-salario-minimo module with the existing Mi
     - expect: The dialog closes and Lista remains selected.
     - expect: No tipo=3 request and no rows/{vigencia} detail request is sent.
     - expect: This locks the confirmed blocking flow and supersedes the supplied unconfirmed assumption that double-click continues into detail.
+
+**Implementation summary:** The test derives an immediately prior year from the fresh rows response, opens its confirmed tipo=2 blocking dialog through the stable row test ID, and starts a request baseline only after the dialog is visible. It clicks Aceptar exactly once, verifies the dialog closes while Lista remains selected and Encabezado remains unselected, and proves that acceptance sends zero tipo=3 validations and zero rows/{vigencia} detail GETs. Focused Chromium verification passed: 1 test.
 
 ### 4. Encabezado detail contracts
 
