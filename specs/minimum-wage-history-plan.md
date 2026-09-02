@@ -111,7 +111,7 @@ Plan the authenticated /mae-historico-salario-minimo module with the existing Mi
 
 **Seed:** `tests/minimumWageHistory/seed-test.spec.ts`
 
-#### 4.1. MWH-007: Direct Encabezado navigation loads the selected row through tipo=3 and detail GET
+#### 4.1. ✅ MWH-007: Direct Encabezado navigation loads the selected row through tipo=3 and detail GET
 
 **File:** `tests/minimumWageHistory/detail-view.spec.ts`
 
@@ -120,6 +120,8 @@ Plan the authenticated /mae-historico-salario-minimo module with the existing Mi
     - expect: GET validar-relacion uses the selected vigencia and tipo=3 and succeeds with mensaje=null.
     - expect: GET /rows/{vigencia} uses the same selected identity and succeeds.
     - expect: Encabezado becomes selected and its five displayed values map to the detail response.
+
+**Implementation summary:** The test derives the latest row from the fresh rows response, single-selects it by its stable vigencia test ID, and waits for the selection validation to settle before observing direct Encabezado navigation. It proves that successful tipo=3 validation and rows/{vigencia} detail requests use the same runtime identity, asserts mensaje=null, and maps all five displayed values to the fresh detail response with locale-aware text formatting and the stable Subsidio alimentación input test ID. Focused Chromium verification passed: 1 test.
 
 #### 4.2. MWH-008: Prior-year detail renders every field as read-only
 

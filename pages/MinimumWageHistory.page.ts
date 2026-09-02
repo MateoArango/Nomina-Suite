@@ -25,6 +25,11 @@ export class MinimumWageHistoryPage {
   readonly pagerSummary: Locator;
   readonly previousPageButton: Locator;
   readonly nextPageButton: Locator;
+  readonly detailYearValue: Locator;
+  readonly detailGovernmentMinimumWageValue: Locator;
+  readonly detailTransportationSubsidyValue: Locator;
+  readonly detailFoodSubsidyInput: Locator;
+  readonly detailIpcValue: Locator;
 
   constructor(readonly page: Page) {
     this.routeHost = page.getByTestId("app-shell-route-host");
@@ -65,6 +70,24 @@ export class MinimumWageHistoryPage {
       'xpath=ancestor::div[contains(concat(" ", normalize-space(@class), " "), " erp-table-pager ")][1]',
     );
     this.pagerSummary = this.pager.locator(".erp-table-pager__summary");
+    this.detailYearValue = this.detailTextValue("Vigencia:");
+    this.detailGovernmentMinimumWageValue = this.detailTextValue(
+      "Salario mínimo gobierno:",
+    );
+    this.detailTransportationSubsidyValue = this.detailTextValue(
+      "Subsidio de transporte:",
+    );
+    this.detailFoodSubsidyInput = page.getByTestId(
+      "mae-historico-salario-minimo-form-food-subsidy-input",
+    );
+    this.detailIpcValue = this.detailTextValue("IPC:");
+  }
+
+  private detailTextValue(label: string): Locator {
+    return this.routeHost
+      .locator(".field-pair")
+      .filter({ has: this.page.getByText(label, { exact: true }) })
+      .locator("strong");
   }
 
   row(year: string | number): Locator {
