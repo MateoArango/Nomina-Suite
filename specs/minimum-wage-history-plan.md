@@ -40,7 +40,7 @@ Plan the authenticated /mae-historico-salario-minimo module with the existing Mi
 
 **Implementation summary:** The test asserts the exact five-column header order, maps every visible row to the fresh runtime response by stable `vigencia`, formats `ndSubsidioAlimentacion` and `ndIpc` with the page locale, and explicitly proves that visible null values render blank while numeric zero renders as `0` without any literal `undefined`, `null`, or `NaN` text. Focused Chromium verification passed: 1 test.
 
-#### 1.3. MWH-003: Page-size controls and navigation follow the runtime total
+#### 1.3. ✅ MWH-003: Page-size controls and navigation follow the runtime total
 
 **File:** `tests/minimumWageHistory/pagination.spec.ts`
 
@@ -54,11 +54,13 @@ Plan the authenticated /mae-historico-salario-minimo module with the existing Mi
     - expect: Each visited page maps to the expected runtime slice.
     - expect: When the runtime total fits on one page, both controls remain disabled; only the unavailable multi-page branch is annotated with its prerequisite.
 
+**Implementation summary:** The test captures the fresh runtime rows response, exercises page sizes `10`, `25`, `50`, and `100` through stable test IDs, and validates each pager range, visible count, navigation-button state, and API-ordered `vigencia` slice. It implements forward navigation to the final page and backward navigation to the first whenever the runtime total exceeds a supported page size; with the current 10-row dataset, it verifies both controls remain disabled and annotates only that unavailable multi-page branch. Focused Chromium verification passed: 1 test.
+
 ### 2. Selection and validation relationships
 
 **Seed:** `tests/minimumWageHistory/seed-test.spec.ts`
 
-#### 2.1. MWH-004: Single selection validates the selected runtime year and remains on Lista
+#### 2.1. ✅ MWH-004: Single selection validates the selected runtime year and remains on Lista
 
 **File:** `tests/minimumWageHistory/row-selection.spec.ts`
 
@@ -71,6 +73,8 @@ Plan the authenticated /mae-historico-salario-minimo module with the existing Mi
     - expect: Each request uses that row's vigencia and tipo=1.
     - expect: The selected row alone is visually highlighted.
     - expect: Lista remains selected and no rows/{vigencia} detail request is sent.
+
+**Implementation summary:** The test establishes the automatic page-load `tipo=1` validation as its network baseline, derives the latest, immediately prior, and oldest years from the fresh rows response, and selects those runtime identities through stable row test IDs. For every explicit selection it validates all observed relationship-request parameters, the current `permitido=false` and `mensaje=null` response contract, the four runtime numeric counters without fixed values, exactly one `row--selected`, the unchanged Lista tab state, and zero detail-row GETs. Focused Chromium verification passed: 1 test.
 
 ### 3. Double-click blocking behavior
 
