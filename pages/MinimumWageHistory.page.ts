@@ -28,6 +28,7 @@ export class MinimumWageHistoryPage {
   readonly detailYearValue: Locator;
   readonly detailGovernmentMinimumWageValue: Locator;
   readonly detailTransportationSubsidyValue: Locator;
+  readonly detailFoodSubsidyValue: Locator;
   readonly detailFoodSubsidyInput: Locator;
   readonly detailIpcValue: Locator;
 
@@ -76,6 +77,9 @@ export class MinimumWageHistoryPage {
     );
     this.detailTransportationSubsidyValue = this.detailTextValue(
       "Subsidio de transporte:",
+    );
+    this.detailFoodSubsidyValue = this.detailTextValue(
+      "Subsidio alimentación:",
     );
     this.detailFoodSubsidyInput = page.getByTestId(
       "mae-historico-salario-minimo-form-food-subsidy-input",

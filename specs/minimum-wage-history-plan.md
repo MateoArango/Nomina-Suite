@@ -123,15 +123,17 @@ Plan the authenticated /mae-historico-salario-minimo module with the existing Mi
 
 **Implementation summary:** The test derives the latest row from the fresh rows response, single-selects it by its stable vigencia test ID, and waits for the selection validation to settle before observing direct Encabezado navigation. It proves that successful tipo=3 validation and rows/{vigencia} detail requests use the same runtime identity, asserts mensaje=null, and maps all five displayed values to the fresh detail response with locale-aware text formatting and the stable Subsidio alimentación input test ID. Focused Chromium verification passed: 1 test.
 
-#### 4.2. MWH-008: Prior-year detail renders every field as read-only
+#### 4.2. ✅ MWH-008: Prior-year detail renders every field as read-only
 
-**File:** `tests/minimumWageHistory/detail-view.spec.ts`
+**File:** `tests/minimumWageHistory/prior-year-detail-read-only.spec.ts`
 
 **Steps:**
   1. Choose any runtime row whose vigencia is lower than max(vigencia), then open Encabezado.
     - expect: Vigencia, Salario mínimo gobierno, Subsidio de transporte, Subsidio alimentación, and IPC render as text rather than inputs.
     - expect: No detail spinbutton is present.
     - expect: Eliminar remains disabled; the currently observed Guardar and Deshacer enabled state is asserted separately from field editability.
+
+**Implementation summary:** The test derives a prior year from the fresh rows response, selects it through its stable vigencia test ID, and observes the tipo=1 selection validation plus the tipo=3 and rows/{vigencia} detail responses. It asserts five visible field containers backed by attached read-only text nodes, proves that no detail input or spinbutton is rendered, and separately checks that Guardar and Deshacer are enabled while Eliminar remains disabled. Focused Chromium verification passed: 1 test.
 
 #### 4.3. MWH-009: Latest-year detail exposes only Subsidio alimentación for editing
 
