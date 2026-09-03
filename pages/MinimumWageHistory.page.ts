@@ -31,6 +31,8 @@ export class MinimumWageHistoryPage {
   readonly detailFoodSubsidyValue: Locator;
   readonly detailFoodSubsidyInput: Locator;
   readonly detailIpcValue: Locator;
+  readonly discardUnsavedChangesDialog: Locator;
+  readonly discardUnsavedChangesConfirmButton: Locator;
 
   constructor(readonly page: Page) {
     this.routeHost = page.getByTestId("app-shell-route-host");
@@ -85,6 +87,10 @@ export class MinimumWageHistoryPage {
       "mae-historico-salario-minimo-form-food-subsidy-input",
     );
     this.detailIpcValue = this.detailTextValue("IPC:");
+    this.discardUnsavedChangesDialog = page.getByRole("dialog");
+    this.discardUnsavedChangesConfirmButton = page.getByTestId(
+      "mae-historico-salario-minimo-dialog-discard-unsaved-changes-confirm-button",
+    );
   }
 
   private detailTextValue(label: string): Locator {

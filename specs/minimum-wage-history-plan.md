@@ -164,7 +164,7 @@ Plan the authenticated /mae-historico-salario-minimo module with the existing Mi
 
 **Implementation summary:** The test derives the latest row and its original Subsidio alimentación from fresh authenticated rows/detail responses, baselines matching POST traffic, and enters a distinct unsaved value. One Deshacer click returns the module to its clean Lista state, removes the dirty detail input, restores the original subsidy in the latest list row, disables Guardar and Deshacer, and sends neither a normal save POST nor a `/pb-messages/f-mensajes-sistema` POST. Focused Chromium verification passed: 1 test.
 
-#### 5.2. MWH-011: Lista is blocked while the latest-row subsidy is dirty
+#### 5.2. ✅ MWH-011: Lista is blocked while the latest-row subsidy is dirty
 
 **File:** `tests/minimumWageHistory/client-state.spec.ts`
 
@@ -172,10 +172,12 @@ Plan the authenticated /mae-historico-salario-minimo module with the existing Mi
   1. Open the latest row in Encabezado, change only Subsidio alimentación without saving, start request observation, and click Lista.
     - expect: POST /pb-messages/f-mensajes-sistema is sent.
     - expect: The information dialog contains the exact title Nomina and message Debe grabar o deshacer los cambios en el documento para ver la lista.
-    - expect: Encabezado remains selected and the dirty input value remains until the user chooses Guardar or Deshacer.
+    - expect: Lista becomes selected, but the dirty Encabezado form remains rendered with its unsaved input value until the user chooses Guardar or Deshacer.
   2. Dismiss the dialog and click Deshacer.
     - expect: The original value is restored and Lista can then be opened.
     - expect: No minimum-wage row mutation was sent.
+
+**Implementation summary:** The test derives max(vigencia) and the saved Subsidio alimentación value from fresh authenticated rows/detail responses, edits only that input, and baselines mutation and error-report traffic before attempting Lista navigation. It verifies one POST to `/pb-messages/f-mensajes-sistema`, the exact `Nomina` information dialog title/message, and the observed client state in which Lista becomes selected while the dirty Encabezado form remains rendered. After dismissing the dialog, Deshacer restores the original subsidy in Lista, removes the dirty input, and sends no minimum-wage row mutation. Focused Chromium verification passed: 1 test.
 
 #### 5.3. MWH-012: Nuevo opens one five-input client-only form and Deshacer removes it
 
