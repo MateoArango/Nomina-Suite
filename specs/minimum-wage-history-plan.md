@@ -225,7 +225,7 @@ Plan the authenticated /mae-historico-salario-minimo module with the existing Mi
 
 **Implementation summary:** The serial test derives the latest complete row and distinct integer/decimal values from the fresh runtime response. For each independent fresh-state iteration, it verifies the single POST `/actions/grabar` envelope, exact full-row delta, successful response and feedback, and complete-row persistence after reload. A `finally` restoration returns the same runtime-selected year to its full captured baseline and proves restoration through a fresh rows response. Focused Chromium verification passed: 1 test.
 
-#### 6.2. MWH-015: Zero is accepted and persisted as numeric zero
+#### 6.2. ✅ MWH-015: Zero is accepted and persisted as numeric zero
 
 **File:** `tests/minimumWageHistory/mutation-contracts.spec.ts`
 
@@ -234,6 +234,8 @@ Plan the authenticated /mae-historico-salario-minimo module with the existing Mi
     - expect: The normal save request contains numeric 0 rather than null or an empty string.
     - expect: A fresh rows/detail response persists numeric 0 and the list renders 0.
     - expect: Finally restoration returns the same vigencia to its complete captured baseline.
+
+**Implementation summary:** The serial test derives the latest complete row from the fresh runtime response, submits Subsidio alimentación as numeric `0` in exactly one normal save request, and validates the complete-row request/response contract plus exact success feedback. Fresh rows and detail responses prove numeric-zero persistence, the list cell and editable detail input both render `0`, and failure-safe `finally` cleanup restores and re-fetches the same runtime-selected vigencia as its complete captured baseline. Focused Chromium verification passed: 1 test.
 
 #### 6.3. MWH-016: Negative subsidy follows the server validation-error path without persistence
 
