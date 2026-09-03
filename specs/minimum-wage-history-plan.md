@@ -194,7 +194,7 @@ Plan the authenticated /mae-historico-salario-minimo module with the existing Mi
 
 **Implementation summary:** The test captures the fresh rows response and visible row identities before clicking Nuevo, then verifies one Encabezado form with exactly five labeled number inputs. It asserts that only Vigencia is required, confirms the observed empty/zero defaults, proves no POST to `/actions/grabar` is sent, and checks that Eliminar remains disabled. One Deshacer click removes every form input, restores the clean Lista toolbar state and the same row identities, and still sends no save request. Focused Chromium verification passed: 1 test.
 
-#### 5.4. MWH-013: Latest-year number-input entry boundaries are explicit client contracts
+#### 5.4. ✅ MWH-013: Latest-year number-input entry boundaries are explicit client contracts
 
 **File:** `tests/minimumWageHistory/input-boundaries.spec.ts`
 
@@ -203,6 +203,8 @@ Plan the authenticated /mae-historico-salario-minimo module with the existing Mi
     - expect: Capture the exact browser-visible value after each user-like entry and whether Guardar remains enabled.
     - expect: Deshacer restores the baseline after every iteration and no data mutation request is sent.
     - expect: Convert only reproduced product gaps into narrowly named test.fixme cases; do not blanket-skip speculative outcomes.
+
+**Implementation summary:** The test derives the latest year from the fresh runtime rows response and reopens its detail view for four independent keyboard-entry iterations. It locks the observed number-input values (`abc!@#` -> empty, `1.2.3` -> `1.23`, 100 digits -> empty, and explicit clearing -> empty), verifies Save remains enabled, and uses Undo after each attempt to restore the runtime-derived list baseline while proving no non-read module request is sent. Focused Chromium verification passed: 1 test.
 
 ### 6. Serialized latest-year persistence and validation contracts
 
