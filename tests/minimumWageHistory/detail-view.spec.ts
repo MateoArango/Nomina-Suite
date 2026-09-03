@@ -179,4 +179,159 @@ test.describe("Encabezado detail contracts", () => {
       formatNumeric(detail.ndIpc),
     );
   });
+
+  test("MWH-009: Latest-year detail exposes only Subsidio alimentación for editing", async ({
+    page,
+  }) => {
+    const minimumWageHistoryPage = new MinimumWageHistoryPage(page);
+    const rowsResponsePromise = page.waitForResponse(response => {
+      const url = new URL(response.url());
+
+      return (
+        response.request().method() === "GET" &&
+        url.pathname === rowsPath
+      );
+    });
+    const initialRelationshipResponsePromise = page.waitForResponse(
+      response => {
+        const url = new URL(response.url());
+
+        return (
+          response.request().method() === "GET" &&
+          url.pathname === relationshipPath &&
+          url.searchParams.get("tipo") === "1"
+        );
+      },
+    );
+
+    await page.goto(applicationUrl);
+
+    const [rowsResponse, initialRelationshipResponse] = await Promise.all([
+      rowsResponsePromise,
+      initialRelationshipResponsePromise,
+    ]);
+
+    expect(rowsResponse.ok()).toBe(true);
+    expect(initialRelationshipResponse.ok()).toBe(true);
+
+    const runtimeRows =
+      (await rowsResponse.json()) as MinimumWageHistoryRow[];
+    expect(
+      runtimeRows.length,
+      "MWH-009 needs at least one runtime row",
+    ).toBeGreaterThan(0);
+
+    const runtimeYears = runtimeRows.map(row => row.vigencia);
+    expect(runtimeYears).toEqual(
+      runtimeRows.map(() => expect.any(Number)),
+    );
+    expect(new Set(runtimeYears).size).toBe(runtimeRows.length);
+
+    const latestYear = Math.max(...runtimeYears);
+
+    await minimumWageHistoryPage.pageSizeButton(100).click();
+    await expect(
+      minimumWageHistoryPage.pageSizeButton(100),
+    ).toHaveAttribute("aria-pressed", "true");
+
+    // 1. Derive max(vigencia), select that row, and open Encabezado.
+    const selectionValidationResponsePromise = page.waitForResponse(
+      response => {
+        const url = new URL(response.url());
+
+        return (
+          response.request().method() === "GET" &&
+          url.pathname === relationshipPath &&
+          url.searchParams.get("vigencia") === String(latestYear) &&
+          url.searchParams.get("tipo") === "1"
+        );
+      },
+    );
+
+    await minimumWageHistoryPage.row(latestYear).click();
+
+    const selectionValidationResponse =
+      await selectionValidationResponsePromise;
+    expect(selectionValidationResponse.ok()).toBe(true);
+
+    const detailValidationResponsePromise = page.waitForResponse(
+      response => {
+        const url = new URL(response.url());
+
+        return (
+          response.request().method() === "GET" &&
+          url.pathname === relationshipPath &&
+          url.searchParams.get("vigencia") === String(latestYear) &&
+          url.searchParams.get("tipo") === "3"
+        );
+      },
+    );
+    const detailResponsePromise = page.waitForResponse(response => {
+      const url = new URL(response.url());
+
+      return (
+        response.request().method() === "GET" &&
+        url.pathname === `${rowsPath}/${latestYear}`
+      );
+    });
+
+    await minimumWageHistoryPage.detailTab.click();
+
+    const [detailValidationResponse, detailResponse] =
+      await Promise.all([
+        detailValidationResponsePromise,
+        detailResponsePromise,
+      ]);
+
+    expect(detailValidationResponse.ok()).toBe(true);
+    expect(detailResponse.ok()).toBe(true);
+
+    const detail =
+      (await detailResponse.json()) as MinimumWageHistoryDetail;
+    expect(detail.vigencia).toBe(latestYear);
+
+    await expect(minimumWageHistoryPage.detailTab).toHaveAttribute(
+      "aria-selected",
+      "true",
+    );
+
+    const readOnlyValues = [
+      minimumWageHistoryPage.detailYearValue,
+      minimumWageHistoryPage.detailGovernmentMinimumWageValue,
+      minimumWageHistoryPage.detailTransportationSubsidyValue,
+      minimumWageHistoryPage.detailIpcValue,
+    ];
+
+    for (const readOnlyValue of readOnlyValues) {
+      await expect(readOnlyValue).toBeVisible();
+      await expect(readOnlyValue).toHaveCount(1);
+    }
+
+    await expect(
+      minimumWageHistoryPage.detailFoodSubsidyValue,
+    ).toHaveCount(0);
+    await expect(
+      minimumWageHistoryPage.routeHost.locator("input"),
+    ).toHaveCount(1);
+    await expect(
+      minimumWageHistoryPage.routeHost.getByRole("spinbutton"),
+    ).toHaveCount(1);
+    await expect(
+      minimumWageHistoryPage.detailFoodSubsidyInput,
+    ).toHaveAttribute("type", "number");
+    await expect(
+      minimumWageHistoryPage.detailFoodSubsidyInput,
+    ).toBeEditable();
+    await expect(
+      minimumWageHistoryPage.detailFoodSubsidyInput,
+    ).toHaveValue(
+      detail.ndSubsidioAlimentacion === null
+        ? ""
+        : String(detail.ndSubsidioAlimentacion),
+    );
+
+    await expect(minimumWageHistoryPage.saveButton).toBeEnabled();
+    await expect(minimumWageHistoryPage.undoButton).toBeEnabled();
+    await expect(minimumWageHistoryPage.deleteButton).toBeDisabled();
+  });
 });
