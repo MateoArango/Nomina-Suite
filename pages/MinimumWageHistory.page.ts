@@ -25,11 +25,15 @@ export class MinimumWageHistoryPage {
   readonly pagerSummary: Locator;
   readonly previousPageButton: Locator;
   readonly nextPageButton: Locator;
+  readonly detailYearInput: Locator;
+  readonly detailGovernmentMinimumWageInput: Locator;
+  readonly detailTransportationSubsidyInput: Locator;
   readonly detailYearValue: Locator;
   readonly detailGovernmentMinimumWageValue: Locator;
   readonly detailTransportationSubsidyValue: Locator;
   readonly detailFoodSubsidyValue: Locator;
   readonly detailFoodSubsidyInput: Locator;
+  readonly detailIpcInput: Locator;
   readonly detailIpcValue: Locator;
   readonly discardUnsavedChangesDialog: Locator;
   readonly discardUnsavedChangesConfirmButton: Locator;
@@ -73,6 +77,15 @@ export class MinimumWageHistoryPage {
       'xpath=ancestor::div[contains(concat(" ", normalize-space(@class), " "), " erp-table-pager ")][1]',
     );
     this.pagerSummary = this.pager.locator(".erp-table-pager__summary");
+    this.detailYearInput = page.getByTestId(
+      "mae-historico-salario-minimo-form-year-input",
+    );
+    this.detailGovernmentMinimumWageInput = page.getByTestId(
+      "mae-historico-salario-minimo-form-minimum-wage-input",
+    );
+    this.detailTransportationSubsidyInput = page.getByTestId(
+      "mae-historico-salario-minimo-form-transport-subsidy-input",
+    );
     this.detailYearValue = this.detailTextValue("Vigencia:");
     this.detailGovernmentMinimumWageValue = this.detailTextValue(
       "Salario mínimo gobierno:",
@@ -85,6 +98,9 @@ export class MinimumWageHistoryPage {
     );
     this.detailFoodSubsidyInput = page.getByTestId(
       "mae-historico-salario-minimo-form-food-subsidy-input",
+    );
+    this.detailIpcInput = page.getByTestId(
+      "mae-historico-salario-minimo-form-ipc-input",
     );
     this.detailIpcValue = this.detailTextValue("IPC:");
     this.discardUnsavedChangesDialog = page.getByRole("dialog");

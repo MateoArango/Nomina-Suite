@@ -21,6 +21,7 @@ const applicationUrl =
   "https://nomina-qa.adacsc.co/mae-historico-salario-minimo";
 const modulePath = "/api/v1/w-mae-historico-salario-minimo";
 const rowsPath = `${modulePath}/rows`;
+const savePath = `${modulePath}/actions/grabar`;
 const relationshipPath = `${modulePath}/actions/validar-relacion`;
 const errorReportPath = "/api/v1/pb-messages/f-mensajes-sistema";
 
@@ -446,5 +447,166 @@ test.describe("Client-only edit, undo, and dirty-navigation behavior", () => {
     expect(rowMutationRequests).toHaveLength(
       baselineRowMutationRequestCount,
     );
+  });
+
+  test("MWH-012: Nuevo opens one five-input client-only form and Deshacer removes it", async ({
+    page,
+  }) => {
+    const minimumWageHistoryPage = new MinimumWageHistoryPage(page);
+    const saveRequests: string[] = [];
+
+    page.on("request", request => {
+      const url = new URL(request.url());
+
+      if (
+        request.method() === "POST" &&
+        url.pathname === savePath
+      ) {
+        saveRequests.push(request.url());
+      }
+    });
+
+    const rowsResponsePromise = page.waitForResponse(response => {
+      const url = new URL(response.url());
+
+      return (
+        response.request().method() === "GET" &&
+        url.pathname === rowsPath
+      );
+    });
+
+    await page.goto(applicationUrl);
+
+    const rowsResponse = await rowsResponsePromise;
+    expect(rowsResponse.ok()).toBe(true);
+
+    const runtimeRows =
+      (await rowsResponse.json()) as MinimumWageHistoryRow[];
+    const runtimeRowIdentities = runtimeRows.map(row => row.vigencia);
+    expect(runtimeRowIdentities).toEqual(
+      runtimeRows.map(() => expect.any(Number)),
+    );
+    expect(new Set(runtimeRowIdentities).size).toBe(
+      runtimeRowIdentities.length,
+    );
+
+    const initialVisibleRowIdentities = await minimumWageHistoryPage
+      .visibleRows()
+      .evaluateAll(rows =>
+        rows.map(row => row.getAttribute("data-testid")),
+      );
+    const expectedVisibleRowIdentities = runtimeRows
+      .slice(0, await minimumWageHistoryPage.selectedPageSize())
+      .map(
+        row =>
+          `mae-historico-salario-minimo-list-table-row--${row.vigencia}`,
+      );
+
+    expect(initialVisibleRowIdentities).toEqual(
+      expectedVisibleRowIdentities,
+    );
+
+    const baselineSaveRequestCount = saveRequests.length;
+
+    // 1. From a fresh list state, observe module traffic and click Nuevo once.
+    await minimumWageHistoryPage.createButton.click();
+
+    await expect(minimumWageHistoryPage.detailTab).toHaveAttribute(
+      "aria-selected",
+      "true",
+    );
+    await expect(minimumWageHistoryPage.listTab).toHaveAttribute(
+      "aria-selected",
+      "false",
+    );
+
+    const formInputs = [
+      minimumWageHistoryPage.detailYearInput,
+      minimumWageHistoryPage.detailGovernmentMinimumWageInput,
+      minimumWageHistoryPage.detailTransportationSubsidyInput,
+      minimumWageHistoryPage.detailFoodSubsidyInput,
+      minimumWageHistoryPage.detailIpcInput,
+    ];
+
+    await expect(
+      minimumWageHistoryPage.routeHost.locator("input"),
+    ).toHaveCount(5);
+    await expect(
+      minimumWageHistoryPage.routeHost.getByRole("spinbutton"),
+    ).toHaveCount(5);
+
+    for (const input of formInputs) {
+      await expect(input).toHaveAttribute("type", "number");
+    }
+
+    await expect(
+      minimumWageHistoryPage.detailYearInput,
+    ).toHaveAccessibleName("Vigencia:");
+    await expect(
+      minimumWageHistoryPage.detailGovernmentMinimumWageInput,
+    ).toHaveAccessibleName("Salario mínimo gobierno:");
+    await expect(
+      minimumWageHistoryPage.detailTransportationSubsidyInput,
+    ).toHaveAccessibleName("Subsidio de transporte:");
+    await expect(
+      minimumWageHistoryPage.detailFoodSubsidyInput,
+    ).toHaveAccessibleName("Subsidio alimentación:");
+    await expect(
+      minimumWageHistoryPage.detailIpcInput,
+    ).toHaveAccessibleName("IPC:");
+    await expect(
+      minimumWageHistoryPage.detailYearInput,
+    ).toHaveAttribute("required", "");
+    await expect(
+      minimumWageHistoryPage.detailYearInput,
+    ).toHaveAttribute("aria-required", "true");
+    await expect(
+      minimumWageHistoryPage.detailYearInput,
+    ).toHaveValue("");
+    await expect(
+      minimumWageHistoryPage.detailGovernmentMinimumWageInput,
+    ).toHaveValue("");
+    await expect(
+      minimumWageHistoryPage.detailTransportationSubsidyInput,
+    ).toHaveValue("");
+    await expect(
+      minimumWageHistoryPage.detailFoodSubsidyInput,
+    ).toHaveValue("0");
+    await expect(
+      minimumWageHistoryPage.detailIpcInput,
+    ).toHaveValue("0");
+    await expect(minimumWageHistoryPage.deleteButton).toBeDisabled();
+    expect(saveRequests).toHaveLength(baselineSaveRequestCount);
+
+    // 2. Click Deshacer without filling or saving.
+    await minimumWageHistoryPage.undoButton.click();
+
+    await expect(minimumWageHistoryPage.listTab).toHaveAttribute(
+      "aria-selected",
+      "true",
+    );
+    await expect(minimumWageHistoryPage.detailTab).toHaveAttribute(
+      "aria-selected",
+      "false",
+    );
+    await expect(minimumWageHistoryPage.table).toBeVisible();
+    await expect(
+      minimumWageHistoryPage.routeHost.locator("input"),
+    ).toHaveCount(0);
+
+    const restoredVisibleRowIdentities = await minimumWageHistoryPage
+      .visibleRows()
+      .evaluateAll(rows =>
+        rows.map(row => row.getAttribute("data-testid")),
+      );
+
+    expect(restoredVisibleRowIdentities).toEqual(
+      initialVisibleRowIdentities,
+    );
+    await expect(minimumWageHistoryPage.createButton).toBeEnabled();
+    await expect(minimumWageHistoryPage.saveButton).toBeDisabled();
+    await expect(minimumWageHistoryPage.undoButton).toBeDisabled();
+    await expect(minimumWageHistoryPage.deleteButton).toBeDisabled();
+    expect(saveRequests).toHaveLength(baselineSaveRequestCount);
   });
 });

@@ -179,7 +179,7 @@ Plan the authenticated /mae-historico-salario-minimo module with the existing Mi
 
 **Implementation summary:** The test derives max(vigencia) and the saved Subsidio alimentación value from fresh authenticated rows/detail responses, edits only that input, and baselines mutation and error-report traffic before attempting Lista navigation. It verifies one POST to `/pb-messages/f-mensajes-sistema`, the exact `Nomina` information dialog title/message, and the observed client state in which Lista becomes selected while the dirty Encabezado form remains rendered. After dismissing the dialog, Deshacer restores the original subsidy in Lista, removes the dirty input, and sends no minimum-wage row mutation. Focused Chromium verification passed: 1 test.
 
-#### 5.3. MWH-012: Nuevo opens one five-input client-only form and Deshacer removes it
+#### 5.3. ✅ MWH-012: Nuevo opens one five-input client-only form and Deshacer removes it
 
 **File:** `tests/minimumWageHistory/client-state.spec.ts`
 
@@ -191,6 +191,8 @@ Plan the authenticated /mae-historico-salario-minimo module with the existing Mi
   2. Click Deshacer without filling or saving.
     - expect: The client-only form is discarded and Lista is restored.
     - expect: The fresh rows response and row identities remain unchanged.
+
+**Implementation summary:** The test captures the fresh rows response and visible row identities before clicking Nuevo, then verifies one Encabezado form with exactly five labeled number inputs. It asserts that only Vigencia is required, confirms the observed empty/zero defaults, proves no POST to `/actions/grabar` is sent, and checks that Eliminar remains disabled. One Deshacer click removes every form input, restores the clean Lista toolbar state and the same row identities, and still sends no save request. Focused Chromium verification passed: 1 test.
 
 #### 5.4. MWH-013: Latest-year number-input entry boundaries are explicit client contracts
 
