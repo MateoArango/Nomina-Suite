@@ -151,7 +151,7 @@ Plan the authenticated /mae-historico-salario-minimo module with the existing Mi
 
 **Seed:** `tests/minimumWageHistory/seed-test.spec.ts`
 
-#### 5.1. MWH-010: Deshacer restores the latest saved subsidy without a data mutation
+#### 5.1. ✅ MWH-010: Deshacer restores the latest saved subsidy without a data mutation
 
 **File:** `tests/minimumWageHistory/client-state.spec.ts`
 
@@ -161,6 +161,8 @@ Plan the authenticated /mae-historico-salario-minimo module with the existing Mi
   2. Click Deshacer once.
     - expect: The input returns to the fresh original value and the view returns to its baseline state.
     - expect: No POST to the normal save endpoint or error-report endpoint is sent.
+
+**Implementation summary:** The test derives the latest row and its original Subsidio alimentación from fresh authenticated rows/detail responses, baselines matching POST traffic, and enters a distinct unsaved value. One Deshacer click returns the module to its clean Lista state, removes the dirty detail input, restores the original subsidy in the latest list row, disables Guardar and Deshacer, and sends neither a normal save POST nor a `/pb-messages/f-mensajes-sistema` POST. Focused Chromium verification passed: 1 test.
 
 #### 5.2. MWH-011: Lista is blocked while the latest-row subsidy is dirty
 
