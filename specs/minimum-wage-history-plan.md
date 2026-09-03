@@ -255,7 +255,7 @@ Plan the authenticated /mae-historico-salario-minimo module with the existing Mi
 
 **Seed:** `tests/minimumWageHistory/seed-test.spec.ts`
 
-#### 7.1. MWH-017: An older vigencia cannot be created
+#### 7.1. MWH-017: An older vigencia cannot be created ✅
 
 **File:** `tests/minimumWageHistory/mutation-contracts.spec.ts`
 
@@ -264,6 +264,8 @@ Plan the authenticated /mae-historico-salario-minimo module with the existing Mi
     - expect: The operation is rejected with title Guardar and message No se permite ingreso de vigencias anteriores a la ultima registrada.
     - expect: No new vigencia identity is present after reload and every complete baseline row remains unchanged.
     - expect: Any unexpected created identity is treated as a test failure and removed only if it is provably test-owned.
+
+**Implementation summary:** The serial test captures every complete runtime row, derives a unique vigencia below the runtime maximum, fills all five creation inputs with valid numeric values, and baselines the save traffic before clicking Guardar exactly once. It proves the request is a complete `isNuevo: true` payload, the API rejects it with HTTP 400 and the exact Guardar message, and fresh rows after reload exactly equal the baseline with no attempted identity. Failure-safe cleanup can target only that exact non-baseline row if the guard ever regresses. Focused Chromium verification with trace passed: 1 test.
 
 #### 7.2. MWH-018: Eliminar remains unavailable in supported list and detail states
 

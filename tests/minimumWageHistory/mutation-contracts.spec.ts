@@ -11,16 +11,16 @@ type MinimumWageHistoryRow = {
   ndSubsidioAlimentacion: number | null;
   ndIpc: number | null;
   ndPorcentajePension: number | null;
-  codigoMempresa: string;
-  usuarioEmpresa: string;
-  fechaActualiza: string;
+  codigoMempresa: string | null;
+  usuarioEmpresa: string | null;
+  fechaActualiza: string | null;
   usuarioActualiza: number | null;
 };
 
 type SavePayload = {
   row: MinimumWageHistoryRow;
   isNuevo: boolean;
-  vigenciaOriginal: number;
+  vigenciaOriginal: number | null;
   codigoAplicacion: number;
   codigoUsuario: number;
 };
@@ -30,11 +30,14 @@ const applicationUrl =
 const modulePath = "/api/v1/w-mae-historico-salario-minimo";
 const rowsPath = `${modulePath}/rows`;
 const savePath = `${modulePath}/actions/grabar`;
+const deletePath = `${modulePath}/actions/eliminar`;
 const relationshipPath = `${modulePath}/actions/validar-relacion`;
 const errorReportPathSuffix = "/errores-reporte/actions/grabar";
 const successMessage = "El registro ha sido procesado correctamente";
 const negativeSubsidyValidationMessage =
   "El valor del subsidio de alimentacion debe se mayor o igual a cero (0)";
+const olderYearValidationMessage =
+  "No se permite ingreso de vigencias anteriores a la ultima registrada.";
 
 test.describe.serial(
   "Serialized latest-year persistence and validation contracts",
@@ -899,6 +902,224 @@ test.describe.serial(
       } finally {
         // 2. Run failure-safe restoration in finally even if an unexpected normal save occurred.
         await restoreOriginalBaseline();
+      }
+    });
+
+    test("MWH-017: An older vigencia cannot be created", async ({
+      page,
+    }) => {
+      test.setTimeout(120_000);
+
+      const minimumWageHistoryPage = new MinimumWageHistoryPage(page);
+      const observedSaveRequests: string[] = [];
+      let baselineRows: MinimumWageHistoryRow[] = [];
+      let attemptedRow: MinimumWageHistoryRow | undefined;
+      let saveRequestHeaders: Record<string, string> = {};
+      let saveOrigin = "";
+
+      page.on("request", request => {
+        const url = new URL(request.url());
+
+        if (request.method() === "POST" && url.pathname === savePath) {
+          observedSaveRequests.push(request.url());
+        }
+      });
+
+      const loadFreshRows = async (
+        action: () => Promise<unknown>,
+      ): Promise<MinimumWageHistoryRow[]> => {
+        const rowsResponsePromise = page.waitForResponse(response => {
+          const url = new URL(response.url());
+
+          return (
+            response.request().method() === "GET" &&
+            url.pathname === rowsPath
+          );
+        });
+        const initialRelationshipResponsePromise = page.waitForResponse(
+          response => {
+            const url = new URL(response.url());
+
+            return (
+              response.request().method() === "GET" &&
+              url.pathname === relationshipPath &&
+              url.searchParams.get("tipo") === "1"
+            );
+          },
+        );
+
+        await action();
+
+        const [rowsResponse, initialRelationshipResponse] =
+          await Promise.all([
+            rowsResponsePromise,
+            initialRelationshipResponsePromise,
+          ]);
+
+        expect(rowsResponse.ok()).toBe(true);
+        expect(initialRelationshipResponse.ok()).toBe(true);
+
+        const rows = (await rowsResponse.json()) as MinimumWageHistoryRow[];
+        expect(
+          rows.length,
+          "MWH-017 needs at least one runtime row",
+        ).toBeGreaterThan(0);
+        expect(rows.map(row => row.vigencia)).toEqual(
+          rows.map(() => expect.any(Number)),
+        );
+
+        return rows;
+      };
+
+      baselineRows = await loadFreshRows(() => page.goto(applicationUrl));
+      const baselineYears = baselineRows.map(row => row.vigencia);
+      expect(new Set(baselineYears).size).toBe(baselineRows.length);
+
+      const latestYear = Math.max(...baselineYears);
+      const attemptedYear = Math.min(...baselineYears) - 1;
+      expect(attemptedYear).toBeLessThan(latestYear);
+      expect(baselineYears).not.toContain(attemptedYear);
+
+      attemptedRow = {
+        vigencia: attemptedYear,
+        ndSalarioMinimoGob: 1,
+        ndSubsidioMes: 1,
+        ndSubsidioAlimentacion: 1,
+        ndIpc: 1,
+        ndPorcentajePension: null,
+        codigoMempresa: null,
+        usuarioEmpresa: null,
+        fechaActualiza: null,
+        usuarioActualiza: null,
+      };
+
+      try {
+        // 1. Capture all baseline rows, click Nuevo, fill a vigencia below the runtime maximum plus valid numeric fields, and click Guardar once.
+        await minimumWageHistoryPage.createButton.click();
+        await minimumWageHistoryPage.detailYearInput.fill(
+          String(attemptedYear),
+        );
+        await minimumWageHistoryPage.detailGovernmentMinimumWageInput.fill(
+          "1",
+        );
+        await minimumWageHistoryPage.detailTransportationSubsidyInput.fill(
+          "1",
+        );
+        await minimumWageHistoryPage.detailFoodSubsidyInput.fill("1");
+        await minimumWageHistoryPage.detailIpcInput.fill("1");
+
+        await expect(minimumWageHistoryPage.detailYearInput).toHaveValue(
+          String(attemptedYear),
+        );
+        await expect(
+          minimumWageHistoryPage.detailGovernmentMinimumWageInput,
+        ).toHaveValue("1");
+        await expect(
+          minimumWageHistoryPage.detailTransportationSubsidyInput,
+        ).toHaveValue("1");
+        await expect(
+          minimumWageHistoryPage.detailFoodSubsidyInput,
+        ).toHaveValue("1");
+        await expect(minimumWageHistoryPage.detailIpcInput).toHaveValue("1");
+
+        const saveRequestCountBeforeClick = observedSaveRequests.length;
+        const saveResponsePromise = page.waitForResponse(response => {
+          const url = new URL(response.url());
+
+          return (
+            response.request().method() === "POST" &&
+            url.pathname === savePath
+          );
+        });
+
+        await minimumWageHistoryPage.saveButton.click();
+
+        const saveResponse = await saveResponsePromise;
+        saveRequestHeaders = saveResponse.request().headers();
+        saveOrigin = new URL(saveResponse.url()).origin;
+
+        expect(observedSaveRequests).toHaveLength(
+          saveRequestCountBeforeClick + 1,
+        );
+        expect(saveResponse.status()).toBe(400);
+        expect(saveResponse.ok()).toBe(false);
+
+        const savePayload =
+          saveResponse.request().postDataJSON() as SavePayload;
+        expect(savePayload.isNuevo).toBe(true);
+        expect(savePayload.vigenciaOriginal).toBeNull();
+        expect(savePayload.row).toEqual(attemptedRow);
+        expect(savePayload.codigoAplicacion).toEqual(expect.any(Number));
+        expect(savePayload.codigoUsuario).toEqual(expect.any(Number));
+
+        const saveError = (await saveResponse.json()) as {
+          message?: string;
+        };
+        expect(saveError.message).toBe(olderYearValidationMessage);
+
+        const validationDialog = page.getByRole("dialog");
+        await expect(
+          validationDialog.getByRole("heading", {
+            name: "Guardar",
+            exact: true,
+          }),
+        ).toBeVisible();
+        await expect(
+          validationDialog.getByText(olderYearValidationMessage, {
+            exact: true,
+          }),
+        ).toBeVisible();
+
+        await page
+          .getByTestId(
+            "mae-historico-salario-minimo-dialog-save-validation-error-confirm-button",
+          )
+          .click();
+
+        const persistedRows = await loadFreshRows(() => page.reload());
+        expect(
+          persistedRows.some(row => row.vigencia === attemptedYear),
+        ).toBe(false);
+        expect(persistedRows).toEqual(baselineRows);
+      } finally {
+        const currentRows = await loadFreshRows(() => page.reload());
+        const unexpectedRow = currentRows.find(
+          row => row.vigencia === attemptedYear,
+        );
+
+        if (unexpectedRow) {
+          expect(attemptedRow).toBeDefined();
+          expect(unexpectedRow).toMatchObject({
+            vigencia: attemptedRow!.vigencia,
+            ndSalarioMinimoGob: attemptedRow!.ndSalarioMinimoGob,
+            ndSubsidioMes: attemptedRow!.ndSubsidioMes,
+            ndSubsidioAlimentacion:
+              attemptedRow!.ndSubsidioAlimentacion,
+            ndIpc: attemptedRow!.ndIpc,
+          });
+          expect(saveOrigin).not.toBe("");
+
+          const authorization = saveRequestHeaders.authorization;
+          expect(
+            authorization,
+            "MWH-017 cleanup requires the authenticated save request header",
+          ).toBeDefined();
+
+          const deleteResponse = await page.request.post(
+            `${saveOrigin}${deletePath}`,
+            {
+              data: { vigencia: attemptedYear },
+              headers: { authorization: authorization! },
+            },
+          );
+          expect(deleteResponse.ok()).toBe(true);
+        }
+
+        const finalRows = await loadFreshRows(() => page.reload());
+        expect(
+          finalRows.some(row => row.vigencia === attemptedYear),
+        ).toBe(false);
+        expect(finalRows).toEqual(baselineRows);
       }
     });
   },
