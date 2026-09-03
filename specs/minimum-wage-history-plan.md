@@ -237,7 +237,7 @@ Plan the authenticated /mae-historico-salario-minimo module with the existing Mi
 
 **Implementation summary:** The serial test derives the latest complete row from the fresh runtime response, submits Subsidio alimentación as numeric `0` in exactly one normal save request, and validates the complete-row request/response contract plus exact success feedback. Fresh rows and detail responses prove numeric-zero persistence, the list cell and editable detail input both render `0`, and failure-safe `finally` cleanup restores and re-fetches the same runtime-selected vigencia as its complete captured baseline. Focused Chromium verification passed: 1 test.
 
-#### 6.3. MWH-016: Negative subsidy follows the server validation-error path without persistence
+#### 6.3. ✅ MWH-016: Negative subsidy follows the server validation-error path without persistence
 
 **File:** `tests/minimumWageHistory/mutation-contracts.spec.ts`
 
@@ -248,6 +248,8 @@ Plan the authenticated /mae-historico-salario-minimo module with the existing Mi
     - expect: After reload, the complete latest row equals the baseline.
   2. Run failure-safe restoration in finally even if an unexpected normal save occurred.
     - expect: Only the captured latest vigencia is restored and a fresh response proves the full baseline row is intact.
+
+**Implementation summary:** The serial test derives and captures the complete latest row from the fresh runtime response, enters `-1`, and baselines both POST streams before clicking Guardar exactly once. It proves the complete-row save payload contains numeric `-1`, the normal save response is rejected, exactly one `/errores-reporte/actions/grabar` request is emitted, and the Guardar dialog shows the exact server validation message. A fresh rows response proves the rejected value was not persisted, while failure-safe `finally` restoration checks and, only if needed, restores that same runtime-selected vigencia before re-fetching the full baseline row. Focused Chromium verification with trace passed: 1 test.
 
 ### 7. Creation and deletion guards
 

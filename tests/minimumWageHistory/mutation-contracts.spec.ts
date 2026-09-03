@@ -31,7 +31,10 @@ const modulePath = "/api/v1/w-mae-historico-salario-minimo";
 const rowsPath = `${modulePath}/rows`;
 const savePath = `${modulePath}/actions/grabar`;
 const relationshipPath = `${modulePath}/actions/validar-relacion`;
+const errorReportPathSuffix = "/errores-reporte/actions/grabar";
 const successMessage = "El registro ha sido procesado correctamente";
+const negativeSubsidyValidationMessage =
+  "El valor del subsidio de alimentacion debe se mayor o igual a cero (0)";
 
 test.describe.serial(
   "Serialized latest-year persistence and validation contracts",
@@ -609,6 +612,292 @@ test.describe.serial(
         ).toHaveValue("0");
       } finally {
         // 1. Finally restoration returns the same vigencia to its complete captured baseline.
+        await restoreOriginalBaseline();
+      }
+    });
+
+    test("MWH-016: Negative subsidy follows the server validation-error path without persistence", async ({
+      page,
+    }) => {
+      test.setTimeout(120_000);
+
+      const minimumWageHistoryPage = new MinimumWageHistoryPage(page);
+      const observedSaveRequests: string[] = [];
+      const observedErrorReportRequests: string[] = [];
+      let originalBaseline: MinimumWageHistoryRow | undefined;
+
+      page.on("request", request => {
+        const url = new URL(request.url());
+
+        if (request.method() === "POST" && url.pathname === savePath) {
+          observedSaveRequests.push(request.url());
+        }
+
+        if (
+          request.method() === "POST" &&
+          url.pathname.endsWith(errorReportPathSuffix)
+        ) {
+          observedErrorReportRequests.push(request.url());
+        }
+      });
+
+      const loadFreshRows = async (
+        action: () => Promise<unknown>,
+      ): Promise<MinimumWageHistoryRow[]> => {
+        const rowsResponsePromise = page.waitForResponse(response => {
+          const url = new URL(response.url());
+
+          return (
+            response.request().method() === "GET" &&
+            url.pathname === rowsPath
+          );
+        });
+        const initialRelationshipResponsePromise = page.waitForResponse(
+          response => {
+            const url = new URL(response.url());
+
+            return (
+              response.request().method() === "GET" &&
+              url.pathname === relationshipPath &&
+              url.searchParams.get("tipo") === "1"
+            );
+          },
+        );
+
+        await action();
+
+        const [rowsResponse, initialRelationshipResponse] =
+          await Promise.all([
+            rowsResponsePromise,
+            initialRelationshipResponsePromise,
+          ]);
+
+        expect(rowsResponse.ok()).toBe(true);
+        expect(initialRelationshipResponse.ok()).toBe(true);
+
+        const rows = (await rowsResponse.json()) as MinimumWageHistoryRow[];
+        expect(
+          rows.length,
+          "MWH-016 needs at least one runtime row",
+        ).toBeGreaterThan(0);
+        expect(rows.map(row => row.vigencia)).toEqual(
+          rows.map(() => expect.any(Number)),
+        );
+
+        return rows;
+      };
+
+      const openDetail = async (
+        year: number,
+      ): Promise<MinimumWageHistoryRow> => {
+        const selectionResponsePromise = page.waitForResponse(response => {
+          const url = new URL(response.url());
+
+          return (
+            response.request().method() === "GET" &&
+            url.pathname === relationshipPath &&
+            url.searchParams.get("vigencia") === String(year) &&
+            url.searchParams.get("tipo") === "1"
+          );
+        });
+
+        await minimumWageHistoryPage.row(year).click();
+
+        const selectionResponse = await selectionResponsePromise;
+        expect(selectionResponse.ok()).toBe(true);
+
+        const detailValidationResponsePromise = page.waitForResponse(
+          response => {
+            const url = new URL(response.url());
+
+            return (
+              response.request().method() === "GET" &&
+              url.pathname === relationshipPath &&
+              url.searchParams.get("vigencia") === String(year) &&
+              url.searchParams.get("tipo") === "3"
+            );
+          },
+        );
+        const detailResponsePromise = page.waitForResponse(response => {
+          const url = new URL(response.url());
+
+          return (
+            response.request().method() === "GET" &&
+            url.pathname === `${rowsPath}/${year}`
+          );
+        });
+
+        await minimumWageHistoryPage.detailTab.click();
+
+        const [detailValidationResponse, detailResponse] =
+          await Promise.all([
+            detailValidationResponsePromise,
+            detailResponsePromise,
+          ]);
+
+        expect(detailValidationResponse.ok()).toBe(true);
+        expect(detailResponse.ok()).toBe(true);
+
+        const detailValidation = (await detailValidationResponse.json()) as {
+          mensaje: string | null;
+        };
+        const detail =
+          (await detailResponse.json()) as MinimumWageHistoryRow;
+
+        expect(detailValidation.mensaje).toBeNull();
+        expect(detail.vigencia).toBe(year);
+
+        return detail;
+      };
+
+      const restoreOriginalBaseline = async (): Promise<void> => {
+        if (!originalBaseline) {
+          return;
+        }
+
+        const currentRows = await loadFreshRows(() => page.reload());
+        const currentRow = currentRows.find(
+          row => row.vigencia === originalBaseline!.vigencia,
+        );
+
+        expect(
+          currentRow,
+          "The captured latest-year row must still exist during cleanup",
+        ).toBeDefined();
+
+        if (
+          currentRow!.ndSubsidioAlimentacion !==
+          originalBaseline.ndSubsidioAlimentacion
+        ) {
+          await openDetail(originalBaseline.vigencia);
+          await minimumWageHistoryPage.detailFoodSubsidyInput.fill(
+            originalBaseline.ndSubsidioAlimentacion === null
+              ? ""
+              : String(originalBaseline.ndSubsidioAlimentacion),
+          );
+
+          const restoreResponsePromise = page.waitForResponse(response => {
+            const url = new URL(response.url());
+
+            return (
+              response.request().method() === "POST" &&
+              url.pathname === savePath
+            );
+          });
+
+          await minimumWageHistoryPage.saveButton.click();
+
+          const restoreResponse = await restoreResponsePromise;
+          expect(restoreResponse.ok()).toBe(true);
+          expect(restoreResponse.request().postDataJSON()).toMatchObject({
+            row: originalBaseline,
+            isNuevo: false,
+            vigenciaOriginal: originalBaseline.vigencia,
+          });
+        }
+
+        const restoredRows = await loadFreshRows(() => page.reload());
+        expect(
+          restoredRows.find(
+            row => row.vigencia === originalBaseline!.vigencia,
+          ),
+        ).toEqual(originalBaseline);
+      };
+
+      const initialRows = await loadFreshRows(() => page.goto(applicationUrl));
+      const initialYears = initialRows.map(row => row.vigencia);
+      expect(new Set(initialYears).size).toBe(initialRows.length);
+
+      const latestYear = Math.max(...initialYears);
+      originalBaseline = initialRows.find(
+        row => row.vigencia === latestYear,
+      );
+      expect(originalBaseline).toBeDefined();
+
+      try {
+        // 1. Capture the complete latest baseline, enter -1, and click Guardar once while observing both the normal save and /errores-reporte/actions/grabar endpoints.
+        const detail = await openDetail(latestYear);
+        expect(detail).toEqual(originalBaseline);
+
+        await minimumWageHistoryPage.detailFoodSubsidyInput.fill("-1");
+        await expect(
+          minimumWageHistoryPage.detailFoodSubsidyInput,
+        ).toHaveValue("-1");
+
+        const saveRequestCountBeforeClick = observedSaveRequests.length;
+        const errorReportRequestCountBeforeClick =
+          observedErrorReportRequests.length;
+        const saveResponsePromise = page.waitForResponse(response => {
+          const url = new URL(response.url());
+
+          return (
+            response.request().method() === "POST" &&
+            url.pathname === savePath
+          );
+        });
+        const errorReportRequestPromise = page.waitForRequest(request => {
+          const url = new URL(request.url());
+
+          return (
+            request.method() === "POST" &&
+            url.pathname.endsWith(errorReportPathSuffix)
+          );
+        });
+
+        await minimumWageHistoryPage.saveButton.click();
+
+        const [saveResponse, errorReportRequest] = await Promise.all([
+          saveResponsePromise,
+          errorReportRequestPromise,
+        ]);
+
+        expect(observedSaveRequests).toHaveLength(
+          saveRequestCountBeforeClick + 1,
+        );
+        expect(observedErrorReportRequests).toHaveLength(
+          errorReportRequestCountBeforeClick + 1,
+        );
+        expect(errorReportRequest.method()).toBe("POST");
+        expect(saveResponse.ok()).toBe(false);
+
+        const attemptedRow: MinimumWageHistoryRow = {
+          ...originalBaseline!,
+          ndSubsidioAlimentacion: -1,
+        };
+        const savePayload =
+          saveResponse.request().postDataJSON() as SavePayload;
+
+        expect(savePayload.isNuevo).toBe(false);
+        expect(savePayload.vigenciaOriginal).toBe(latestYear);
+        expect(savePayload.row).toEqual(attemptedRow);
+        expect(savePayload.codigoAplicacion).toEqual(expect.any(Number));
+        expect(savePayload.codigoUsuario).toEqual(expect.any(Number));
+
+        const validationDialog = page.getByRole("dialog");
+        await expect(
+          validationDialog.getByRole("heading", {
+            name: "Guardar",
+            exact: true,
+          }),
+        ).toBeVisible();
+        await expect(
+          validationDialog.getByText(negativeSubsidyValidationMessage, {
+            exact: true,
+          }),
+        ).toBeVisible();
+
+        await page
+          .getByTestId(
+            "mae-historico-salario-minimo-dialog-save-validation-error-confirm-button",
+          )
+          .click();
+
+        const persistedRows = await loadFreshRows(() => page.reload());
+        expect(
+          persistedRows.find(row => row.vigencia === latestYear),
+        ).toEqual(originalBaseline);
+      } finally {
+        // 2. Run failure-safe restoration in finally even if an unexpected normal save occurred.
         await restoreOriginalBaseline();
       }
     });
