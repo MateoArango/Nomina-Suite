@@ -210,7 +210,7 @@ Plan the authenticated /mae-historico-salario-minimo module with the existing Mi
 
 **Seed:** `tests/minimumWageHistory/seed-test.spec.ts`
 
-#### 6.1. MWH-014: Valid integer and decimal subsidies save as a complete-row update
+#### 6.1. ✅ MWH-014: Valid integer and decimal subsidies save as a complete-row update
 
 **File:** `tests/minimumWageHistory/mutation-contracts.spec.ts`
 
@@ -222,6 +222,8 @@ Plan the authenticated /mae-historico-salario-minimo module with the existing Mi
   2. Reload, re-fetch the latest row, and compare persistence; then repeat as an independent test iteration with a distinct decimal value using a dot.
     - expect: The persisted value equals the submitted integer or decimal and every other row field is unchanged.
     - expect: In finally, restore the complete original subsidy for the same vigencia, reload, and prove the full baseline row is restored.
+
+**Implementation summary:** The serial test derives the latest complete row and distinct integer/decimal values from the fresh runtime response. For each independent fresh-state iteration, it verifies the single POST `/actions/grabar` envelope, exact full-row delta, successful response and feedback, and complete-row persistence after reload. A `finally` restoration returns the same runtime-selected year to its full captured baseline and proves restoration through a fresh rows response. Focused Chromium verification passed: 1 test.
 
 #### 6.2. MWH-015: Zero is accepted and persisted as numeric zero
 
