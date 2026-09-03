@@ -267,7 +267,7 @@ Plan the authenticated /mae-historico-salario-minimo module with the existing Mi
 
 **Implementation summary:** The serial test captures every complete runtime row, derives a unique vigencia below the runtime maximum, fills all five creation inputs with valid numeric values, and baselines the save traffic before clicking Guardar exactly once. It proves the request is a complete `isNuevo: true` payload, the API rejects it with HTTP 400 and the exact Guardar message, and fresh rows after reload exactly equal the baseline with no attempted identity. Failure-safe cleanup can target only that exact non-baseline row if the guard ever regresses. Focused Chromium verification with trace passed: 1 test.
 
-#### 7.2. MWH-018: Eliminar remains unavailable in supported list and detail states
+#### 7.2. MWH-018: Eliminar remains unavailable in supported list and detail states ✅
 
 **File:** `tests/minimumWageHistory/delete-guard.spec.ts`
 
@@ -276,3 +276,5 @@ Plan the authenticated /mae-historico-salario-minimo module with the existing Mi
     - expect: Eliminar is disabled in every observed supported state.
     - expect: No delete endpoint request is sent.
     - expect: The test does not bypass the disabled control or attempt to delete shared QA data.
+
+**Implementation summary:** The test derives a prior vigencia and `max(vigencia)` from the fresh authenticated rows response, then checks the initial list, both runtime-selected list states, both API-backed detail states, and an untouched five-input Nuevo form. It observes the exact `/actions/eliminar` endpoint from before navigation, proves Eliminar remains disabled in every state with zero delete requests, and never clicks or bypasses the disabled control. Focused Chromium verification with trace passed: 1 test.
