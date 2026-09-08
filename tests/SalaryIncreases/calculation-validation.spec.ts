@@ -8,9 +8,8 @@ test.describe("P0 - Initial state and calculation validation", () => {
   test("SI-002: Required input matrix uses server validation", async ({ page }) => {
     test.setTimeout(90_000);
     const salaryIncreasesPage = new SalaryIncreasesPage(page);
-    const apiBase = "https://nomina-qa-api.adacsc.co/api/v1/";
-    const calculateUrl = apiBase + "w-aumento-sueldo/actions/calculate";
-    const saveUrl = apiBase + "w-aumento-sueldo/actions/grabar";
+    const calculateUrl = salaryIncreasesPage.apiBase + "w-aumento-sueldo/actions/calculate";
+    const saveUrl = salaryIncreasesPage.apiBase + "w-aumento-sueldo/actions/grabar";
     const calculations: string[] = [];
     const saves: string[] = [];
     page.on("request", request => {
@@ -42,7 +41,7 @@ test.describe("P0 - Initial state and calculation validation", () => {
           "w-aumento-sueldo/lookups/dw-drop-secciones",
         ];
         const startupPromises = startupPaths.map(path => page.waitForResponse(response =>
-          response.request().method() === "GET" && response.url().split("?")[0] === apiBase + path));
+          response.request().method() === "GET" && response.url().split("?")[0] === salaryIncreasesPage.apiBase + path));
         await salaryIncreasesPage.goto();
         const startupResponses = await Promise.all(startupPromises);
         for (const response of startupResponses) {

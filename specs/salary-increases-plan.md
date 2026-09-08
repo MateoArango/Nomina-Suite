@@ -2,7 +2,7 @@
 
 ## Application Overview
 
-Plan date: 2026-09-07. Status: planning complete; SI-001 and SI-002 are implemented and verified. Remaining SI scenarios are planned.
+Plan date: 2026-09-07. Status: planning complete; SI-001, SI-002 and SI-003 are implemented and verified. Remaining SI scenarios are planned.
 
 ## Scope and sources
 
@@ -111,9 +111,9 @@ Resolve numeric boundaries and rounding ties; supported context years; position/
 
 **Implementation summary:** Implemented all six matrix rows in `tests/SalaryIncreases/calculation-validation.spec.ts`, using the authentication fixture, fresh document navigation per row, and completed startup GET responses. Each submission sends exactly one calculate POST with the full expected payload. Defaults and either positive mode without a date return the exact missing-date 400 BAD_REQUEST; date-only returns the exact missing-increase error, including its trailing space. The POM verifies both the rendered dialog message and raw text before dismissal; invalid rows leave no preview and disable Export/Save. Both valid modes return 200 with matching startup context and nonempty runtime rows, verified by employee identity in the visible preview. No salary-save POST occurs. Focused Chromium verification with trace passed on 2026-09-08: **1 passed (44.6s)**.
 
-#### 1.3. SI-003: Amount and percentage conflict [LIVE]
+#### 1.3. SI-003: Amount and percentage conflict [LIVE] ✅
 
-**File:** `tests/SalaryIncreases/calculation-validation.spec.ts`
+**File:** `tests/SalaryIncreases/amount-and-percentage-conflict.spec.ts`
 
 **Steps:**
   1. Start with a fresh authenticated browser context through auth.fixture and SalaryIncreasesPage.goto(). Use a context-supported increase date.
@@ -124,11 +124,13 @@ Resolve numeric boundaries and rounding ties; supported context years; position/
   3. Dismiss the error, set amount to zero, and calculate again.
     - expect: Percentage-only calculation succeeds and the error is cleared; no stale invalid preview remains.
 
-#### 1.4. SI-004: Amount and percentage boundaries [DISCOVERY]
+**Implementation summary:** Implemented as a standalone test using auth.fixture and SalaryIncreasesPage. Settles all six in-scope startup responses and derives the increase date from the context request year. Amount 100 plus percentage 5 sends exactly one calculate POST, returns HTTP 400 BAD_REQUEST, and shows the exact observed conflict message matching the response. Dismissing the dialog and setting only amount to zero sends one successful retry with the remaining payload unchanged. Verifies the cleared error, response context, runtime employee rows, enabled export, and zero salary-save requests. Focused Chromium verification with trace enabled: 1 passed (19.1s). The generator MCP tools were unavailable in this session; live verification used the local Playwright runner.
+
+#### 1.4. SI-004: Amount and percentage boundaries [DISCOVERY]Read the all the SI-.004 and Explain me before you do something, what do you want to achieve, for create a good test.
 
 **File:** `tests/SalaryIncreases/numeric-boundaries.spec.ts`
 
-[DISCOVERY] Percentage accepts more than 12 numbers (1.1111111111111112e+211) without errors and Valor a incrementar until 15 ($222,222,222,222,222).
+[DISCOVERY] Percentage accepts more than 12 numbers (1.1111111111111112e+211) without errors and Valor a incrementar until 15 ($222,222,222,222,222). This verification are front-end boundaries. 
 
 **Steps:**
   1. Start with a fresh authenticated browser context through auth.fixture and SalaryIncreasesPage.goto(). Prepare a matching employee and a supported date; independently test each value.

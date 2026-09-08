@@ -7,12 +7,11 @@ import { SalaryIncreasesPage } from "../../pages/SalaryIncreases.page";
 test.describe("P0 - Initial state and calculation validation", () => {
   test("SI-001: Initial filters and empty increases state", async ({ page }) => {
     const salaryIncreasesPage = new SalaryIncreasesPage(page);
-    const apiBase = "https://nomina-qa-api.adacsc.co/api/v1/";
     const actionRequests: string[] = [];
     page.on("request", request => {
       if (request.method() === "POST" &&
           ["w-aumento-sueldo/actions/calculate", "w-aumento-sueldo/actions/grabar"]
-            .some(path => request.url().split("?")[0] === apiBase + path)) {
+            .some(path => request.url().split("?")[0] === salaryIncreasesPage.apiBase + path)) {
         actionRequests.push(request.url());
       }
     });
@@ -29,7 +28,7 @@ test.describe("P0 - Initial state and calculation validation", () => {
     ];
     const startupResponses = startupPaths.map(path => page.waitForResponse(response =>
       response.request().method() === "GET" &&
-      response.url().split("?")[0] === apiBase + path));
+      response.url().split("?")[0] === salaryIncreasesPage.apiBase + path));
     await salaryIncreasesPage.goto();
     const responses = await Promise.all(startupResponses);
     for (const response of responses) {
