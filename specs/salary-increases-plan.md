@@ -2,7 +2,7 @@
 
 ## Application Overview
 
-Plan date: 2026-09-07. Status: planning complete; SI-001 is implemented and verified. Remaining SI scenarios are planned.
+Plan date: 2026-09-07. Status: planning complete; SI-001 and SI-002 are implemented and verified. Remaining SI scenarios are planned.
 
 ## Scope and sources
 
@@ -95,7 +95,7 @@ Resolve numeric boundaries and rounding ties; supported context years; position/
 
 **Implementation summary:** Implemented in `tests/SalaryIncreases/initial-state.spec.ts` using the existing authentication fixture and SalaryIncreasesPage. Captures all six in-scope startup GET responses before navigation, verifies HTTP 200/completed responses and the runtime current year, and checks default filters and enabled actions. Opening increases renders no table or rows, leaves Export/Save disabled, and sends zero calculate/salary-save POST requests. The loading-strip container remains present after startup, so readiness uses completed responses and enabled controls. Focused Chromium verification with trace passed on 2026-09-08: **1 passed (12.7s)**.
 
-#### 1.2. SI-002: Required input matrix uses server validation [PARTLY LIVE]
+#### 1.2. SI-002: Required input matrix uses server validation [LIVE] ✅
 
 **File:** `tests/SalaryIncreases/calculation-validation.spec.ts`
 
@@ -108,6 +108,8 @@ Resolve numeric boundaries and rounding ties; supported context years; position/
   3. Inspect the error dialog and dismiss it for each invalid case.
     - expect: The dialog message matches the response message, accounting explicitly for observed trailing whitespace.
     - expect: No salary-save request is sent; invalid cases do not display a successful fresh calculation.
+
+**Implementation summary:** Implemented all six matrix rows in `tests/SalaryIncreases/calculation-validation.spec.ts`, using the authentication fixture, fresh document navigation per row, and completed startup GET responses. Each submission sends exactly one calculate POST with the full expected payload. Defaults and either positive mode without a date return the exact missing-date 400 BAD_REQUEST; date-only returns the exact missing-increase error, including its trailing space. The POM verifies both the rendered dialog message and raw text before dismissal; invalid rows leave no preview and disable Export/Save. Both valid modes return 200 with matching startup context and nonempty runtime rows, verified by employee identity in the visible preview. No salary-save POST occurs. Focused Chromium verification with trace passed on 2026-09-08: **1 passed (44.6s)**.
 
 #### 1.3. SI-003: Amount and percentage conflict [LIVE]
 

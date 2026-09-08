@@ -1,4 +1,4 @@
-import type { Locator, Page } from "@playwright/test";
+import { expect, type Locator, type Page } from "@playwright/test";
 
 type PageSize = 10 | 25 | 50 | 100;
 type Lookup = "employee-type" | "payment-unit" | "profession" | "position" | "level" | "grade";
@@ -205,8 +205,16 @@ export class SalaryIncreasesPage {
     return this.byId(`${kind}-dialog`);
   }
 
+  async expectApiErrorMessage(message: string): Promise<void> {
+    const dialog = this.dialog("api-error");
+    await expect(dialog).toBeVisible();
+    const content = dialog.locator(".swal2-html-container");
+    await expect(content).toHaveText(message.trimEnd());
+    // Preserve the server's trailing whitespace as well as its rendered message.
+    expect(await content.textContent()).toBe(message);
+  }
+
   dialogButton(kind: Dialog, action: DialogAction): Locator {
     return this.byId(`${kind}-${action}-button`);
   }
 }
-
