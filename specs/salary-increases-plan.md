@@ -2,7 +2,7 @@
 
 ## Application Overview
 
-Plan date: 2026-09-07. Status: planning complete; SI-001, SI-002, SI-003 and SI-004 are implemented and verified. Remaining SI scenarios are planned.
+Plan date: 2026-09-07. Status: planning complete; SI-001, SI-002, SI-003, SI-004 and SI-005 are implemented and verified. Remaining SI scenarios are planned.
 
 ## Scope and sources
 
@@ -143,18 +143,20 @@ Resolve numeric boundaries and rounding ties; supported context years; position/
 
 **Implementation summary:** Implemented one standalone test with 18 independent matrix cases using auth.fixture and SalaryIncreasesPage. Each case navigates afresh, settles all six in-scope startup responses, and derives its date from the context request year. Verifies typing/paste normalization before and after blur, the unused zero mode, exactly one calculate POST with the full expected payload, exact 400 BAD_REQUEST/dialog text or successful response context, and visible employee identities and current/new salary values against the response. Batched POM assertions retain full visible-page coverage while reducing assertion overhead. Includes 14/15/16-digit amounts, 12/13-digit percentages and the pasted extreme exponent; no salary-save POST occurs. This characterizes current silent normalization and excessive-percentage acceptance without approving those business rules. Focused Chromium verification with trace passed on 2026-09-08: **1 passed (2.4m)**. Initial verification exposed matrix timeout overhead and unstable character-by-character exponent entry; the final test batches preview checks and uses clipboard paste for that exponent.
 
-#### 1.5. SI-005: Malformed date handling [SUPPLIED; VERIFY]
+#### 1.5. SI-005: Malformed date handling [LIVE] ✅
 
 **File:** `tests/SalaryIncreases/date-validation.spec.ts`
 
 **Steps:**
   1. Start with a fresh authenticated browser context through auth.fixture and SalaryIncreasesPage.goto(). Keep one valid increase mode.
-    - expect: The seed is ready, initial module traffic has settled, and this scenario does not depend on a preceding test.
-  2. Try the supplied malformed extended-year date through the native date input; inspect the submitted value before calculating.
-    - expect: If the browser normalizes or rejects the input, record that UI boundary; do not force a DOM value and call it user coverage.
-  3. Submit a malformed value only if the real control permits it.
-    - expect: Record whether rejection is browser-side or POST calculate; compare the actual error dialog with the response.
-    - expect: The supplied parse-index error is an unverified candidate, not a guaranteed current message.
+    - expect: All six in-scope startup GET responses complete successfully; amount is 100 and percentage is zero.
+  2. Enter the supplied extended-year date 275760-09-09 through the native date input and blur it.
+    - expect: Chromium retains the exact value, the native input matches :valid, and aria-invalid is false. Use normal Playwright input interaction without DOM value injection.
+  3. Calculate and inspect the rejection.
+    - expect: Exactly one POST calculate submits the unchanged date and full expected payload, returning HTTP 400 BAD_REQUEST with message "Text '275760-09-09' could not be parsed at index 0".
+    - expect: The dialog exactly matches response.message. After dismissal, opening increases shows zero preview rows and disabled Export/Save; no salary-save POST occurs.
+
+**Implementation summary:** Implemented one standalone SI-005 test using auth.fixture and SalaryIncreasesPage, following live generator exploration. Confirms that the extended year is accepted by Chromium but rejected by the backend parser. Captures startup and calculation responses before their triggering actions and verifies the full request payload, exact API/dialog error, empty preview, and zero salary persistence requests. Focused Chromium verification with trace passed on 2026-09-08: **1 passed (15.3s)**. The initial run exposed serialization of the native validity object as an empty object; the final assertion uses the native :valid selector.
 
 #### 1.6. SI-006: Context-dependent unsupported year [SUPPLIED; VERIFY]
 
