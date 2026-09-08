@@ -1,0 +1,38 @@
+[       3ms] TypeError: Cannot read properties of null (reading 'appendChild')
+    at <anonymous>:6:32
+    at <anonymous>:7:7
+    at <anonymous>:8:7
+[ 4341935ms] TypeError: Cannot read properties of null (reading 'appendChild')
+    at <anonymous>:6:32
+    at <anonymous>:7:7
+    at <anonymous>:8:7
+[ 4342574ms] [ERROR] Failed to load resource: the server responded with a status of 401 () @ https://nomina-qa-api.adacsc.co/api/v1/w-empleados-p/lookups/dw_drop_cargos:0
+[ 4342635ms] [ERROR] Failed to load resource: the server responded with a status of 401 () @ https://nomina-qa-api.adacsc.co/api/v1/w-aumento-sueldo/lookups/dw-drop-secciones:0
+[ 4342639ms] [ERROR] Failed to load resource: the server responded with a status of 401 () @ https://nomina-qa-api.adacsc.co/api/v1/w-aumento-sueldo/lookups/dw_drop_unidades_pago:0
+[ 4342641ms] [ERROR] Failed to load resource: the server responded with a status of 401 () @ https://nomina-qa-api.adacsc.co/api/v1/w-aumento-sueldo/context?year=2026:0
+[ 4342654ms] [ERROR] Failed to load resource: the server responded with a status of 401 () @ https://nomina-qa-api.adacsc.co/api/v1/w-aumento-sueldo/lookups/dw_drop_tipos_liquidacion:0
+[ 4342657ms] [ERROR] Failed to load resource: the server responded with a status of 401 () @ https://nomina-qa-api.adacsc.co/api/v1/w-aumento-sueldo/lookups/dw_drop_grados:0
+[ 4342660ms] [ERROR] Failed to load resource: the server responded with a status of 401 () @ https://nomina-qa-api.adacsc.co/api/v1/w-aumento-sueldo/lookups/dd_niveles:0
+[ 4342664ms] [ERROR] Failed to load resource: the server responded with a status of 401 () @ https://nomina-qa-api.adacsc.co/api/v1/w-aumento-sueldo/lookups/dw_drop_profesiones:0
+[ 4342667ms] [ERROR] Failed to load resource: the server responded with a status of 401 () @ https://nomina-qa-api.adacsc.co/api/v1/w-aumento-sueldo/lookups/dw_drop_tipos_tercero:0
+[ 4342682ms] [ERROR] ERROR TypeError: Cannot read properties of null (reading 'addControl')
+    at t._setUpControl (https://nomina-qa.adacsc.co/chunk-6OO7BDVP.js:5:133174)
+    at t.ngOnChanges (https://nomina-qa.adacsc.co/chunk-6OO7BDVP.js:5:132727)
+    at t.Y0 (https://nomina-qa.adacsc.co/chunk-6OO7BDVP.js:4:22461)
+    at s_ (https://nomina-qa.adacsc.co/chunk-6OO7BDVP.js:4:24024)
+    at Q0 (https://nomina-qa.adacsc.co/chunk-6OO7BDVP.js:4:24179)
+    at Z_ (https://nomina-qa.adacsc.co/chunk-6OO7BDVP.js:4:23931)
+    at dl (https://nomina-qa.adacsc.co/chunk-6OO7BDVP.js:4:23659)
+    at cA (https://nomina-qa.adacsc.co/chunk-6OO7BDVP.js:4:63926)
+    at Yh (https://nomina-qa.adacsc.co/chunk-6OO7BDVP.js:4:64967)
+    at aD (https://nomina-qa.adacsc.co/chunk-6OO7BDVP.js:4:64799) @ https://nomina-qa.adacsc.co/chunk-6OO7BDVP.js:3
+[ 4342683ms] [ERROR] [test-id bridge][form-field-password] controles=0 @ https://nomina-qa.adacsc.co/chunk-S5KCKRGV.js:0
+[ 4342708ms] [ERROR] Failed to load resource: the server responded with a status of 401 () @ https://nomina-qa-api.adacsc.co/api/v1/errores-reporte/actions/grabar:0
+[ 4342720ms] [ERROR] Failed to load resource: the server responded with a status of 401 () @ https://nomina-qa-api.adacsc.co/api/v1/errores-reporte/actions/grabar:0
+[ 4342721ms] [ERROR] Failed to load resource: the server responded with a status of 401 () @ https://nomina-qa-api.adacsc.co/api/v1/errores-reporte/actions/grabar:0
+[ 4342723ms] [ERROR] Failed to load resource: the server responded with a status of 401 () @ https://nomina-qa-api.adacsc.co/api/v1/errores-reporte/actions/grabar:0
+[ 4342724ms] [ERROR] Failed to load resource: the server responded with a status of 401 () @ https://nomina-qa-api.adacsc.co/api/v1/errores-reporte/actions/grabar:0
+[ 4342725ms] [ERROR] Failed to load resource: the server responded with a status of 401 () @ https://nomina-qa-api.adacsc.co/api/v1/errores-reporte/actions/grabar:0
+[ 4342726ms] [ERROR] Failed to load resource: the server responded with a status of 401 () @ https://nomina-qa-api.adacsc.co/api/v1/errores-reporte/actions/grabar:0
+[ 4342727ms] [ERROR] Failed to load resource: the server responded with a status of 401 () @ https://nomina-qa-api.adacsc.co/api/v1/errores-reporte/actions/grabar:0
+[ 4342729ms] [ERROR] Failed to load resource: the server responded with a status of 401 () @ https://nomina-qa-api.adacsc.co/api/v1/errores-reporte/actions/grabar:0

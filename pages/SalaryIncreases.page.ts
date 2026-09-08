@@ -170,6 +170,16 @@ export class SalaryIncreasesPage {
     return this.checkbox(`increases-select-checkbox--${employeeId}`);
   }
 
+  async expectPreviewSalaries(rows: Array<{ kaNlTercero: string | number; ndSalarioMes: number; nuevoSalario: number }>): Promise<void> {
+    await expect.poll(() => this.visibleRows().evaluateAll(elements =>
+      elements.map(element => element.getAttribute("data-testid")))).toEqual(
+      rows.map(row => `aumento-sueldo-increases-row--${row.kaNlTercero}`));
+    // The default grid places monthly salary and its preview after the ten identity/selection cells.
+    const format = (value: number) => value.toLocaleString("es-CO", { maximumFractionDigits: 0 });
+    await expect(this.visibleRows().locator("td:nth-child(11)")).toHaveText(rows.map(row => format(row.ndSalarioMes)));
+    await expect(this.visibleRows().locator("td:nth-child(12)")).toHaveText(rows.map(row => format(row.nuevoSalario)));
+  }
+
   visibleRows(): Locator {
     return this.page.getByTestId(/^aumento-sueldo-increases-row--/).filter({ visible: true });
   }

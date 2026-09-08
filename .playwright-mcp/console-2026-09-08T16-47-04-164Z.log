@@ -1,0 +1,97 @@
+[       3ms] TypeError: Cannot read properties of null (reading 'appendChild')
+    at <anonymous>:6:32
+    at <anonymous>:7:7
+    at <anonymous>:8:7
+[      67ms] TypeError: Cannot read properties of null (reading 'appendChild')
+    at <anonymous>:6:32
+    at <anonymous>:7:7
+    at <anonymous>:8:7
+[    4815ms] [ERROR] Failed to load resource: the server responded with a status of 400 () @ https://nomina-qa-api.adacsc.co/api/v1/w-aumento-sueldo/actions/calculate:0
+[    4907ms] TypeError: Cannot read properties of null (reading 'appendChild')
+    at <anonymous>:6:32
+    at <anonymous>:7:7
+    at <anonymous>:8:7
+[    7598ms] [ERROR] Failed to load resource: the server responded with a status of 400 () @ https://nomina-qa-api.adacsc.co/api/v1/w-aumento-sueldo/actions/calculate:0
+[    7711ms] TypeError: Cannot read properties of null (reading 'appendChild')
+    at <anonymous>:6:32
+    at <anonymous>:7:7
+    at <anonymous>:8:7
+[   10817ms] TypeError: Cannot read properties of null (reading 'appendChild')
+    at <anonymous>:6:32
+    at <anonymous>:7:7
+    at <anonymous>:8:7
+[   15874ms] TypeError: Cannot read properties of null (reading 'appendChild')
+    at <anonymous>:6:32
+    at <anonymous>:7:7
+    at <anonymous>:8:7
+[   18848ms] TypeError: Cannot read properties of null (reading 'appendChild')
+    at <anonymous>:6:32
+    at <anonymous>:7:7
+    at <anonymous>:8:7
+[   24010ms] TypeError: Cannot read properties of null (reading 'appendChild')
+    at <anonymous>:6:32
+    at <anonymous>:7:7
+    at <anonymous>:8:7
+[   29068ms] TypeError: Cannot read properties of null (reading 'appendChild')
+    at <anonymous>:6:32
+    at <anonymous>:7:7
+    at <anonymous>:8:7
+[   34155ms] TypeError: Cannot read properties of null (reading 'appendChild')
+    at <anonymous>:6:32
+    at <anonymous>:7:7
+    at <anonymous>:8:7
+[   44440ms] TypeError: Cannot read properties of null (reading 'appendChild')
+    at <anonymous>:6:32
+    at <anonymous>:7:7
+    at <anonymous>:8:7
+[   49111ms] [ERROR] Failed to load resource: the server responded with a status of 400 () @ https://nomina-qa-api.adacsc.co/api/v1/w-aumento-sueldo/actions/calculate:0
+[   49194ms] TypeError: Cannot read properties of null (reading 'appendChild')
+    at <anonymous>:6:32
+    at <anonymous>:7:7
+    at <anonymous>:8:7
+[   51809ms] [ERROR] Failed to load resource: the server responded with a status of 400 () @ https://nomina-qa-api.adacsc.co/api/v1/w-aumento-sueldo/actions/calculate:0
+[   51886ms] TypeError: Cannot read properties of null (reading 'appendChild')
+    at <anonymous>:6:32
+    at <anonymous>:7:7
+    at <anonymous>:8:7
+[   56657ms] [ERROR] Failed to load resource: the server responded with a status of 400 () @ https://nomina-qa-api.adacsc.co/api/v1/w-aumento-sueldo/actions/calculate:0
+[   56762ms] TypeError: Cannot read properties of null (reading 'appendChild')
+    at <anonymous>:6:32
+    at <anonymous>:7:7
+    at <anonymous>:8:7
+[   61885ms] TypeError: Cannot read properties of null (reading 'appendChild')
+    at <anonymous>:6:32
+    at <anonymous>:7:7
+    at <anonymous>:8:7
+[   64855ms] TypeError: Cannot read properties of null (reading 'appendChild')
+    at <anonymous>:6:32
+    at <anonymous>:7:7
+    at <anonymous>:8:7
+[   67819ms] TypeError: Cannot read properties of null (reading 'appendChild')
+    at <anonymous>:6:32
+    at <anonymous>:7:7
+    at <anonymous>:8:7
+[   72941ms] TypeError: Cannot read properties of null (reading 'appendChild')
+    at <anonymous>:6:32
+    at <anonymous>:7:7
+    at <anonymous>:8:7
+[   87975ms] TypeError: Cannot read properties of null (reading 'appendChild')
+    at <anonymous>:6:32
+    at <anonymous>:7:7
+    at <anonymous>:8:7
+[   91283ms] TypeError: Cannot read properties of null (reading 'appendChild')
+    at <anonymous>:6:32
+    at <anonymous>:7:7
+    at <anonymous>:8:7
+[   94396ms] TypeError: Cannot read properties of null (reading 'appendChild')
+    at <anonymous>:6:32
+    at <anonymous>:7:7
+    at <anonymous>:8:7
+[  108713ms] TypeError: Cannot read properties of null (reading 'appendChild')
+    at <anonymous>:6:32
+    at <anonymous>:7:7
+    at <anonymous>:8:7
+[  111886ms] TypeError: Cannot read properties of null (reading 'appendChild')
+    at <anonymous>:6:32
+    at <anonymous>:7:7
+    at <anonymous>:8:7

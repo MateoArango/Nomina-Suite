@@ -1,0 +1,13 @@
+[       3ms] TypeError: Cannot read properties of null (reading 'appendChild')
+    at <anonymous>:6:32
+    at <anonymous>:7:7
+    at <anonymous>:8:7
+[   19551ms] TypeError: Cannot read properties of null (reading 'appendChild')
+    at <anonymous>:6:32
+    at <anonymous>:7:7
+    at <anonymous>:8:7
+[   44791ms] TypeError: Cannot read properties of null (reading 'appendChild')
+    at <anonymous>:6:32
+    at <anonymous>:7:7
+    at <anonymous>:8:7
+[   48034ms] [ERROR] Failed to load resource: the server responded with a status of 400 () @ https://nomina-qa-api.adacsc.co/api/v1/w-aumento-sueldo/actions/calculate:0
