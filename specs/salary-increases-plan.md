@@ -2,7 +2,7 @@
 
 ## Application Overview
 
-Plan date: 2026-09-07. Status: planning complete; all SI scenarios below are planned, not implemented or marked passed.
+Plan date: 2026-09-07. Status: planning complete; SI-001 is implemented and verified. Remaining SI scenarios are planned.
 
 ## Scope and sources
 
@@ -14,7 +14,7 @@ Use English plan prose and existing code identifiers. Capture actual UI error st
 
 ## Evidence and corrections
 
-LIVE means directly explored, PARTLY LIVE means only the named part was observed, SUPPLIED means an attachment requirement awaiting verification, DISCOVERY means an unresolved behavior to establish, and CONTROLLED means deterministic fault injection. No scenario is a completed automated test.
+LIVE means directly explored, PARTLY LIVE means only the named part was observed, SUPPLIED means an attachment requirement awaiting verification, DISCOVERY means an unresolved behavior to establish, and CONTROLLED means deterministic fault injection. Completed automated tests are marked with a checkmark and implementation summary.
 
 - Authenticated Chromium seed completed setup and reached the module. Initial amount is $0, percentage 0, dates blank, rounding off, and Calculate enabled. This contradicts the supplied required $1 initial amount and disabled-button implications.
 - Missing-date submission and date-only submission each reached POST calculate and returned 400; conflict of positive amount and percentage also returned 400. These are server validation cases, not zero-request client guards. Error telemetry can separately POST to errores-reporte/actions/grabar; do not confuse that with salary persistence.
@@ -79,7 +79,7 @@ Resolve numeric boundaries and rounding ties; supported context years; position/
 
 **Seed:** `tests/SalaryIncreases/seed-test.spec.ts`
 
-#### 1.1. SI-001: Initial filters and empty increases state [LIVE]
+#### 1.1. SI-001: Initial filters and empty increases state [LIVE] ✅
 
 **File:** `tests/SalaryIncreases/initial-state.spec.ts`
 
@@ -92,6 +92,8 @@ Resolve numeric boundaries and rounding ties; supported context years; position/
   3. Open the increases tab before calculating.
     - expect: There are no calculated rows; Export and Save are disabled.
     - expect: No calculate or salary-save request is sent by tab navigation.
+
+**Implementation summary:** Implemented in `tests/SalaryIncreases/initial-state.spec.ts` using the existing authentication fixture and SalaryIncreasesPage. Captures all six in-scope startup GET responses before navigation, verifies HTTP 200/completed responses and the runtime current year, and checks default filters and enabled actions. Opening increases renders no table or rows, leaves Export/Save disabled, and sends zero calculate/salary-save POST requests. The loading-strip container remains present after startup, so readiness uses completed responses and enabled controls. Focused Chromium verification with trace passed on 2026-09-08: **1 passed (12.7s)**.
 
 #### 1.2. SI-002: Required input matrix uses server validation [PARTLY LIVE]
 
