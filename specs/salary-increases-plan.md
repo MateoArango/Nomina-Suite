@@ -2,7 +2,7 @@
 
 ## Application Overview
 
-Plan date: 2026-09-07. Status: planning complete; SI-001, SI-002, SI-003, SI-004 and SI-005 are implemented and verified. Remaining SI scenarios are planned.
+Plan date: 2026-09-07. Status: planning complete; SI-001, SI-002, SI-003, SI-004, SI-005 and SI-006 are implemented and verified. Remaining SI scenarios are planned.
 
 ## Scope and sources
 
@@ -158,9 +158,9 @@ Resolve numeric boundaries and rounding ties; supported context years; position/
 
 **Implementation summary:** Implemented one standalone SI-005 test using auth.fixture and SalaryIncreasesPage, following live generator exploration. Confirms that the extended year is accepted by Chromium but rejected by the backend parser. Captures startup and calculation responses before their triggering actions and verifies the full request payload, exact API/dialog error, empty preview, and zero salary persistence requests. Focused Chromium verification with trace passed on 2026-09-08: **1 passed (15.3s)**. The initial run exposed serialization of the native validity object as an empty object; the final assertion uses the native :valid selector.
 
-#### 1.6. SI-006: Context-dependent unsupported year [SUPPLIED; VERIFY]
+#### 1.6. SI-006: Context-dependent unsupported year [LIVE] ✅
 
-**File:** `tests/SalaryIncreases/date-validation.spec.ts`
+**File:** `tests/SalaryIncreases/context-dependent-unsupported-year.spec.ts`
 
 **Steps:**
   1. Start with a fresh authenticated browser context through auth.fixture and SalaryIncreasesPage.goto(). Discover one year with minimum-wage context and one without through current context responses.
@@ -168,6 +168,8 @@ Resolve numeric boundaries and rounding ties; supported context years; position/
   2. Calculate using the unsupported-context year, then correct to the supported year.
     - expect: Missing context produces the actual minimum-wage configuration error and no successful preview; recovery succeeds.
     - expect: Do not hard-code the supplied 2021-to-current range or assume every future year is invalid.
+
+**Implementation summary:** Implemented one standalone test after live generator exploration, preserving SI-005. Settles all six in-scope startup GET responses and probes a bounded set of years relative to the startup context year, reusing authentication headers only in memory. Selects supported and unsupported years from positive and null minimum-wage context values; missing prerequisites fail explicitly. The unsupported year sends exactly one calculate POST with the full expected payload and returns 400 BAD_REQUEST with the exact observed configuration error, matched against the dialog. After dismissal, the preview is empty and Export/Save are disabled. Changing only the year produces a 200 response matching the supported context and verifies visible employee identities and salary values against runtime rows. Both calculations emit zero salary-save POSTs. Focused Chromium verification with trace passed on 2026-09-08: **1 passed (37.8s)**.
 
 ### 2. P1 - Filter controls and employee eligibility
 
