@@ -176,6 +176,24 @@ export class SalaryIncreasesPage {
     return this.byId(`filter-${picker}-row--${id}`);
   }
 
+  picker(picker: Picker) {
+    return {
+      open: this.control(`filter-${picker}-open-button`, "button"),
+      panel: this.byId(`filter-${picker}-panel`),
+      search: this.control(`filter-${picker}-search-input`, "input"),
+      clear: this.control(`filter-${picker}-clear-button`, "button"),
+      status: this.byId(`filter-${picker}-status`),
+      empty: this.byId(`filter-${picker}-empty-state`),
+      rows: this.page.getByTestId(new RegExp(`^aumento-sueldo-filter-${picker}-row--`)),
+    };
+  }
+
+  async expectPickerCount(picker: Picker, count: number): Promise<void> {
+    await expect(this.picker(picker).status).toHaveText(
+      `${count} ${picker === "position" ? "cargo(s)" : "seccion(es)"}`,
+    );
+  }
+
   row(employeeId: string | number): Locator {
     return this.byId(`increases-row--${employeeId}`);
   }

@@ -25,7 +25,7 @@ LIVE means directly explored, PARTLY LIVE means only the named part was observed
 - Missing selection showed its dedicated dialog. First confirmation asks whether to update position salaries; choosing No still advances to final confirmation. That dialog uses success-sounding wording before persistence. Choosing No there emitted no salary-save request. No real salary-save request was sent during exploration; backend success, atomicity, duplicate-history and hire-date rejection remain unverified.
 - Export downloaded w_aumento_sueldo.xls containing HTML with an Excel wrapper, not a binary XLSX workbook. Its table had 155 data rows, 12 headers and all-selected flags equal to 1. It covered every calculated page. Active-filter export semantics and mixed selection remain to verify.
 - Undo returned to filters without a module request. Reset restored $0/0, blank dates/documents, rounding off and empty/unselected filters; reopening increases after reset had Export/Save disabled. Do not assume Undo and Reset are equivalent.
-- Position and section pickers opened and showed searchable tables and no-match messages. Selection payload mappings and clearing semantics need targeted confirmation.
+- Position and section picker search, selection, clearing and calculation mappings were confirmed in SI-008 exploration on 2026-09-09; see its steps and evidence below.
 - Exploration included a broad-checkbox locator that stalled on hidden controls; its incidental filter change was reset before subsequent inspection. Use the existing POM and short action timeouts. Exploratory results are not a substitute for focused test execution.
 
 ## Confirmed network shape
@@ -40,7 +40,7 @@ Startup GET endpoints:
 
 Level, grade and liquidation-type lookups were also loaded automatically; their traffic is not a reason to expand excluded control coverage.
 
-POST w-aumento-sueldo/actions/calculate accepts the observed keys tipoTercero, unidad, profesion, rango, fuerza, nivel, grado, nitInicial, nitFinal, salarioInicial, salarioFinal, porcentaje, valor, decreto, fechaDesde, fechaIngresoDesde, aproximarCien, aumentoPorPuntos. Unselected optional filters were null, inactive amount/percentage were 0, and date values were ISO date-only strings. Do not infer the selected position/section mappings from these null fields.
+POST w-aumento-sueldo/actions/calculate accepts the observed keys tipoTercero, unidad, profesion, rango, fuerza, nivel, grado, nitInicial, nitFinal, salarioInicial, salarioFinal, porcentaje, valor, decreto, fechaDesde, fechaIngresoDesde, aproximarCien, aumentoPorPuntos. Unselected optional filters were null, inactive amount/percentage were 0, and date values were ISO date-only strings. SI-008 confirmed position selection maps lookup.id to rango and section selection maps lookup.kaNlSeccion to fuerza; clearing restores null.
 
 Successful response: { context, rows }. Context includes salarioMinimoActual, dobleMesada, dobleMesadaFlag. Row identity is kaNlTercero; document is nNit. Relevant row fields include scNombre, scDetalleCargo, ssSeccion, scUnidadDePago, sDescripcion, tipoPension, tipoCotizante, ddIngreso, ndSalarioMes, nuevoSalario, salarioFijo and nuevoSalarioFijo. Additional fields are available for filter eligibility. Fixed-salary/conditional-column business semantics are not established; add fixtures before asserting them.
 
@@ -70,7 +70,7 @@ Attachment coverage: filter/defaults SI-001/004/007-012; required inputs and err
 
 ## Open contracts
 
-Resolve numeric boundaries and rounding ties; supported context years; position/section payload mappings; native malformed-date behavior; active-filter selection/export scope; Undo retained state; reset search/column state; save payload and success/error schema; processing UI; position-update effects; duplicate-history atomicity; before-hire-date validation stage; and fixture readback/cleanup endpoints. Record desired behavior separately when current behavior differs. Never silently promote a supplied assertion to a live-confirmed contract.
+Resolve numeric boundaries and rounding ties; supported context years; native malformed-date behavior; active-filter selection/export scope; Undo retained state; reset search/column state; save payload and success/error schema; processing UI; position-update effects; duplicate-history atomicity; before-hire-date validation stage; and fixture readback/cleanup endpoints. Record desired behavior separately when current behavior differs. Never silently promote a supplied assertion to a live-confirmed contract.
 
 
 ## Test Scenarios
@@ -192,21 +192,37 @@ Resolve numeric boundaries and rounding ties; supported context years; position/
 The test repeats the same process for employee type, payment unit and profession, selecting one runtime option per filter and testing each filter independently. It uses the initial unfiltered API results to identify the expected employees, checks that the filtered API response contains exactly that group, and compares the first page (up to 25 employees) with the UI by employee ID, row order, current salary and new salary. It then resets the filters and confirms that the API returns the original employee group before testing the next filter. Later UI pages and other options are not checked by this scenario.
 
 
-#### 2.2. SI-008: Position and section searchable pickers [PARTLY LIVE]
+#### 2.2. SI-008: Position and section searchable pickers [LIVE] ?
 
 **File:** `tests/SalaryIncreases/filter-pickers.spec.ts`
 
 **Steps:**
-  1. Start with a fresh authenticated browser context through auth.fixture and SalaryIncreasesPage.goto(). Parameterize position and section; use fresh lookup responses and stable runtime row IDs.
-    - expect: The seed is ready, initial module traffic has settled, and this scenario does not depend on a preceding test.
-  2. Open the picker; search a known runtime value, clear the query, then enter a guaranteed non-match.
-    - expect: Panel and results table are visible; status counts reflect current data; no-match state is displayed.
-    - expect: Do not hard-code the observed counts of 95 positions or 37 sections.
-  3. Select a matching row and reopen the picker to exercise its clear-selection action.
-    - expect: Selection is reflected in the field and row selection closes the panel; clear restores the unselected state.
-    - expect: Confirm clear-query versus clear-selection behavior separately before implementing the helper.
-  4. Select again and calculate.
-    - expect: Capture the actual position/section payload mapping rather than assuming names for rango or fuerza; every result matches the selected lookup identity.
+  1. Start fresh and capture completed startup GET responses, including position and section lookups. Calculate an unfiltered baseline with a supported context-year date, percentage 0 and amount 100.
+    - expect: HTTP 200 with context and rows; rango and fuerza are null. Choose each option at runtime by joining the lookup identity to baseline employees, requiring both matching and excluded employees.
+    - expect: Position lookup uses id, codigo and descripcion; section lookup uses kaNlSeccion and ssSeccion. Do not hard-code IDs, labels or totals.
+  2. Exercise position and section independently. Open the picker, search a runtime position code or section name, erase the query, then enter a guaranteed non-match.
+    - expect: The matching runtime row is visible; erasing the query restores the full lookup status count. Status counts describe all matching records, not just currently rendered rows.
+    - expect: No-match shows the picker-specific empty-state message and no selectable matching rows. Use positionEmptyState/sectionEmptyState and preserve the live product text in future assertions.
+    - expect: Search may render only a subset of the full lookup at once. Search for the target before using pickerRow(); do not require every lookup row to be simultaneously rendered.
+  3. Erase the non-match query, search the target again and select its stable runtime row.
+    - expect: The panel closes and the field displays the selected description/name. Wait for the panel to become hidden before reopening; an immediate visibility read can catch the closing transition.
+    - expect: Reopening starts with an empty query. With a selection present, enter a non-match and erase the query: the selection remains and full lookup results return.
+  4. Click the picker's clear button with a selection and search query present, then reopen.
+    - expect: Clear removes the selection, erases the query and closes the panel. Reopening shows the unselected placeholder, empty query and full lookup status count. This differs from simply erasing search text.
+    - expect: Use the existing native button/input intersections in SalaryIncreasesPage; wrapper components can share the same test ID.
+  5. Select the target again and calculate with the same baseline date and increase values; leave the other picker unselected.
+    - expect: Exactly one POST to w-aumento-sueldo/actions/calculate returns HTTP 200. Position sends rango = lookup.id and fuerza = null; section sends fuerza = lookup.kaNlSeccion and rango = null. Remaining payload fields equal the baseline.
+    - expect: Returned employee identities exactly equal the baseline subset where kaNiCargo equals the selected position ID, or kaNlSeccion equals the selected section ID. Compare identities, not potentially duplicated descriptions.
+    - expect: First-page visible employee IDs and order equal the first up-to-25 response rows. Later-page UI coverage belongs to the pagination scenarios.
+  6. Return to filters, clear the selected picker and calculate again without changing the date or increase values.
+    - expect: Both rango and fuerza return to null; HTTP 200 returns the complete original baseline identity set when data is unchanged. Repeat independently for the other picker.
+    - expect: Picker interactions do not trigger calculation by themselves; no salary-save POST occurs anywhere in this scenario. Finish with a fresh page so exploratory selections and previews are discarded.
+
+
+**Implementation summary (2026-09-09):** Implemented the single SI-008 test with reusable picker locators and retrying full-count assertions in `SalaryIncreasesPage`. Captures all six completed startup GET responses and derives each target from lookup IDs joined to baseline employees, requiring matching and excluded employees. Independently verifies search, exact empty-state text, zero no-match rows, query erasure, selection retention, reopening, and Clear with a query present. Five HTTP 200 calculations check full payloads (`rango = position.id`, `fuerza = section.kaNlSeccion`, otherwise null), exact baseline-subset/restored identities, and first-page employee order and preview salaries. Picker interactions cause no extra calculation and the entire scenario sends zero salary-save requests. Ends on a fresh page with empty picker selections and date. Focused Chromium verification with `--trace on`: **1 passed (20.1s)**. Earlier exploration counts are historical evidence; the test hard-codes no lookup IDs, labels, employee totals or subset sizes.
+
+STUDY THIS ONE AFTER CONTINUE
+
 
 #### 2.3. SI-009: Inclusive document bounds [SUPPLIED; VERIFY]
 

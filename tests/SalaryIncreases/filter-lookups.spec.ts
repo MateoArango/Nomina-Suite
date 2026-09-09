@@ -1,5 +1,4 @@
-import { expect, test } from "@playwright/test";
-import { LoginPage } from "../../pages/Login.page";
+import { expect, test } from "../fixtures/auth.fixture";
 import { SalaryIncreasesPage } from "../../pages/SalaryIncreases.page";
 
 // spec: specs/salary-increases-plan.md
@@ -18,15 +17,6 @@ type Employee = {
 test.describe("P1 - Filter controls and employee eligibility", () => {
   test("SI-007: Employee type, payment unit and profession", async ({ page }) => {
     test.setTimeout(90_000);
-    // Temporary credentials for the updated database; scoped to SI-007.
-    const loginPage = new LoginPage(page);
-    await loginPage.goto();
-    await loginPage.usernameInput.fill("SICOF");
-    await loginPage.primaryActionButton.click();
-    await loginPage.passwordInput.fill("12345");
-    await loginPage.primaryActionButton.click();
-    await page.waitForURL(url => !url.pathname.includes("/login"));
-
     const screen = new SalaryIncreasesPage(page);
     const calculateUrl = screen.apiBase + "w-aumento-sueldo/actions/calculate";
     const calculations: string[] = [];
