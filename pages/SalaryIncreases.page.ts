@@ -158,6 +158,20 @@ export class SalaryIncreasesPage {
     return this.byId(`${lookup}-option--${id}`);
   }
 
+  async selectLookupOption(
+    select: Locator,
+    option: { codigo: string; descripcion: string },
+    options: Array<{ codigo: string; descripcion: string }>,
+  ): Promise<void> {
+    const label = (value: { codigo: string; descripcion: string }) => `${value.codigo} - ${value.descripcion}`;
+    await select.click();
+    // These shared dropdown options currently have no test IDs or all-records entry.
+    const list = this.page.getByRole("listbox");
+    await expect(list.getByRole("option")).toHaveText(options.map(label));
+    await list.getByRole("option", { name: label(option), exact: true }).click();
+    await expect(select).toHaveText(label(option));
+  }
+
   pickerRow(picker: Picker, id: string | number): Locator {
     return this.byId(`filter-${picker}-row--${id}`);
   }

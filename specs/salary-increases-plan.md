@@ -2,7 +2,7 @@
 
 ## Application Overview
 
-Plan date: 2026-09-07. Status: planning complete; SI-001, SI-002, SI-003, SI-004, SI-005 and SI-006 are implemented and verified. Remaining SI scenarios are planned.
+Plan date: 2026-09-07. Status: planning complete; SI-001, SI-002, SI-003, SI-004, SI-005, SI-006 and SI-007 are implemented and verified. Remaining SI scenarios are planned.
 
 ## Scope and sources
 
@@ -175,7 +175,7 @@ Resolve numeric boundaries and rounding ties; supported context years; position/
 
 **Seed:** `tests/SalaryIncreases/seed-test.spec.ts`
 
-#### 2.1. SI-007: Employee type, payment unit and profession [DISCOVERY]
+#### 2.1. SI-007: Employee type, payment unit and profession [LIVE] ✅
 
 **File:** `tests/SalaryIncreases/filter-lookups.spec.ts`
 
@@ -185,8 +185,12 @@ Resolve numeric boundaries and rounding ties; supported context years; position/
   2. Independently select each in-scope lookup option and calculate with valid date and amount.
     - expect: Displayed selection maps to the lookup ID; payload fields tipoTercero, unidad and profesion contain the selected values.
     - expect: All returned employees satisfy the chosen filter; an option without eligible employees is tested as empty results, not a false success.
-  3. Return that control to its all-records option and recalculate.
+  3. Use Reset to restore all-records state, re-enter the same valid date and amount, and recalculate. Live discovery: these dropdowns expose no all-records option or individual clear action.
     - expect: Its payload field returns to null and the independent baseline employee set is restored.
+
+**Implementation summary:** Implemented in `tests/SalaryIncreases/filter-lookups.spec.ts` with the authentication fixture and a reusable POM lookup-selection assertion. Captures all six startup responses and derives eligible options from an independent baseline. Verifies exact runtime option labels, numeric lookup IDs in the full calculate payload, every returned employee against `kaNlTipoTercero`/`kaNlUnidad`/`kaNiProfesion`, exact baseline-subset identities, and visible preview salaries. Missing matching employees fail explicitly. Dropdown options currently lack test IDs and an all-records entry, so exact runtime accessible labels are used and Reset restores all three controls before re-entering the increase. Each restored calculation sends null filters and returns the baseline identity set. Seven calculations send zero salary-save requests. Focused Chromium verification with trace passed on 2026-09-08: **1 passed (29.8s)**.
+The test repeats the same process for employee type, payment unit and profession, selecting one runtime option per filter and testing each filter independently. It uses the initial unfiltered API results to identify the expected employees, checks that the filtered API response contains exactly that group, and compares the first page (up to 25 employees) with the UI by employee ID, row order, current salary and new salary. It then resets the filters and confirms that the API returns the original employee group before testing the next filter. Later UI pages and other options are not checked by this scenario.
+
 
 #### 2.2. SI-008: Position and section searchable pickers [PARTLY LIVE]
 
