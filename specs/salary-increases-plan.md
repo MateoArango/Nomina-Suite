@@ -256,17 +256,21 @@ The test repeats the same process for employee type, payment unit and profession
 
 **Implementation summary:** Implemented in `tests/SalaryIncreases/hire-date.spec.ts` using auth.fixture and the existing SalaryIncreasesPage. Settles six startup GET responses and derives the increase year from runtime context. Selects an interior date from distinct baseline hire dates, explicitly skipping when fewer than three dates are available. Enters and verifies dates in the UI's DD/MM/YYYY format while asserting ISO request dates. Verifies complete calculation payloads, response context, unique identities, date-only response values and first-page salary previews. The filtered identity set must exactly match employees hired on or after the threshold, with explicit before/equal/after checks; clearing restores a null bound and the complete baseline. Asserts three calculate POSTs and zero salary-save POSTs. Generator exploration confirmed inclusion and equality; focused Chromium verification with trace passed on 2026-09-10: **1 passed (16.3s)**.
 
-#### 2.5. SI-011: Combined filters intersect [DISCOVERY]
+#### 2.5. SI-011: Combined filters intersect [LIVE INTERSECTION; BASELINE EXCLUSIONS] ✅
 
 **File:** `tests/SalaryIncreases/combined-filters.spec.ts`
 
 **Steps:**
-  1. Start with a fresh authenticated browser context through auth.fixture and SalaryIncreasesPage.goto(). Choose a runtime employee and at least one near-match excluded by each chosen filter.
+  1. Start with a fresh authenticated browser context through auth.fixture and SalaryIncreasesPage.goto(). Choose a runtime employee present in all five lookups and baseline employees excluded by each chosen filter, including each document bound and hire date.
     - expect: The seed is ready, initial module traffic has settled, and this scenario does not depend on a preceding test.
   2. Combine employee type, payment unit, profession, position, section, document bounds and hire date; calculate.
     - expect: Each in-scope filter has the correct payload value; returned employees satisfy the intersection.
   3. Change one criterion to a non-matching combination and recalculate.
     - expect: The grid clears or shows the observed empty-result state; no previous employee remains eligible by accident.
+
+**Implementation summary:** Implemented in `tests/SalaryIncreases/combined-filters.spec.ts` using auth.fixture and the existing SalaryIncreasesPage. Settles six startup GET responses, derives the increase year from context, and calculates an unfiltered runtime baseline. Combines all five lookup selections, equal document bounds and the target's hire date; verifies the complete POST payload, response context, exact baseline intersection, each returned eligibility field, excluded baseline identities and first-page salary previews. Changing only profession produces HTTP 200 with empty rows, displays the empty-results dialog, clears the previous preview and disables Export/Save. Asserts exactly three calculate POSTs and zero salary-save POSTs. Missing runtime prerequisites explicitly skip. Focused Chromium verification with trace passed on 2026-09-10: **1 passed (15.8s)**.
+
+**Coverage boundary:** Live data provides baseline exclusions for every criterion, but exploration did not establish near-matches satisfying every other criterion for each filter. This verifies the combined intersection and empty-result transition; it does not independently prove every filter's necessity within the combination. The original isolated near-match fixture requirement remains unverified and requires suitable data. No shared-QA records were created or changed.
 
 #### 2.6. SI-012: Reset restores defaults and clears preview [LIVE DEFAULTS; VERIFY FULL STATE]
 
