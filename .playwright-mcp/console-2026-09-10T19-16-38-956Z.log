@@ -1,0 +1,12 @@
+[ 5472729ms] [ERROR] ERROR TypeError: Cannot read properties of null (reading 'addControl')
+    at t._setUpControl (https://nomina-qa.adacsc.co/chunk-GJDE6VQX.js:5:133174)
+    at t.ngOnChanges (https://nomina-qa.adacsc.co/chunk-GJDE6VQX.js:5:132727)
+    at t.Y0 (https://nomina-qa.adacsc.co/chunk-GJDE6VQX.js:4:22461)
+    at s_ (https://nomina-qa.adacsc.co/chunk-GJDE6VQX.js:4:24024)
+    at Q0 (https://nomina-qa.adacsc.co/chunk-GJDE6VQX.js:4:24179)
+    at Z_ (https://nomina-qa.adacsc.co/chunk-GJDE6VQX.js:4:23931)
+    at dl (https://nomina-qa.adacsc.co/chunk-GJDE6VQX.js:4:23659)
+    at cA (https://nomina-qa.adacsc.co/chunk-GJDE6VQX.js:4:63926)
+    at Yh (https://nomina-qa.adacsc.co/chunk-GJDE6VQX.js:4:64967)
+    at aD (https://nomina-qa.adacsc.co/chunk-GJDE6VQX.js:4:64799) @ https://nomina-qa.adacsc.co/chunk-GJDE6VQX.js:3
+[ 5472729ms] [ERROR] [test-id bridge][form-field-password] controles=0 @ https://nomina-qa.adacsc.co/chunk-ADJKSJMY.js:0

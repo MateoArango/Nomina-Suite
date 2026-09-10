@@ -1,0 +1,15 @@
+[       4ms] TypeError: Cannot read properties of null (reading 'appendChild')
+    at <anonymous>:6:32
+    at <anonymous>:7:7
+    at <anonymous>:8:7
+[   16735ms] TypeError: Cannot read properties of null (reading 'appendChild')
+    at <anonymous>:6:32
+    at <anonymous>:7:7
+    at <anonymous>:8:7
+[   54832ms] TypeError: Cannot read properties of null (reading 'appendChild')
+    at <anonymous>:6:32
+    at <anonymous>:7:7
+    at <anonymous>:8:7
+[   57970ms] [ERROR] [test-id bridge][select] panel abierto no encontrado: mat-select-5-panel @ https://nomina-qa.adacsc.co/chunk-ADJKSJMY.js:0
+[   58067ms] [ERROR] [test-id bridge][select] panel abierto no encontrado: mat-select-6-panel @ https://nomina-qa.adacsc.co/chunk-ADJKSJMY.js:0
+[   58167ms] [ERROR] [test-id bridge][select] panel abierto no encontrado: mat-select-7-panel @ https://nomina-qa.adacsc.co/chunk-ADJKSJMY.js:0

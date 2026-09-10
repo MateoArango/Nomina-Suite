@@ -272,10 +272,10 @@ The test repeats the same process for employee type, payment unit and profession
 
 **Coverage boundary:** Live data provides baseline exclusions for every criterion, but exploration did not establish near-matches satisfying every other criterion for each filter. This verifies the combined intersection and empty-result transition; it does not independently prove every filter's necessity within the combination. The original isolated near-match fixture requirement remains unverified and requires suitable data. No shared-QA records were created or changed.
 
-#### 2.6. SI-012: Reset restores defaults and clears preview [LIVE DEFAULTS; VERIFY FULL STATE]
+#### 2.6. SI-012: Reset restores defaults and clears preview ✅
 
 **File:** `tests/SalaryIncreases/reset-filters.spec.ts`
-[LIVE DEFAULTS; VERIFY FULL STATE] Although Rango de Sueldos is not covered, when it has values it does not resets with 'limpiar filtros'.
+**Scope boundary:** Salary-range controls remain excluded. The previously reported salary-range reset issue is not covered by this scenario.
 **Steps:**
   1. Start with a fresh authenticated browser context through auth.fixture and SalaryIncreasesPage.goto(). Populate all in-scope controls and first obtain a successful calculation.
     - expect: The seed is ready, initial module traffic has settled, and this scenario does not depend on a preceding test.
@@ -284,6 +284,10 @@ The test repeats the same process for employee type, payment unit and profession
     - expect: No module request is caused by reset.
   3. Open increases again.
     - expect: Export and Save are disabled with no current calculation; confirm selection, search and column-filter reset state explicitly.
+
+**Implementation summary:** Implemented in `tests/SalaryIncreases/reset-filters.spec.ts` with auth.fixture and SalaryIncreasesPage. Settles startup responses and derives eligible employees, lookup selections, document bounds, hire date and baseline salaries at runtime. Populates every in-scope filter, calculates successfully, selects a row, enters document search and establishes a restrictive document column filter. Dirties percentage after the successful amount calculation so both numeric controls exercise Reset without submitting their invalid combination. Verifies lookup/picker defaults and empty picker searches, blank dates/documents, zero amount/percentage, unchecked rounding, absent preview and disabled Export/Save. Reset and subsequent state inspection issue zero module requests. Recalculation checks the default request payload, restored baseline identities and first-page salaries, all rows unselected, empty search and all document-column options checked. Asserts exactly three calculate POSTs and zero salary-save POSTs; missing runtime prerequisites explicitly skip. Focused Chromium verification with trace passed on 2026-09-10: **1 passed (43.3s)**.
+
+**Observed column-filter behavior:** Unchecking the only available document option does not exclude the row. The test therefore requires multiple distinct documents sharing the selected lookup combination and verifies that the active search plus restrictive column filter hides the target before Reset.
 
 ### 3. P0 - Salary calculation and API-to-grid mapping
 
