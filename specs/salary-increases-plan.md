@@ -221,7 +221,6 @@ The test repeats the same process for employee type, payment unit and profession
 
 **Implementation summary (2026-09-09):** Implemented the single SI-008 test with reusable picker locators and retrying full-count assertions in `SalaryIncreasesPage`. Captures all six completed startup GET responses and derives each target from lookup IDs joined to baseline employees, requiring matching and excluded employees. Independently verifies search, exact empty-state text, zero no-match rows, query erasure, selection retention, reopening, and Clear with a query present. Five HTTP 200 calculations check full payloads (`rango = position.id`, `fuerza = section.kaNlSeccion`, otherwise null), exact baseline-subset/restored identities, and first-page employee order and preview salaries. Picker interactions cause no extra calculation and the entire scenario sends zero salary-save requests. Ends on a fresh page with empty picker selections and date. Focused Chromium verification with `--trace on`: **1 passed (20.1s)**. Earlier exploration counts are historical evidence; the test hard-codes no lookup IDs, labels, employee totals or subset sizes.
 
-STUDY THIS ONE AFTER CONTINUE
 
 
 #### 2.3. SI-009: Inclusive document bounds [SUPPLIED; VERIFY]
