@@ -192,7 +192,7 @@ Resolve numeric boundaries and rounding ties; supported context years; native ma
 The test repeats the same process for employee type, payment unit and profession, selecting one runtime option per filter and testing each filter independently. It uses the initial unfiltered API results to identify the expected employees, checks that the filtered API response contains exactly that group, and compares the first page (up to 25 employees) with the UI by employee ID, row order, current salary and new salary. It then resets the filters and confirms that the API returns the original employee group before testing the next filter. Later UI pages and other options are not checked by this scenario.
 
 
-#### 2.2. SI-008: Position and section searchable pickers [LIVE] ?
+#### 2.2. SI-008: Position and section searchable pickers [LIVE] ✅
 
 **File:** `tests/SalaryIncreases/filter-pickers.spec.ts`
 
@@ -223,17 +223,22 @@ The test repeats the same process for employee type, payment unit and profession
 
 
 
-#### 2.3. SI-009: Inclusive document bounds [SUPPLIED; VERIFY]
+#### 2.3. SI-009: Inclusive document bounds [LIVE] ✅
 
 **File:** `tests/SalaryIncreases/document-range.spec.ts`
 
 **Steps:**
-  1. Start with a fresh authenticated browser context through auth.fixture and SalaryIncreasesPage.goto(). Choose runtime employee documents; compare values numerically, not lexicographically.
+  1. Start with a fresh authenticated browser context through auth.fixture and SalaryIncreasesPage.goto(). Fetch fresh employee records on every run from GET https://nomina-qa-api.adacsc.co/api/v1/w-empleados-p/rows without filters. The observed response is an array without pagination metadata and is not ordered by numeric nNit. Verify unique identities and coverage of every eligible baseline employee, exclude missing documents from candidates, and explicitly sort candidate documents numerically.
     - expect: The seed is ready, initial module traffic has settled, and this scenario does not depend on a preceding test.
+    - expect: HTTP 200 supplies current candidate document numbers without hardcoded records. Guard the observed array/no-pagination-metadata contract; if pagination is introduced, update retrieval before selecting bounds. Baseline coverage establishes completeness for this scenario's eligible population, not an independently verified global employee total.
+    - expect: Calculate an unfiltered salary baseline with the same calculation inputs used below. Select candidate documents from employee records also present in that baseline, using the baseline as the expected eligible population. Choose existing endpoints with employees inside and outside the range; require sufficient runtime data to prove inclusion and exclusion.
   2. Calculate independently with equal start/end, lower bound only, upper bound only, and both ordered bounds.
     - expect: Payload nitInicial/nitFinal reflects inputs; equal bounds return only the matching document and ordered bounds include endpoints.
+    - expect: For each calculation, returned employee identities equal the exact baseline subset selected by the inclusive numeric document bounds, with all other inputs unchanged.
   3. Reverse the bounds and use a valid non-matching range.
-    - expect: Record actual reverse-range validation versus empty-result behavior before fixing its expectation; a non-matching range never reuses stale rows.
+    - expect: Both reversed and non-matching ranges return HTTP 200 with empty rows and show the empty-results dialog. After dismissal, the increases grid has no visible rows and Export/Save are disabled. Repopulate the preview before the non-matching case so both cases prove stale-row clearing.
+
+**Implementation summary:** Implemented in `tests/SalaryIncreases/document-range.spec.ts` using auth.fixture and the existing SalaryIncreasesPage. Settles six startup responses, fetches fresh unfiltered employee records using current authenticated request headers, validates eligible-population coverage, and sorts runtime document candidates numerically. Checks equal, lower-only, upper-only and ordered bounds against exact baseline identity subsets, full unchanged calculation payloads, response context and first-page salary previews. Reversed and non-matching ranges each clear a populated preview. Missing shared-QA baseline/candidate prerequisites are explicitly skipped. Eight calculate POSTs and zero salary-save POSTs are asserted. Generator exploration completed; focused Chromium verification with trace passed on 2026-09-10: **1 passed (15.0s)**.
 
 #### 2.4. SI-010: Hire-date lower bound and equality [PARTLY LIVE]
 
