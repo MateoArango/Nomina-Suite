@@ -240,7 +240,7 @@ The test repeats the same process for employee type, payment unit and profession
 
 **Implementation summary:** Implemented in `tests/SalaryIncreases/document-range.spec.ts` using auth.fixture and the existing SalaryIncreasesPage. Settles six startup responses, fetches fresh unfiltered employee records using current authenticated request headers, validates eligible-population coverage, and sorts runtime document candidates numerically. Checks equal, lower-only, upper-only and ordered bounds against exact baseline identity subsets, full unchanged calculation payloads, response context and first-page salary previews. Reversed and non-matching ranges each clear a populated preview. Missing shared-QA baseline/candidate prerequisites are explicitly skipped. Eight calculate POSTs and zero salary-save POSTs are asserted. Generator exploration completed; focused Chromium verification with trace passed on 2026-09-10: **1 passed (15.0s)**.
 
-#### 2.4. SI-010: Hire-date lower bound and equality [PARTLY LIVE]
+#### 2.4. SI-010: Hire-date lower bound and equality [LIVE] ✅
 
 **File:** `tests/SalaryIncreases/hire-date.spec.ts`
 
@@ -253,6 +253,8 @@ The test repeats the same process for employee type, payment unit and profession
   3. Clear the hire-date input and calculate again.
     - expect: The request restores null and returns the baseline set when the underlying data is unchanged.
     - expect: Live exploration narrowed 155 employees to 3 at 2026-01-01; these are evidence values only.
+
+**Implementation summary:** Implemented in `tests/SalaryIncreases/hire-date.spec.ts` using auth.fixture and the existing SalaryIncreasesPage. Settles six startup GET responses and derives the increase year from runtime context. Selects an interior date from distinct baseline hire dates, explicitly skipping when fewer than three dates are available. Enters and verifies dates in the UI's DD/MM/YYYY format while asserting ISO request dates. Verifies complete calculation payloads, response context, unique identities, date-only response values and first-page salary previews. The filtered identity set must exactly match employees hired on or after the threshold, with explicit before/equal/after checks; clearing restores a null bound and the complete baseline. Asserts three calculate POSTs and zero salary-save POSTs. Generator exploration confirmed inclusion and equality; focused Chromium verification with trace passed on 2026-09-10: **1 passed (16.3s)**.
 
 #### 2.5. SI-011: Combined filters intersect [DISCOVERY]
 
