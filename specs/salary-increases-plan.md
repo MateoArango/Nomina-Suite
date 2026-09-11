@@ -375,7 +375,7 @@ Use document bounds 1 through 1, after verifying that the runtime baseline conta
 
 **Seed:** `tests/SalaryIncreases/seed-test.spec.ts`
 
-#### 4.1. SI-017: All page sizes and navigation [LIVE CONTROLS; VERIFY MATRIX]
+#### 4.1. SI-017: All page sizes and navigation [LIVE] ✅
 
 **File:** `tests/SalaryIncreases/grid-pagination.spec.ts`
 
@@ -389,7 +389,9 @@ Use document bounds 1 through 1, after verifying that the runtime baseline conta
     - expect: Previous/Next are disabled at their boundaries; pagination does not recalculate or save.
     - expect: If data is insufficient, annotate the unavailable branch instead of passing unexercised cross-page assertions.
 
-#### 4.2. SI-018: Single selection and cross-page select-all [LIVE]
+**Implementation summary:** Implemented `tests/SalaryIncreases/grid-pagination.spec.ts` with the existing authentication fixture and SalaryIncreasesPage. Settles all six startup GETs, derives the increase date year from context, and verifies one successful calculate POST with the complete payload and matching response context. For sizes 10/25/50/100, compares every visible employee identity in response order on every forward and backward page, verifies pager ranges and final-page remainders, retained hidden DOM rows, and Previous/Next boundary states. Pagination sends no additional calculation or salary-save requests. Explicitly skips when runtime data has at most 100 rows. Generator exploration confirmed all branches with 156 runtime rows; totals and identities are not hard-coded. Focused Chromium verification with trace passed on 2026-09-11: **1 passed (3.6m)**. An initial run exceeded its timeout while repeating salary-format checks; the final test focuses on pagination and uses a four-minute timeout for the full traced matrix.
+
+#### 4.2. SI-018: Single selection and cross-page select-all [LIVE] ✅
 
 **File:** `tests/SalaryIncreases/grid-selection.spec.ts`
 
@@ -401,6 +403,8 @@ Use document bounds 1 through 1, after verifying that the runtime baseline conta
   3. Toggle Select/Deselect all and inspect later and final pages; toggle again.
     - expect: All result identities are selected across pages, then all are deselected.
     - expect: Selection is client-side and sends neither calculate nor grabar.
+
+**Implementation summary:** Implemented `tests/SalaryIncreases/grid-selection.spec.ts` using the existing authentication fixture and SalaryIncreasesPage. Settles all six startup GETs, derives the increase date year from context, and verifies one successful calculate POST with its complete payload and matching response context. Uses runtime employee identities to verify initial deselection, single-row selection retained after navigating away and back, and select-all across every result, including hidden DOM rows. Inspects each later page through the final page, deselects all from the final page, and verifies every page while returning to the first. Selection and navigation emit no additional calculate or salary-save requests. Explicitly skips when QA has at most 25 calculated employees. Generator exploration confirmed the behavior with 156 runtime rows; no identities or counts are hard-coded. Focused Chromium verification with trace passed on 2026-09-11: **1 passed (1.3m)**.
 
 #### 4.3. SI-019: Client-side search and clearing [LIVE DOCUMENT; VERIFY OTHER FIELDS]
 
