@@ -406,7 +406,7 @@ Use document bounds 1 through 1, after verifying that the runtime baseline conta
 
 **Implementation summary:** Implemented `tests/SalaryIncreases/grid-selection.spec.ts` using the existing authentication fixture and SalaryIncreasesPage. Settles all six startup GETs, derives the increase date year from context, and verifies one successful calculate POST with its complete payload and matching response context. Uses runtime employee identities to verify initial deselection, single-row selection retained after navigating away and back, and select-all across every result, including hidden DOM rows. Inspects each later page through the final page, deselects all from the final page, and verifies every page while returning to the first. Selection and navigation emit no additional calculate or salary-save requests. Explicitly skips when QA has at most 25 calculated employees. Generator exploration confirmed the behavior with 156 runtime rows; no identities or counts are hard-coded. Focused Chromium verification with trace passed on 2026-09-11: **1 passed (1.3m)**.
 
-#### 4.3. SI-019: Client-side search and clearing [LIVE DOCUMENT; VERIFY OTHER FIELDS]
+#### 4.3. SI-019: Client-side search and clearing [LIVE] ✅
 
 **File:** `tests/SalaryIncreases/grid-search.spec.ts`
 
@@ -414,11 +414,13 @@ Use document bounds 1 through 1, after verifying that the runtime baseline conta
   1. Start with a fresh authenticated browser context through auth.fixture and SalaryIncreasesPage.goto(). Calculate multiple distinct employees; capture runtime document, name and position search values.
     - expect: The seed is ready, initial module traffic has settled, and this scenario does not depend on a preceding test.
   2. Open search and independently enter document, name fragment and position fragment.
-    - expect: Document search filters visible rows; establish matching and case/accent rules for other fields before strict assertions.
+    - expect: Document, name and position use case-insensitive substring matching; accents remain significant. Clear between independent queries. Case-only query changes preserve the current page; clearing preserves a valid page rather than always resetting it.
     - expect: Filtering sends no new calculation or save request.
   3. Enter a guaranteed non-match, then clear and close the search.
     - expect: Empty search results contain no stale visible employees; clearing restores the calculated set and valid pager position.
     - expect: Search Find/Next action buttons remain out of scope.
+
+**Implementation summary:** Implemented one standalone test in `tests/SalaryIncreases/grid-search.spec.ts` using shared authentication, the existing POM, six completed startup responses, and a context-derived increase date. Verifies the complete calculate payload, HTTP 200 and response context. Derives document, name, multi-page position and accented-name queries from runtime employees; missing prerequisites explicitly skip. Checks exact filtered identities in response order across every result page for document, upper/lowercase name and position fragments, and accented versus unaccented name variants. Returns to the first page between independent searches because Clear preserves a valid current page. A guaranteed non-match leaves zero visible employees and disabled navigation; clearing and closing search restore the full baseline, verified across every page. Exactly one calculation and zero salary-save requests. Generator exploration and focused runs resolved case/accent and pagination behavior; earlier runs exposed incorrect test assumptions about Clear availability and page reset. Discovery: **1 test**. Focused Chromium verification with trace on 2026-09-11: **1 passed (1.6m)**.
 
 #### 4.4. SI-020: Column filtering and sorting [DISCOVERY EXTENSION]
 
