@@ -293,9 +293,11 @@ The test repeats the same process for employee type, payment unit and profession
 
 **Seed:** `tests/SalaryIncreases/seed-test.spec.ts`
 
-#### 3.1. SI-013: Fixed amount salary preview [LIVE]
+#### 3.1. SI-013: Fixed amount salary preview ✅
 
-**File:** `tests/SalaryIncreases/calculation.spec.ts`
+**File:** `tests/SalaryIncreases/fixed-amount-salary-preview.spec.ts`
+
+**Implemented / verified (2026-09-11):** Shared authentication and settled startup responses; context-year date, fixed amount 100, percentage zero, rounding and points off. Asserts the exact calculate payload, HTTP 200/context, ordinary non-points salary arithmetic, unique runtime employee IDs, every visible identity/description/date/salary cell, selected increases tab, response-derived pagination total, and zero save requests. Live response contained 156 rows with 25 visible; hire dates render as ISO dates and null descriptions as hyphens. Focused Chromium run: **1 passed** (6.8s).
 
 For the percentage with '-1' appears 'Aumento de sueldos
 Se debe registrar valor a incrementar o porcentaje a incrementar'
