@@ -354,11 +354,11 @@ Se debe registrar valor a incrementar o porcentaje a incrementar'
 
 **Implementation summary:** Implemented one standalone test in `tests/SalaryIncreases/rounding.spec.ts` using shared authentication, the existing POM, six settled startup responses, and a context-supported date. Discovers an ordinary employee at runtime and derives four fixed amounts for paired rounding-off/on calculations, keeping percentage zero and points disabled. Asserts complete calculate payloads and that only `aproximarCien` changes within each pair, HTTP 200/context, unchanged full employee identity/current-salary sets, independent ordinary-row arithmetic, hundred alignment, and salary rendering across every grid page. Live generator exploration confirmed positive ties round upward for both even and odd hundreds; missing eligible employees explicitly skip. Zero salary-save requests. Discovery: **1 test**. Focused Chromium verification with trace on 2026-09-11: **1 passed (55.9s)**.
 
-#### 3.4. SI-016: No eligible employees clears stale calculation [SUPPLIED; PARTLY LIVE]
+#### 3.4. SI-016: No eligible employees clears stale calculation [LIVE] ✅
 
 **File:** `tests/SalaryIncreases/empty-results.spec.ts`
 
-With CC 1 for both fields can you find 0 results.
+Use document bounds 1 through 1, after verifying that the runtime baseline contains no eligible employee with document 1.
 
 **Steps:**
   1. Start with a fresh authenticated browser context through auth.fixture and SalaryIncreasesPage.goto(). First obtain results, then choose a valid non-matching document range.
@@ -368,6 +368,8 @@ With CC 1 for both fields can you find 0 results.
   3. Inspect the increases grid and actions.
     - expect: Old rows and selections are gone; Export is disabled, as observed for the initial/reset empty state.
     - expect: No download or salary-save request can be triggered from the empty state.
+
+**Implementation summary:** Implemented one standalone test in `tests/SalaryIncreases/empty-results.spec.ts` using shared authentication, the existing POM, six completed startup responses, and a context-supported date. Obtains a nonempty runtime preview, verifies first-page salaries, selects an employee, and changes only document bounds to 1 through 1. Missing baseline or nonmatching-range prerequisites explicitly skip. Both calculate POSTs verify full payloads, HTTP 200 and response context; the second returns an empty rows array. Live generator exploration confirmed that the increases tab becomes selected and an information dialog explains that no employees match the current filter. The test asserts the exact observed dialog message, dismisses it, and verifies removal of the entire table, all row nodes, and the selected employee checkbox. Export and Save are disabled and ignore native clicks; tab navigation retains the empty state. Exactly two calculations, zero downloads and zero salary-save requests. Focused Chromium verification with trace on 2026-09-11: **1 passed (16.8s)**.
 
 ### 4. P1 - Grid, search, selection and undo
 
