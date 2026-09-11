@@ -297,11 +297,6 @@ The test repeats the same process for employee type, payment unit and profession
 
 **File:** `tests/SalaryIncreases/fixed-amount-salary-preview.spec.ts`
 
-**Implemented / verified (2026-09-11):** Shared authentication and settled startup responses; context-year date, fixed amount 100, percentage zero, rounding and points off. Asserts the exact calculate payload, HTTP 200/context, ordinary non-points salary arithmetic, unique runtime employee IDs, every visible identity/description/date/salary cell, selected increases tab, response-derived pagination total, and zero save requests. Live response contained 156 rows with 25 visible; hire dates render as ISO dates and null descriptions as hyphens. Focused Chromium run: **1 passed** (6.8s).
-
-For the percentage with '-1' appears 'Aumento de sueldos
-Se debe registrar valor a incrementar o porcentaje a incrementar'
-
 **Steps:**
   1. Start with a fresh authenticated browser context through auth.fixture and SalaryIncreasesPage.goto(). Choose ordinary non-points employees with a numeric monthly salary; use a supported date and rounding off.
     - expect: The seed is ready, initial module traffic has settled, and this scenario does not depend on a preceding test.
@@ -312,7 +307,9 @@ Se debe registrar valor a incrementar o porcentaje a incrementar'
     - expect: Employee identity, document, descriptive fields, hire date, old salary and new salary match the API with the UI's formatting.
     - expect: The increases tab is selected and totals derive from rows.length.
 
-#### 3.2. SI-014: Percentage salary preview [LIVE MODE; VERIFY PRECISION]
+**Implementation summary:** Shared authentication and settled startup responses; context-year date, fixed amount 100, percentage zero, rounding and points off. Asserts the exact calculate payload, HTTP 200/context, ordinary non-points salary arithmetic, unique runtime employee IDs, every visible identity/description/date/salary cell, selected increases tab, response-derived pagination total, and zero save requests. Live response contained 156 rows with 25 visible; hire dates render as ISO dates and null descriptions as hyphens. Focused Chromium run: **1 passed** (6.8s).
+
+#### 3.2. SI-014: Percentage salary preview [LIVE] ✅
 
 **File:** `tests/SalaryIncreases/calculation.spec.ts`
 
@@ -321,6 +318,14 @@ Se debe registrar valor a incrementar o porcentaje a incrementar'
 
 - Percentages with decimal numbers
 
+**Rounding observation for SI-014 (2026-09-11):**
+
+- With nearest-hundred rounding disabled, percentage salary previews round to the nearest integer and display no decimals.
+- At **1.02%**, `9,545,928 × 1.0102 = 9,643,296.4656` displays as **9,643,296**.
+- At **1.02%**, `2,899,697 × 1.0102 = 2,929,273.9094` displays as **2,929,274**, confirming rounding rather than truncation.
+- Integer rounding is separate from the nearest-hundred checkbox. SI-014 covers integer rounding with the checkbox disabled; SI-015 covers rounding to hundreds with it enabled.
+
+
 **Steps:**
   1. Start with a fresh authenticated browser context through auth.fixture and SalaryIncreasesPage.goto(). Set amount to zero; use ordinary employees and rounding off.
     - expect: The seed is ready, initial module traffic has settled, and this scenario does not depend on a preceding test.
@@ -328,7 +333,10 @@ Se debe registrar valor a incrementar o porcentaje a incrementar'
     - expect: Payload porcentaje is numeric and valor is 0; request succeeds.
     - expect: Preview follows the confirmed percentage precision rule; independently calculate expected values rather than only comparing UI to API.
   3. Exercise a fractional percentage and salaries producing fractional results.
-    - expect: Document and assert the actual cents/integer rounding policy once verified; do not infer it from one rounded sample.
+    - expect: With nearest-hundred rounding disabled, independently calculate expected percentage results and assert nearest-integer previews with no decimals. Cover fractional parts below and above .5 using runtime salaries; verify exact .5 tie handling separately.
+    - expect: Inspect calculate response precision separately from UI formatting to establish whether the API also rounds to integers.
+
+**Implementation summary:** Implemented one standalone test in `tests/SalaryIncreases/calculation.spec.ts` with shared authentication and all six startup responses settled. Uses a context-supported date, amount zero, percentages 5 and 1.02, and rounding/points disabled. Asserts exact calculate method/path/payload, HTTP 200 and response context. Independently computes ordinary employee results using integer arithmetic: the API itself rounds to the nearest integer, with positive exact .5 ties rounded upward. Runtime coverage requires fractional results below and above .5 at 1.02%, plus exact ties with both even and odd integer parts to distinguish half-up from half-even; missing prerequisites explicitly skip. Verifies current and independently expected new salaries without decimals by employee identity across every grid page, and zero salary-save requests. Live generator exploration completed; focused Chromium verification with trace on 2026-09-11: **1 passed (21.6s)**. Negative percentage validation remains covered by SI-004.
 
 #### 3.3. SI-015: Nearest-hundred payload and arithmetic [PARTLY LIVE]
 
