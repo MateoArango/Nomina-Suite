@@ -338,7 +338,7 @@ Se debe registrar valor a incrementar o porcentaje a incrementar'
 
 **Implementation summary:** Implemented one standalone test in `tests/SalaryIncreases/calculation.spec.ts` with shared authentication and all six startup responses settled. Uses a context-supported date, amount zero, percentages 5 and 1.02, and rounding/points disabled. Asserts exact calculate method/path/payload, HTTP 200 and response context. Independently computes ordinary employee results using integer arithmetic: the API itself rounds to the nearest integer, with positive exact .5 ties rounded upward. Runtime coverage requires fractional results below and above .5 at 1.02%, plus exact ties with both even and odd integer parts to distinguish half-up from half-even; missing prerequisites explicitly skip. Verifies current and independently expected new salaries without decimals by employee identity across every grid page, and zero salary-save requests. Live generator exploration completed; focused Chromium verification with trace on 2026-09-11: **1 passed (21.6s)**. Negative percentage validation remains covered by SI-004.
 
-#### 3.3. SI-015: Nearest-hundred payload and arithmetic [PARTLY LIVE]
+#### 3.3. SI-015: Nearest-hundred payload and arithmetic [LIVE] ✅
 
 **File:** `tests/SalaryIncreases/rounding.spec.ts`
 
@@ -349,8 +349,10 @@ Se debe registrar valor a incrementar o porcentaje a incrementar'
     - expect: Payload aproximarCien changes false to true; other calculation inputs remain identical.
     - expect: The enabled calculation returns hundred-aligned previews for ordinary salary rows.
   3. Use values just below, exactly at, and just above the half-hundred boundary.
-    - expect: Verify the independently established nearest-hundred and tie-breaking rule.
-    - expect: The observed percentage example 2902604 at 5 percent produced 3047700 with rounding on; this single example does not settle ties.
+    - expect: Ordinary positive fixed-amount results round to the nearest hundred, with exact half-hundred ties rounded upward. Derive amounts from a runtime salary to produce endings 49, 50, and 51; test another tie one hundred higher to distinguish half-up from half-even.
+    - expect: Verify the independent formula against all ordinary API rows and displayed salaries across every grid page; no salary-save request occurs.
+
+**Implementation summary:** Implemented one standalone test in `tests/SalaryIncreases/rounding.spec.ts` using shared authentication, the existing POM, six settled startup responses, and a context-supported date. Discovers an ordinary employee at runtime and derives four fixed amounts for paired rounding-off/on calculations, keeping percentage zero and points disabled. Asserts complete calculate payloads and that only `aproximarCien` changes within each pair, HTTP 200/context, unchanged full employee identity/current-salary sets, independent ordinary-row arithmetic, hundred alignment, and salary rendering across every grid page. Live generator exploration confirmed positive ties round upward for both even and odd hundreds; missing eligible employees explicitly skip. Zero salary-save requests. Discovery: **1 test**. Focused Chromium verification with trace on 2026-09-11: **1 passed (55.9s)**.
 
 #### 3.4. SI-016: No eligible employees clears stale calculation [SUPPLIED; PARTLY LIVE]
 
