@@ -422,18 +422,24 @@ Use document bounds 1 through 1, after verifying that the runtime baseline conta
 
 **Implementation summary:** Implemented one standalone test in `tests/SalaryIncreases/grid-search.spec.ts` using shared authentication, the existing POM, six completed startup responses, and a context-derived increase date. Verifies the complete calculate payload, HTTP 200 and response context. Derives document, name, multi-page position and accented-name queries from runtime employees; missing prerequisites explicitly skip. Checks exact filtered identities in response order across every result page for document, upper/lowercase name and position fragments, and accented versus unaccented name variants. Returns to the first page between independent searches because Clear preserves a valid current page. A guaranteed non-match leaves zero visible employees and disabled navigation; clearing and closing search restore the full baseline, verified across every page. Exactly one calculation and zero salary-save requests. Generator exploration and focused runs resolved case/accent and pagination behavior; earlier runs exposed incorrect test assumptions about Clear availability and page reset. Discovery: **1 test**. Focused Chromium verification with trace on 2026-09-11: **1 passed (1.6m)**.
 
-#### 4.4. SI-020: Column filtering and sorting [DISCOVERY EXTENSION]
+#### 4.4. SI-020: Identification column sorting and value filtering ✅ [LIVE]
 
 **File:** `tests/SalaryIncreases/grid-columns.spec.ts`
 
 **Steps:**
-  1. Start with a fresh authenticated browser context through auth.fixture and SalaryIncreasesPage.goto(). Calculate distinguishable text, numeric, date and nullable values.
+  1. Start with a fresh authenticated browser context through auth.fixture and SalaryIncreasesPage.goto(). Calculate a runtime set with at least three distinct numeric Identification values, with no active search or column filters.
     - expect: The seed is ready, initial module traffic has settled, and this scenario does not depend on a preceding test.
-  2. Open each representative column menu; apply one value filter, clear it, and sort ascending/descending.
-    - expect: Filtered identities and numeric/date ordering follow the column's value type; nulls follow a captured stable policy.
-  3. Combine two column filters with text search and clear them independently.
-    - expect: The resulting set is their intersection; clearing one preserves the other conditions.
-    - expect: Selection and totals remain consistent, and no calculate/save request is emitted.
+    - expect: Missing runtime data prerequisites explicitly skip with a specific reason.
+  2. Open the Identification column menu and independently verify ascending and descending sorting on the unfiltered calculated set.
+    - expect: Identification values follow numeric order from lowest to highest, then highest to lowest, across result pages.
+  3. In the Identification column menu, use its select-all checkbox to uncheck all values, then check two or three distinct runtime-derived IDs, leaving at least one other ID excluded.
+    - expect: The complete filtered table contains exactly the chosen IDs, with no missing or extra records; compare identities independently of the preceding sort direction.
+    - expect: These column-menu checkboxes filter displayed records; they are separate from the grid's employee selection checkboxes.
+    - expect: Sorting and column filtering emit no additional calculate or save request.
+
+**Scope:** Identification only. Combined column filters and combinations with text search are outside this scenario. The reported issue where a second column filter overrides the first remains outside this coverage.
+
+**Implementation summary:** Implemented one standalone test in `tests/SalaryIncreases/grid-columns.spec.ts` using shared authentication, the existing POM, six completed startup GET responses, and a context-derived increase year. Verifies the full calculate payload, HTTP 200 and response context. Requires at least three distinct safe numeric Identification values, with explicit prerequisite skips. Checks baseline identities and numeric ascending/descending order across every result page at page size 25, including displayed Identification values and unchecked employee selection controls. Unchecks the column menu's select-all checkbox, chooses two or three runtime-derived values while excluding another, and compares the complete filtered employee identity set independently of sort direction. Exactly one calculation and zero salary-save requests. Live exploration covered 156 employees; this count is not a fixture. The first focused run exposed an incorrect Escape-to-close assumption; the verified menu toggle now closes the menu. Discovery: **1 test**. Scoped TypeScript check: **passed**. Focused Chromium verification with trace on 2026-09-11: **1 passed (1.9m)**.
 
 #### 4.5. SI-021: Select-all with active search or column filters [SUPPLIED; VERIFY]
 
