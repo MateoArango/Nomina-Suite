@@ -22,11 +22,11 @@ type SavePayload = {
 
 const conceptCode = "1001";
 const conceptName = "SUELDO ORDINARIO ADMINISTRATIVO";
-const pageUrl = "https://nomina-qa.adacsc.co/priorizacion-conceptos";
+const pageUrl = "https://nomina-qa2.adacsc.co/priorizacion-conceptos";
 const rowsUrl =
-  "https://nomina-qa-api.adacsc.co/api/v1/w-priorizacion-conceptos/rows";
+  "https://nomina-qa2-api.adacsc.co/api/v1/w-priorizacion-conceptos/rows";
 const saveUrl =
-  "https://nomina-qa-api.adacsc.co/api/v1/w-priorizacion-conceptos/actions/grabar";
+  "https://nomina-qa2-api.adacsc.co/api/v1/w-priorizacion-conceptos/actions/grabar";
 
 async function readRows(response: Response): Promise<PrioritizedConcept[]> {
   expect(response.ok()).toBe(true);

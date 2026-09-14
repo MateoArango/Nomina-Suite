@@ -8,7 +8,7 @@ type LiquidationPeriodRecord = {
   kaNlPeriodo: number;
 };
 
-const applicationUrl = "https://nomina-qa.adacsc.co/periodos-liq";
+const applicationUrl = "https://nomina-qa2.adacsc.co/periodos-liq";
 
 function isRowsRequest(url: URL): boolean {
   return url.pathname.endsWith("/w-periodos-liq/rows");

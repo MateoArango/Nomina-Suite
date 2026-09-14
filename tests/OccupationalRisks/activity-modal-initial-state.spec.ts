@@ -11,7 +11,7 @@ type Activity = {
 };
 
 const activitiesUrl =
-  "https://nomina-qa-api.adacsc.co/api/v1/w-riesgos-profesionales/lookups/dddw-actividad-riesgo";
+  "https://nomina-qa2-api.adacsc.co/api/v1/w-riesgos-profesionales/lookups/dddw-actividad-riesgo";
 
 test.describe("Activity lookup and modal behavior", () => {
   test("RP-013: Activity modal loads and maps runtime lookup data", async ({
@@ -26,7 +26,7 @@ test.describe("Activity lookup and modal behavior", () => {
         response.request().method() === "GET",
     );
 
-    await page.goto("https://nomina-qa.adacsc.co/riesgos-profesionales");
+    await page.goto("https://nomina-qa2.adacsc.co/riesgos-profesionales");
     await risksPage.createButton.click();
     const originalActivityValue = await risksPage.activityInput.inputValue();
     await risksPage.openActivityModalButton.click();

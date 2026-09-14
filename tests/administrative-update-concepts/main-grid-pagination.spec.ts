@@ -12,7 +12,7 @@ type AdministrativeConcept = {
 type PageSize = 10 | 25 | 50 | 100;
 
 const rowsUrl =
-  "https://nomina-qa-api.adacsc.co/api/v1/w-conceptos-nov-ad/rows";
+  "https://nomina-qa2-api.adacsc.co/api/v1/w-conceptos-nov-ad/rows";
 
 function persistedIdentity(concept: AdministrativeConcept): string {
   return `${concept.kaNlConceptoContable}-${concept.codigoNovedad.toLowerCase()}`;
@@ -94,7 +94,7 @@ test.describe("Runtime grid and local state", () => {
       response =>
         response.url() === rowsUrl && response.request().method() === "GET",
     );
-    await page.goto("https://nomina-qa.adacsc.co/conceptos-nov-ad");
+    await page.goto("https://nomina-qa2.adacsc.co/conceptos-nov-ad");
 
     const rowsResponse = await rowsResponsePromise;
     expect(rowsResponse.ok()).toBe(true);

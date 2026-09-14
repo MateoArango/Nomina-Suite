@@ -6,9 +6,9 @@ import { expect, test } from "../fixtures/auth.fixture";
 import { RiesgosProfesionalesPage } from "../../pages/RiesgosProfesionales.page";
 
 const rowsUrl =
-  "https://nomina-qa-api.adacsc.co/api/v1/w-riesgos-profesionales/rows";
+  "https://nomina-qa2-api.adacsc.co/api/v1/w-riesgos-profesionales/rows";
 const saveUrl =
-  "https://nomina-qa-api.adacsc.co/api/v1/w-riesgos-profesionales/actions/grabar";
+  "https://nomina-qa2-api.adacsc.co/api/v1/w-riesgos-profesionales/actions/grabar";
 
 const validationCases = [
   {
@@ -51,7 +51,7 @@ test.describe("Validation and backend error contracts", () => {
       response =>
         response.url() === rowsUrl && response.request().method() === "GET",
     );
-    await page.goto("https://nomina-qa.adacsc.co/riesgos-profesionales");
+    await page.goto("https://nomina-qa2.adacsc.co/riesgos-profesionales");
 
     const rowsResponse = await rowsResponsePromise;
     expect(rowsResponse.ok()).toBe(true);

@@ -14,7 +14,7 @@ export type SalaryIncreaseColumn =
 // IDs come from the salary increase screen and its shared picker/pager components.
 // Conditional results and dialog controls are available only in their respective states.
 export class SalaryIncreasesPage {
-  readonly apiBase = "https://nomina-qa-api.adacsc.co/api/v1/";
+  readonly apiBase = "https://nomina-qa2-api.adacsc.co/api/v1/";
   readonly loadingStrip: Locator;
   readonly toolbar: Locator;
   readonly tabs: Locator;
@@ -142,7 +142,7 @@ export class SalaryIncreasesPage {
   }
 
   async goto(): Promise<void> {
-    await this.page.goto("https://nomina-qa.adacsc.co/aumento-sueldo");
+    await this.page.goto("https://nomina-qa2.adacsc.co/aumento-sueldo");
     await this.filterTab.waitFor({ state: "visible" });
   }
 

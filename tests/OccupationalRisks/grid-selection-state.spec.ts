@@ -6,9 +6,9 @@ import type { Request } from "@playwright/test";
 import { RiesgosProfesionalesPage } from "../../pages/RiesgosProfesionales.page";
 
 const rowsUrl =
-  "https://nomina-qa-api.adacsc.co/api/v1/w-riesgos-profesionales/rows";
+  "https://nomina-qa2-api.adacsc.co/api/v1/w-riesgos-profesionales/rows";
 const deleteUrl =
-  "https://nomina-qa-api.adacsc.co/api/v1/w-riesgos-profesionales/actions/borrar";
+  "https://nomina-qa2-api.adacsc.co/api/v1/w-riesgos-profesionales/actions/borrar";
 
 test.describe("Initial state, API mapping, and non-mutating grid behavior", () => {
   test("RP-005: Individual selection controls Delete Selected without deleting data", async ({
@@ -27,7 +27,7 @@ test.describe("Initial state, API mapping, and non-mutating grid behavior", () =
       response =>
         response.url() === rowsUrl && response.request().method() === "GET",
     );
-    await page.goto("https://nomina-qa.adacsc.co/riesgos-profesionales");
+    await page.goto("https://nomina-qa2.adacsc.co/riesgos-profesionales");
 
     const rowsResponse = await rowsResponsePromise;
     expect(rowsResponse.ok()).toBe(true);

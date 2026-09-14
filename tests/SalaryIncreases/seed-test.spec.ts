@@ -9,7 +9,7 @@ test.describe("Salary Increases", () => {
     await salaryIncreasesPage.goto();
 
     // 2. Verify the page and its default filter tab.
-    await expect(page).toHaveURL("https://nomina-qa.adacsc.co/aumento-sueldo");
+    await expect(page).toHaveURL("https://nomina-qa2.adacsc.co/aumento-sueldo");
     await expect(salaryIncreasesPage.toolbar).toBeVisible();
     await expect(salaryIncreasesPage.filterTab).toHaveAttribute("aria-selected", "true");
     await expect(salaryIncreasesPage.increasesTab).toHaveAttribute("aria-selected", "false");

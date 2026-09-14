@@ -10,11 +10,11 @@ type PeriodTypeLookup = {
   texto: string;
 };
 
-const applicationUrl = "https://nomina-qa.adacsc.co/periodos-liq";
+const applicationUrl = "https://nomina-qa2.adacsc.co/periodos-liq";
 const contextUrl =
-  "https://nomina-qa-api.adacsc.co/api/v1/w-periodos-liq/context";
+  "https://nomina-qa2-api.adacsc.co/api/v1/w-periodos-liq/context";
 const periodTypesUrl =
-  "https://nomina-qa-api.adacsc.co/api/v1/w-periodos-liq/lookups/dw-tipos-periodo";
+  "https://nomina-qa2-api.adacsc.co/api/v1/w-periodos-liq/lookups/dw-tipos-periodo";
 
 test.describe("Initial state and period-type loading", () => {
   test("LP-001: Initial load requires an explicit period type", async ({

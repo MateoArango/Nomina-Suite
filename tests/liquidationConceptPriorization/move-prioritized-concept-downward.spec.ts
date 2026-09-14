@@ -10,7 +10,7 @@ type PrioritizedConcept = {
 };
 
 const rowsUrl =
-  "https://nomina-qa-api.adacsc.co/api/v1/w-priorizacion-conceptos/rows";
+  "https://nomina-qa2-api.adacsc.co/api/v1/w-priorizacion-conceptos/rows";
 
 test.describe("Liquidation Concept Prioritization", () => {
   test("PLC-006: Move a prioritized concept downward", async ({ page }) => {
@@ -20,7 +20,7 @@ test.describe("Liquidation Concept Prioritization", () => {
         response.url() === rowsUrl && response.request().method() === "GET",
     );
 
-    await page.goto("https://nomina-qa.adacsc.co/priorizacion-conceptos");
+    await page.goto("https://nomina-qa2.adacsc.co/priorizacion-conceptos");
     await expect(page).toHaveURL(/\/priorizacion-conceptos/);
 
     const rowsResponse = await rowsResponsePromise;

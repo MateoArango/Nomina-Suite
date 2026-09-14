@@ -17,9 +17,9 @@ type ApiError = {
 };
 
 const rowsUrl =
-  "https://nomina-qa-api.adacsc.co/api/v1/w-riesgos-profesionales/rows";
+  "https://nomina-qa2-api.adacsc.co/api/v1/w-riesgos-profesionales/rows";
 const saveUrl =
-  "https://nomina-qa-api.adacsc.co/api/v1/w-riesgos-profesionales/actions/grabar";
+  "https://nomina-qa2-api.adacsc.co/api/v1/w-riesgos-profesionales/actions/grabar";
 
 test.describe("Validation and backend error contracts", () => {
   test("RP-008: Duplicate code is rejected on create without adding a row", async ({
@@ -32,7 +32,7 @@ test.describe("Validation and backend error contracts", () => {
       (response) =>
         response.url() === rowsUrl && response.request().method() === "GET",
     );
-    await page.goto("https://nomina-qa.adacsc.co/riesgos-profesionales");
+    await page.goto("https://nomina-qa2.adacsc.co/riesgos-profesionales");
 
     const initialRowsResponse = await initialRowsResponsePromise;
     expect(initialRowsResponse.ok()).toBe(true);

@@ -48,7 +48,7 @@ test.describe("P0 - Initial state and calculation validation", () => {
         mode: value.input.includes("e+") ? "paste" as const : "type" as const })),
     ];
     await page.context().grantPermissions(["clipboard-read", "clipboard-write"], {
-      origin: "https://nomina-qa.adacsc.co",
+      origin: "https://nomina-qa2.adacsc.co",
     });
     for (const scenario of cases) {
       await test.step(`${scenario.field}: ${scenario.mode} "${scenario.input}"`, async () => {

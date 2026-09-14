@@ -12,7 +12,7 @@ type AdministrativeConcept = {
 };
 
 const rowsUrl =
-  "https://nomina-qa-api.adacsc.co/api/v1/w-conceptos-nov-ad/rows";
+  "https://nomina-qa2-api.adacsc.co/api/v1/w-conceptos-nov-ad/rows";
 
 function expectValidAdministrativeConcept(
   concept: AdministrativeConcept,
@@ -49,7 +49,7 @@ test.describe("Runtime grid and local state", () => {
         response.url() === rowsUrl && response.request().method() === "GET",
     );
 
-    await page.goto("https://nomina-qa.adacsc.co/conceptos-nov-ad");
+    await page.goto("https://nomina-qa2.adacsc.co/conceptos-nov-ad");
     await expect(page).toHaveURL(/\/conceptos-nov-ad/);
 
     const rowsResponse = await rowsResponsePromise;

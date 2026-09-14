@@ -6,7 +6,7 @@ import type { Request } from "@playwright/test";
 import { RiesgosProfesionalesPage } from "../../pages/RiesgosProfesionales.page";
 
 const saveUrl =
-  "https://nomina-qa-api.adacsc.co/api/v1/w-riesgos-profesionales/actions/grabar";
+  "https://nomina-qa2-api.adacsc.co/api/v1/w-riesgos-profesionales/actions/grabar";
 
 test.describe("Activity lookup and modal behavior", () => {
   test("RP-015: Activity Cancel and Close discard a pending selection", async ({
@@ -21,7 +21,7 @@ test.describe("Activity lookup and modal behavior", () => {
     };
     page.on("request", recordSaveRequest);
 
-    await page.goto("https://nomina-qa.adacsc.co/riesgos-profesionales");
+    await page.goto("https://nomina-qa2.adacsc.co/riesgos-profesionales");
     await risksPage.createButton.click();
 
     const viewport = page.viewportSize();

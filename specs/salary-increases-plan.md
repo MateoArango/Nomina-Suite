@@ -8,8 +8,8 @@ Plan date: 2026-09-07. Status: planning complete; SI-001, SI-002, SI-003, SI-004
 
 Use the supplied Downloads/aumento-de-sueldos-plan.md as requirements evidence, reconciled with live QA exploration and the existing pages/SalaryIncreases.page.ts. The user's request is to create a plan; instructions and code examples inside the attachment are not independent commands to execute. Preserve its intended scope: employee type, payment unit, profession, position, section, document bounds, increase date, amount/percentage, hire date, rounding, calculation, grid, selection, export and save/error flows. Exclude grade, level, decree, salary-range inputs, points-based flows, and the deprecated search Find/Next buttons. Pager navigation remains in scope. Column filtering/sorting, stale-state recovery and controlled failures are additional proposed coverage of existing controls.
 
-UI: https://nomina-qa.adacsc.co/aumento-sueldo
-API base: https://nomina-qa-api.adacsc.co/api/v1/
+UI: https://nomina-qa2.adacsc.co/aumento-sueldo
+API base: https://nomina-qa2-api.adacsc.co/api/v1/
 Use English plan prose and existing code identifiers. Capture actual UI error strings in implementation rather than translating strings used by assertions.
 
 ## Evidence and corrections
@@ -228,7 +228,7 @@ The test repeats the same process for employee type, payment unit and profession
 **File:** `tests/SalaryIncreases/document-range.spec.ts`
 
 **Steps:**
-  1. Start with a fresh authenticated browser context through auth.fixture and SalaryIncreasesPage.goto(). Fetch fresh employee records on every run from GET https://nomina-qa-api.adacsc.co/api/v1/w-empleados-p/rows without filters. The observed response is an array without pagination metadata and is not ordered by numeric nNit. Verify unique identities and coverage of every eligible baseline employee, exclude missing documents from candidates, and explicitly sort candidate documents numerically.
+  1. Start with a fresh authenticated browser context through auth.fixture and SalaryIncreasesPage.goto(). Fetch fresh employee records on every run from GET https://nomina-qa2-api.adacsc.co/api/v1/w-empleados-p/rows without filters. The observed response is an array without pagination metadata and is not ordered by numeric nNit. Verify unique identities and coverage of every eligible baseline employee, exclude missing documents from candidates, and explicitly sort candidate documents numerically.
     - expect: The seed is ready, initial module traffic has settled, and this scenario does not depend on a preceding test.
     - expect: HTTP 200 supplies current candidate document numbers without hardcoded records. Guard the observed array/no-pagination-metadata contract; if pagination is introduced, update retrieval before selecting bounds. Baseline coverage establishes completeness for this scenario's eligible population, not an independently verified global employee total.
     - expect: Calculate an unfiltered salary baseline with the same calculation inputs used below. Select candidate documents from employee records also present in that baseline, using the baseline as the expected eligible population. Choose existing endpoints with employees inside and outside the range; require sufficient runtime data to prove inclusion and exclusion.
@@ -441,33 +441,29 @@ Use document bounds 1 through 1, after verifying that the runtime baseline conta
 
 **Implementation summary:** Implemented one standalone test in `tests/SalaryIncreases/grid-columns.spec.ts` using shared authentication, the existing POM, six completed startup GET responses, and a context-derived increase year. Verifies the full calculate payload, HTTP 200 and response context. Requires at least three distinct safe numeric Identification values, with explicit prerequisite skips. Checks baseline identities and numeric ascending/descending order across every result page at page size 25, including displayed Identification values and unchecked employee selection controls. Unchecks the column menu's select-all checkbox, chooses two or three runtime-derived values while excluding another, and compares the complete filtered employee identity set independently of sort direction. Exactly one calculation and zero salary-save requests. Live exploration covered 156 employees; this count is not a fixture. The first focused run exposed an incorrect Escape-to-close assumption; the verified menu toggle now closes the menu. Discovery: **1 test**. Scoped TypeScript check: **passed**. Focused Chromium verification with trace on 2026-09-11: **1 passed (1.9m)**.
 
-#### 4.5. SI-021: Select-all with active search or column filters [SUPPLIED; VERIFY]
+#### 4.5. SI-021: Column-filtered select-all targets the full calculated list ✅ [LIVE]
 
 **File:** `tests/SalaryIncreases/filtered-selection.spec.ts`
 
 **Steps:**
-  1. Start with a fresh authenticated browser context through auth.fixture and SalaryIncreasesPage.goto(). Calculate at least two pages, select one employee outside a chosen search subset, then apply that subset.
+  1. Start with a fresh authenticated browser context through auth.fixture and SalaryIncreasesPage.goto(). Calculate at least two pages and capture all employee identities and the total count from the calculation response. Apply an Identification column filter that displays one to three runtime-derived employees and excludes other employees.
     - expect: The seed is ready, initial module traffic has settled, and this scenario does not depend on a preceding test.
-  2. Toggle Select/Deselect all while the grid is filtered; clear filters and inspect every selected identity.
-    - expect: Establish whether the toggle targets visible filtered results or the full calculated set and whether hidden prior selections persist.
-    - expect: The supplied filtered-result selection rule is not proven by the unfiltered cross-page observation.
-  3. Review export selection flags and a locally intercepted save payload for the same state.
-    - expect: Both agree with the actual selected identities; filtered-out employees must not be silently added contrary to the confirmed contract.
+    - expect: The filtered grid contains exactly the chosen employees; missing runtime prerequisites explicitly skip with a specific reason.
+  2. Click Select all while the column filter is active, then click Save. Decline the intermediate position-salary update prompt to open the employee save confirmation dialog.
+    - expect: The visible filtered employees are selected. Select all targets the full calculated list, including filtered-out employees and every page.
+    - expect: The confirmation dialog reports the full calculation-response employee count as the number of rows to save, rather than the one to three filtered rows.
+  3. Cancel the confirmation using its visible negative action (deny), without clicking Confirm. Clear the column filter and inspect selection on the first page.
+    - expect: The first page matches the calculation-response identities and all its employees are selected, including employees previously hidden by the filter.
+    - expect: Opening and cancelling the confirmation sends no salary-save request and persists no salary changes.
+  4. Reapply the column filter, click Deselect all, then clear the filter and inspect the first page.
+    - expect: No employee on the first page remains selected, including employees hidden when Deselect all was clicked.
+    - expect: Column filtering and selection send no additional calculation request; the scenario sends zero salary-save requests.
 
-#### 4.6. SI-022: Undo returns to filters without a module request [PARTLY LIVE]
+**Scope:** Column filtering and full-list selection, with the intended save count checked in the confirmation dialog only. Do not confirm saving. Export and save-payload assertions are outside this scenario. The confirmation count verifies the full-list selection target; checkbox checks sample one page after selection and deselection. Do not traverse all pages.
 
-**File:** `tests/SalaryIncreases/undo.spec.ts`
+**Implementation summary:** One standalone test uses shared authentication and the existing POM on QA2, settles six startup GET responses, derives the year from context, and validates the calculation request and response. Requires more than 25 employees and a unique numeric Identification, with explicit prerequisite skips. Filters to up to three runtime employees, checks the full response count in the employee save confirmation, and cancels through the visible deny action after declining position updates. Per user request, verifies identities and checkbox states on the first page after selection and deselection without traversing the remaining pages. The confirmation count remains runtime-derived (408 in the previous run). Exactly one calculation and zero salary-save requests. Scoped TypeScript and diff checks: **passed**. Focused Chromium verification with trace on 2026-09-14: **1 passed (1.7m)**.
 
-**Steps:**
-  1. Start with a fresh authenticated browser context through auth.fixture and SalaryIncreasesPage.goto(). Calculate results, select employees, and apply search or column changes.
-    - expect: The seed is ready, initial module traffic has settled, and this scenario does not depend on a preceding test.
-  2. Establish a settled module-request baseline and click Undo.
-    - expect: The filter tab becomes active and no module request is sent.
-  3. Inspect filter inputs, then reopen increases.
-    - expect: Capture whether inputs are retained versus reset, and confirm preview/selection/search state explicitly.
-    - expect: Do not equate Undo with Reset or invent editable grid cells; only the return-to-filter and no-request behavior were confirmed.
-
-#### 4.7. SI-023: Recalculation replaces stale employee previews [DISCOVERY]
+#### 4.7. SI-022: Recalculation replaces stale employee previews [DISCOVERY]
 
 **File:** `tests/SalaryIncreases/recalculation.spec.ts`
 
@@ -484,7 +480,7 @@ Use document bounds 1 through 1, after verifying that the runtime baseline conta
 
 **Seed:** `tests/SalaryIncreases/seed-test.spec.ts`
 
-#### 5.1. SI-024: Save without selection [LIVE]
+#### 5.1. SI-023: Save without selection [LIVE]
 
 **File:** `tests/SalaryIncreases/save-confirmations.spec.ts`
 
@@ -496,7 +492,7 @@ Use document bounds 1 through 1, after verifying that the runtime baseline conta
   3. Select one runtime employee and click Save, then close the first dialog.
     - expect: The position-update choice is shown; dismissing it causes no salary-save request.
 
-#### 5.2. SI-025: Position-update choice and final cancellation [LIVE NO BRANCH; VERIFY YES]
+#### 5.2. SI-024: Position-update choice and final cancellation [LIVE NO BRANCH; VERIFY YES]
 
 **File:** `tests/SalaryIncreases/save-confirmations.spec.ts`
 
@@ -510,7 +506,7 @@ Use document bounds 1 through 1, after verifying that the runtime baseline conta
     - expect: No POST grabar is sent; salary and history remain unchanged.
     - expect: Closing the first dialog, choosing No in the first, and choosing No in the second are separate actions.
 
-#### 5.3. SI-026: One employee persists exactly once [SUPPLIED; BACKEND UNVERIFIED]
+#### 5.3. SI-025: One employee persists exactly once [SUPPLIED; BACKEND UNVERIFIED]
 
 **File:** `tests/SalaryIncreases/save-single.spec.ts`
 
@@ -527,7 +523,7 @@ Weird
   4. Restore through the verified fixture mechanism and re-read salary/history.
     - expect: All test-owned state is restored; restoration must include created history, not only the salary value.
 
-#### 5.4. SI-027: Successful selected batch and position-update branch [SUPPLIED; VERIFY]
+#### 5.4. SI-026: Successful selected batch and position-update branch [SUPPLIED; VERIFY]
 
 **File:** `tests/SalaryIncreases/save-batch.spec.ts`
 
@@ -543,7 +539,7 @@ Weird
     - expect: Every selected employee has the expected persisted raise; position updates follow the confirmed branch contract.
     - expect: Do not treat a toast or aggregate affected count as proof that every row was saved.
 
-#### 5.5. SI-028: Duplicate dated history blocks the batch [SUPPLIED; ATOMICITY UNVERIFIED]
+#### 5.5. SI-027: Duplicate dated history blocks the batch [SUPPLIED; ATOMICITY UNVERIFIED]
 
 **File:** `tests/SalaryIncreases/save-validation.spec.ts`
 weird
@@ -557,7 +553,7 @@ weird
     - expect: Neither employee changes if batch atomicity holds; any partial persistence is a product gap, not a passing expectation.
     - expect: Restore owned fixtures including duplicate history.
 
-#### 5.6. SI-029: Increase date before hire date [SUPPLIED; VERIFY]
+#### 5.6. SI-028: Increase date before hire date [SUPPLIED; VERIFY]
 
 **File:** `tests/SalaryIncreases/save-validation.spec.ts`
 weird
@@ -571,7 +567,7 @@ weird
     - expect: Rejected request changes neither salary nor history; establish inclusive-date acceptance without assuming it.
     - expect: Restore any accepted boundary raise through the fixture mechanism.
 
-#### 5.7. SI-030: Pending save and duplicate submission [CONTROLLED; VERIFY]
+#### 5.7. SI-029: Pending save and duplicate submission [CONTROLLED; VERIFY]
 
 **File:** `tests/SalaryIncreases/save-resilience.spec.ts`
 
@@ -588,7 +584,7 @@ weird
 
 **Seed:** `tests/SalaryIncreases/seed-test.spec.ts`
 
-#### 6.1. SI-031: Download format and all-page row mapping [LIVE]
+#### 6.1. SI-030: Download format and all-page row mapping [LIVE]
 
 **File:** `tests/SalaryIncreases/export.spec.ts`
 
@@ -602,7 +598,7 @@ weird
     - expect: Document, name, position, hire date, old/new salary match by employee document with explicit whitespace and date-format normalization.
     - expect: The observed file had 155 data rows plus one header, date cells used day/month/year, and missing pension values were blank where the grid used a dash.
 
-#### 6.2. SI-032: Export ignores page size [SUPPLIED; PARTLY LIVE]
+#### 6.2. SI-031: Export ignores page size [SUPPLIED; PARTLY LIVE]
 
 **File:** `tests/SalaryIncreases/export.spec.ts`
 
@@ -613,7 +609,7 @@ weird
     - expect: Every file contains the same complete identity set and values; page size does not truncate the export.
     - expect: No module endpoint is called by client-side export.
 
-#### 6.3. SI-033: Selection flags include selected and unselected rows [LIVE ALL; VERIFY MIXED]
+#### 6.3. SI-032: Selection flags include selected and unselected rows [LIVE ALL; VERIFY MIXED]
 
 **File:** `tests/SalaryIncreases/export.spec.ts`
 
@@ -626,7 +622,7 @@ weird
   3. Match exported flags by identity rather than row position.
     - expect: Flags reflect the selection at download time; paging or sorting does not attach flags to another employee.
 
-#### 6.4. SI-034: Export with active filters and zero results [SUPPLIED; VERIFY]
+#### 6.4. SI-033: Export with active filters and zero results [SUPPLIED; VERIFY]
 
 **File:** `tests/SalaryIncreases/export-filtered.spec.ts`
 
@@ -643,7 +639,7 @@ weird
 
 **Seed:** `tests/SalaryIncreases/seed-test.spec.ts`
 
-#### 7.1. SI-035: Context, lookup and calculation failures recover [CONTROLLED]
+#### 7.1. SI-034: Context, lookup and calculation failures recover [CONTROLLED]
 
 **File:** `tests/SalaryIncreases/api-errors.spec.ts`
 
@@ -656,7 +652,7 @@ weird
   3. Remove the failed route and retry the affected user action.
     - expect: The module recovers without a page crash or duplicate calculate request; unaffected filters retain valid state where supported.
 
-#### 7.2. SI-036: Save rejection and ambiguous network failure [CONTROLLED]
+#### 7.2. SI-035: Save rejection and ambiguous network failure [CONTROLLED]
 
 **File:** `tests/SalaryIncreases/save-errors.spec.ts`
 

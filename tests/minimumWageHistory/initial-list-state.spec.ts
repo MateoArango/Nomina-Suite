@@ -30,7 +30,7 @@ test.describe("Runtime list view and pagination", () => {
     });
 
     await page.goto(
-      "https://nomina-qa.adacsc.co/mae-historico-salario-minimo",
+      "https://nomina-qa2.adacsc.co/mae-historico-salario-minimo",
     );
     await expect(page).toHaveURL(/\/mae-historico-salario-minimo/);
 
@@ -118,7 +118,7 @@ test.describe("Runtime list view and pagination", () => {
     });
 
     await page.goto(
-      "https://nomina-qa.adacsc.co/mae-historico-salario-minimo",
+      "https://nomina-qa2.adacsc.co/mae-historico-salario-minimo",
     );
 
     const rowsResponse = await rowsResponsePromise;

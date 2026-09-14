@@ -16,11 +16,11 @@ type Risk = {
 };
 
 const rowsUrl =
-  "https://nomina-qa-api.adacsc.co/api/v1/w-riesgos-profesionales/rows";
+  "https://nomina-qa2-api.adacsc.co/api/v1/w-riesgos-profesionales/rows";
 const activitiesUrl =
-  "https://nomina-qa-api.adacsc.co/api/v1/w-riesgos-profesionales/lookups/dddw-actividad-riesgo";
+  "https://nomina-qa2-api.adacsc.co/api/v1/w-riesgos-profesionales/lookups/dddw-actividad-riesgo";
 const saveUrl =
-  "https://nomina-qa-api.adacsc.co/api/v1/w-riesgos-profesionales/actions/grabar";
+  "https://nomina-qa2-api.adacsc.co/api/v1/w-riesgos-profesionales/actions/grabar";
 
 test.describe("Activity lookup and modal behavior", () => {
   test("RP-016: Double-clicking an activity applies it directly", async ({
@@ -45,7 +45,7 @@ test.describe("Activity lookup and modal behavior", () => {
         response.request().method() === "GET",
     );
 
-    await page.goto("https://nomina-qa.adacsc.co/riesgos-profesionales");
+    await page.goto("https://nomina-qa2.adacsc.co/riesgos-profesionales");
 
     const [rowsResponse, activitiesResponse] = await Promise.all([
       rowsResponsePromise,

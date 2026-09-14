@@ -16,7 +16,7 @@ test("Seed Test", async ({ page }) => {
   });
 
   await page.goto(
-    "https://nomina-qa.adacsc.co/mae-historico-salario-minimo",
+    "https://nomina-qa2.adacsc.co/mae-historico-salario-minimo",
   );
   await expect(page).toHaveURL(/\/mae-historico-salario-minimo/);
 

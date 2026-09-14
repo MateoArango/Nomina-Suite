@@ -6,7 +6,7 @@ import { expect, test } from "../fixtures/auth.fixture";
 import { RiesgosProfesionalesPage } from "../../pages/RiesgosProfesionales.page";
 
 const saveUrl =
-  "https://nomina-qa-api.adacsc.co/api/v1/w-riesgos-profesionales/actions/grabar";
+  "https://nomina-qa2-api.adacsc.co/api/v1/w-riesgos-profesionales/actions/grabar";
 
 test.describe("Validation and backend error contracts", () => {
   test("RP-007: Code input enforces its three-character UI boundary", async ({
@@ -21,7 +21,7 @@ test.describe("Validation and backend error contracts", () => {
     };
     page.on("request", recordSaveRequest);
 
-    await page.goto("https://nomina-qa.adacsc.co/riesgos-profesionales");
+    await page.goto("https://nomina-qa2.adacsc.co/riesgos-profesionales");
     await expect(risksPage.heading).toBeVisible();
 
     // 1. Click New and fill the Code input with four characters.

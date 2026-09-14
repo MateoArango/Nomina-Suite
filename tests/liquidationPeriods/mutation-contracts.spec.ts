@@ -23,8 +23,8 @@ type SubmittedPeriod = {
   fechaFinal: string | null;
 };
 
-const applicationUrl = "https://nomina-qa.adacsc.co/periodos-liq";
-const apiBase = "https://nomina-qa-api.adacsc.co/api/v1/w-periodos-liq";
+const applicationUrl = "https://nomina-qa2.adacsc.co/periodos-liq";
+const apiBase = "https://nomina-qa2-api.adacsc.co/api/v1/w-periodos-liq";
 const saveUrl = `${apiBase}/actions/grabar`;
 const deleteUrl = `${apiBase}/actions/eliminar`;
 const periodType: PeriodType = "M";

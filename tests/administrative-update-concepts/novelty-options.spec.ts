@@ -5,7 +5,7 @@ import { expect, test } from "../fixtures/auth.fixture";
 import { AdministrativeUpdateConceptsPage } from "../../pages/AdministrativeUpdateConcepts.page";
 
 const apiBase =
-  "https://nomina-qa-api.adacsc.co/api/v1/w-conceptos-nov-ad";
+  "https://nomina-qa2-api.adacsc.co/api/v1/w-conceptos-nov-ad";
 const rowsUrl = `${apiBase}/rows`;
 const conceptLookupUrl = `${apiBase}/lookups/conceptos`;
 const noveltyCatalog = [
@@ -48,7 +48,7 @@ test.describe("Runtime grid and local state", () => {
         response.url() === rowsUrl && response.request().method() === "GET",
     );
 
-    await page.goto("https://nomina-qa.adacsc.co/conceptos-nov-ad");
+    await page.goto("https://nomina-qa2.adacsc.co/conceptos-nov-ad");
     await expect(page).toHaveURL(/\/conceptos-nov-ad/);
 
     const initialRowsResponse = await initialRowsResponsePromise;

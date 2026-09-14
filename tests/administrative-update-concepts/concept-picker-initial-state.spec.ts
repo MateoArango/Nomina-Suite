@@ -12,7 +12,7 @@ type AccountingConcept = {
 };
 
 const apiBase =
-  "https://nomina-qa-api.adacsc.co/api/v1/w-conceptos-nov-ad";
+  "https://nomina-qa2-api.adacsc.co/api/v1/w-conceptos-nov-ad";
 const conceptLookupUrl = `${apiBase}/lookups/conceptos`;
 
 function expectValidAccountingConcept(
@@ -60,7 +60,7 @@ test.describe("Concept picker and validation contracts", () => {
         response.request().method() === "GET",
     );
 
-    await page.goto("https://nomina-qa.adacsc.co/conceptos-nov-ad");
+    await page.goto("https://nomina-qa2.adacsc.co/conceptos-nov-ad");
     await expect(page).toHaveURL(/\/conceptos-nov-ad/);
 
     const conceptLookupResponse = await conceptLookupResponsePromise;

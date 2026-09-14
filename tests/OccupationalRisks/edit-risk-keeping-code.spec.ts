@@ -17,13 +17,13 @@ type RiskDetail = RiskRow & {
   ssActividad: string;
 };
 
-const pageUrl = "https://nomina-qa.adacsc.co/riesgos-profesionales";
+const pageUrl = "https://nomina-qa2.adacsc.co/riesgos-profesionales";
 const rowsUrl =
-  "https://nomina-qa-api.adacsc.co/api/v1/w-riesgos-profesionales/rows";
+  "https://nomina-qa2-api.adacsc.co/api/v1/w-riesgos-profesionales/rows";
 const saveUrl =
-  "https://nomina-qa-api.adacsc.co/api/v1/w-riesgos-profesionales/actions/grabar";
+  "https://nomina-qa2-api.adacsc.co/api/v1/w-riesgos-profesionales/actions/grabar";
 const deleteUrl =
-  "https://nomina-qa-api.adacsc.co/api/v1/w-riesgos-profesionales/actions/borrar";
+  "https://nomina-qa2-api.adacsc.co/api/v1/w-riesgos-profesionales/actions/borrar";
 
 test.describe("CRUD persistence and safe deletion", () => {
   test("RP-020: Edit with unchanged code persists other fields and can be restored", async ({

@@ -12,11 +12,11 @@ type RiskRecord = {
 };
 
 const rowsUrl =
-  "https://nomina-qa-api.adacsc.co/api/v1/w-riesgos-profesionales/rows";
+  "https://nomina-qa2-api.adacsc.co/api/v1/w-riesgos-profesionales/rows";
 const saveUrl =
-  "https://nomina-qa-api.adacsc.co/api/v1/w-riesgos-profesionales/actions/grabar";
+  "https://nomina-qa2-api.adacsc.co/api/v1/w-riesgos-profesionales/actions/grabar";
 const deleteUrl =
-  "https://nomina-qa-api.adacsc.co/api/v1/w-riesgos-profesionales/actions/borrar";
+  "https://nomina-qa2-api.adacsc.co/api/v1/w-riesgos-profesionales/actions/borrar";
 //"RP-012 is pending the product owner's decision on whether negative percentages are valid.
 //"RP-012 is pending the product owner's decision on whether negative percentages are valid.
 test.describe("Validation and backend error contracts", () => {
@@ -90,7 +90,7 @@ test.describe("Validation and backend error contracts", () => {
         (response) =>
           response.url() === rowsUrl && response.request().method() === "GET",
       );
-      await page.goto("https://nomina-qa.adacsc.co/riesgos-profesionales");
+      await page.goto("https://nomina-qa2.adacsc.co/riesgos-profesionales");
 
       const initialRowsResponse = await initialRowsResponsePromise;
       expect(initialRowsResponse.ok()).toBe(true);

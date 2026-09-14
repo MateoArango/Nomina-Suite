@@ -11,7 +11,7 @@ type LiquidationPeriodRecord = {
   fechaFinal: string | null;
 };
 
-const applicationUrl = "https://nomina-qa.adacsc.co/periodos-liq";
+const applicationUrl = "https://nomina-qa2.adacsc.co/periodos-liq";
 const newClickCount = 3;
 
 function isRowsRequest(url: URL): boolean {

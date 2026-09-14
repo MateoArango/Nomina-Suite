@@ -2,7 +2,7 @@ import type { Locator, Page } from "@playwright/test";
 
 export class LoginPage {
   private static readonly username = "SICOF";
-  private static readonly password = "qa304";
+  private static readonly password = "12345";
 
   readonly recoveryOpenLink: Locator;
   readonly usernameInput: Locator;
@@ -23,7 +23,7 @@ export class LoginPage {
   }
 
   async goto(): Promise<void> {
-    await this.page.goto("https://nomina-qa.adacsc.co/login");
+    await this.page.goto("https://nomina-qa2.adacsc.co/inicio");
   }
 
   async signIn(): Promise<void> {

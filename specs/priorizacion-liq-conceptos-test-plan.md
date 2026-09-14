@@ -44,8 +44,8 @@ The save request still needs to be observed and documented. Prefer API-backed se
 
 Opening `/priorizacion-conceptos` requests:
 
-1. `GET https://nomina-qa-api.adacsc.co/api/v1/w-priorizacion-conceptos/conceptos`
-2. `GET https://nomina-qa-api.adacsc.co/api/v1/w-priorizacion-conceptos/rows`
+1. `GET https://nomina-qa2-api.adacsc.co/api/v1/w-priorizacion-conceptos/conceptos`
+2. `GET https://nomina-qa2-api.adacsc.co/api/v1/w-priorizacion-conceptos/rows`
 
 The `/conceptos` response is the available-catalog source. It returns an array with:
 

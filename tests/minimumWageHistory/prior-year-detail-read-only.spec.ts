@@ -9,7 +9,7 @@ type MinimumWageHistoryRow = {
 };
 
 const applicationUrl =
-  "https://nomina-qa.adacsc.co/mae-historico-salario-minimo";
+  "https://nomina-qa2.adacsc.co/mae-historico-salario-minimo";
 const modulePath = "/api/v1/w-mae-historico-salario-minimo";
 const rowsPath = `${modulePath}/rows`;
 const relationshipPath = `${modulePath}/actions/validar-relacion`;

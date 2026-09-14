@@ -19,9 +19,9 @@ type RiskDetail = Risk & {
 };
 
 const rowsUrl =
-  "https://nomina-qa-api.adacsc.co/api/v1/w-riesgos-profesionales/rows";
+  "https://nomina-qa2-api.adacsc.co/api/v1/w-riesgos-profesionales/rows";
 const saveUrl =
-  "https://nomina-qa-api.adacsc.co/api/v1/w-riesgos-profesionales/actions/grabar";
+  "https://nomina-qa2-api.adacsc.co/api/v1/w-riesgos-profesionales/actions/grabar";
 
 test.describe("Initial state, API mapping, and non-mutating grid behavior", () => {
   test("RP-002: Open exactly one existing record for editing and cancel", async ({
@@ -34,7 +34,7 @@ test.describe("Initial state, API mapping, and non-mutating grid behavior", () =
       response =>
         response.url() === rowsUrl && response.request().method() === "GET",
     );
-    await page.goto("https://nomina-qa.adacsc.co/riesgos-profesionales");
+    await page.goto("https://nomina-qa2.adacsc.co/riesgos-profesionales");
 
     const rowsResponse = await rowsResponsePromise;
     expect(rowsResponse.ok()).toBe(true);
@@ -138,7 +138,7 @@ test.describe("Initial state, API mapping, and non-mutating grid behavior", () =
       response =>
         response.url() === rowsUrl && response.request().method() === "GET",
     );
-    await page.goto("https://nomina-qa.adacsc.co/riesgos-profesionales");
+    await page.goto("https://nomina-qa2.adacsc.co/riesgos-profesionales");
 
     const refreshedRowsResponse = await refreshedRowsResponsePromise;
     expect(refreshedRowsResponse.ok()).toBe(true);

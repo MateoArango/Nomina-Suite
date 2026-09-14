@@ -16,9 +16,9 @@ type PrioritizedConcept = Concept & {
 };
 
 const conceptsUrl =
-  "https://nomina-qa-api.adacsc.co/api/v1/w-priorizacion-conceptos/conceptos";
+  "https://nomina-qa2-api.adacsc.co/api/v1/w-priorizacion-conceptos/conceptos";
 const rowsUrl =
-  "https://nomina-qa-api.adacsc.co/api/v1/w-priorizacion-conceptos/rows";
+  "https://nomina-qa2-api.adacsc.co/api/v1/w-priorizacion-conceptos/rows";
 
 function expectValidConcept(concept: Concept): void {
   expect(concept.kaNlConcepto).toEqual(expect.any(Number));
@@ -42,7 +42,7 @@ test.describe("Liquidation Concept Prioritization", () => {
     );
 
     // 2. Open the prioritization page.
-    await page.goto("https://nomina-qa.adacsc.co/priorizacion-conceptos");
+    await page.goto("https://nomina-qa2.adacsc.co/priorizacion-conceptos");
     await expect(page).toHaveURL(/\/priorizacion-conceptos/);
 
     // 3. Assert both requests use their documented endpoints and succeed.
