@@ -60,7 +60,7 @@ Parse the observed exported HTML table with a suitable HTML parser or browser DO
 
 ## Order and completion criteria
 
-**Number one priority: SI-023, the complete salary-increase flow for one existing employee row.** Implement and verify calculation, selection, confirmation, saving, and persisted salary after reload before adding further scenarios. Keep scenario IDs stable. SI-023 uses an existing row and only increases its salary; it requires no record creation, history assertions, deletion, or salary restoration. Run controlled failure cases separately. Implement and verify one numbered scenario at a time, then append its implementation summary and completion checkmark. Completion requires focused Chromium verification and runtime-derived assertions; apply restoration requirements only to scenarios that explicitly require restoration.
+**Number one priority: SI-023, the complete salary-increase flow for one existing employee row.** Verify a successful increase and its persisted salary, then repeat the same employee/date and verify rejection with no further salary change before adding further scenarios. Keep scenario IDs stable. SI-023 uses an existing row and only increases its salary; it requires no record creation, history assertions, deletion, or salary restoration. Run controlled failure cases separately. Implement and verify one numbered scenario at a time, then append its implementation summary and completion checkmark. Completion requires focused Chromium verification and runtime-derived assertions; apply restoration requirements only to scenarios that explicitly require restoration.
 
 ## Scenario success and failure rules
 
@@ -483,33 +483,33 @@ Use document bounds 1 through 1, after verifying that the runtime baseline conta
 
 **Implementation summary:** Implemented one standalone test in `tests/SalaryIncreases/save-confirmations.spec.ts` using centralized authentication and SalaryIncreasesPage. Settles six startup GET responses, derives the context year, and validates the calculation request and response. Requires at least one runtime employee, with an explicit prerequisite skip for empty results. Selects then explicitly deselects all employees and verifies first-page checkbox states. Checks the dedicated missing-selection message and acknowledgment, selects exactly one runtime employee, declines position updates, asserts the literal confirmation count 1, and cancels through the visible deny action. Exactly one calculation and zero salary-save requests. Scoped TypeScript check passed. Focused Chromium verification with trace on 2026-09-14: **1 passed (34.5s)**.
 
-#### 5.3. SI-023: Full salary-increase flow for one existing employee [LIVE] ✅
+#### 5.3. SI-023: Full salary-increase flow for one existing employee [LIVE] ?
 
 **File:** `tests/SalaryIncreases/save-single.spec.ts`
 
-**Scope:** Complete the flow using one existing employee row. Only increase that employee's salary. Do not create or delete records, assume salary-history behavior, or require salary restoration.
+**Purpose:** Verify that a valid increase is saved and that repeating it for the same employee and date is blocked. Run A followed by B in the same test.
 
-**Steps:**
-  1. Start with a fresh authenticated browser context through auth.fixture and SalaryIncreasesPage.goto(). Set a supported increase date and a positive increase amount, then calculate.
-    - expect: Startup traffic has settled, calculation succeeds, and existing employee rows are available. Derive the employee identity and original salary at runtime.
-  2. Select exactly one existing employee row and capture its original salary and expected increased salary.
-    - expect: Only that employee is selected and its preview matches the intended increase.
-  3. Click Save and inspect the employee save confirmation.
-    - expect: The confirmation reports exactly 1 employee. Zero salary-save requests have occurred at this point.
-  4. Accept the employee save confirmation.
-    - expect: Exactly one POST actions/grabar targets the selected employee with the intended increase settings. Establish and assert the actual request schema and successful response during implementation.
-  5. Reload and locate the same employee using its runtime identity.
-    - expect: The employee's current salary equals the expected increased salary, proving persistence beyond the preview and confirmation dialog.
-  6. Select the same employee in the recalculated results and confirm a second increase using the same date, declining position updates again.
-    - expect: Exactly one additional save request targets the same employee and date. HTTP 400 BAD_REQUEST and the exact duplicate-date message containing the runtime employee name are asserted in the response and error dialog.
-  7. Reload and recalculate for the same runtime identity again.
-    - expect: Current salary still equals the salary persisted in step 5; the rejected attempt produces no further increase. The complete test makes three calculation requests and two save attempts (one successful, one rejected).
+**Before running:** Edit `INCREASE_DATE` in the test to a supported date (`YYYY-MM-DD`) not already used for the selected employee. Use one existing employee and an increase of 1. Capture the employee identity, name, and original salary at runtime.
 
-**Implementation summary:** Implemented one standalone test in `tests/SalaryIncreases/save-single.spec.ts` using centralized authentication and SalaryIncreasesPage. Settles all six startup GETs, calculates an increase of 1 with zero percentage and no rounding, derives an eligible existing employee and baseline salary at runtime, and checks exactly one selection across all rendered rows including hidden pages. Declines position updates and verifies confirmation count 1 with zero saves before confirmation. Asserts exactly one POST `actions/grabar` with `{ command, selectedEmployeeIds: [runtimeEmployeeId], actualizarCargosVacantes: false, confirmarCambios: true }`, HTTP 201, `affectedEmployees: 1`, `updatedVacantCargos: 0`, and numeric response counters. Reloads, settles startup again, recalculates using the runtime document bounds, and verifies the same employee's current salary equals the original salary plus 1 in both response and UI. The successful-save phase makes two calculations and one save before the duplicate-date phase. Saves before/after salary evidence and the response as test attachments. No record creation, deletion, restoration, or history readback is performed.
+**A. Normal flow ? save the increase**
 
-**Run prerequisite:** Edit `INCREASE_DATE` near the top of `tests/SalaryIncreases/save-single.spec.ts` to a supported ISO date (`YYYY-MM-DD`) unused for the selected employee, then run `npx playwright test tests/SalaryIncreases/save-single.spec.ts --project=chromium --workers=1 --retries=0 --trace=on`. A missing eligible employee produces an explicit prerequisite skip; an invalid date or rejected first save fails. An already-used date at the start does not count as passing the successful-save phase. Retries are disabled in the spec because each successful run permanently increases one salary. Exploration found an existing duplicate for 2026-09-14 (HTTP 400, salary unchanged), then verified a successful save for 2026-09-15. Focused Chromium verification used 2026-09-16 and passed on 2026-09-14: **1 passed (32.8s)**. The two successful executions each increased the same runtime employee's salary by 1; those dates are now consumed for that employee. Scoped TypeScript validation passed with Node types enabled. These observations establish SI-023 persistence only; response counters are not proof of historical-record or position behavior.
+1. Select the date, enter an increase of 1, and calculate.
+2. Select exactly one employee and verify the preview equals the original salary + 1.
+3. Click Save, decline position updates, verify the confirmation shows 1 employee, and confirm.
+4. Verify the save succeeds (HTTP 201). Reload, locate the same employee, and verify the current salary equals the original salary + 1.
 
-**A/B flow extension:** SI-023 now requires the successful-save phase followed by a duplicate attempt for the same runtime employee and date. The second preview is first verified as another increase of 1; the second save must return HTTP 400 `BAD_REQUEST` with the exact employee-specific duplicate-date message, including trailing whitespace, in both API response and dialog. A second reload and runtime-document calculation verifies the current salary remains at the first saved value. The final counts are three calculations and two save attempts, with exactly one successful increase. Duplicate response and final salary evidence are attached. An initial run with 2026-09-18 correctly failed in phase A because that date was already used; the constant was changed to 2026-09-19. Focused Chromium verification with trace and one worker passed on 2026-09-14: **1 passed (38.6s)**. Scoped TypeScript and diff checks passed. The verified run consumed 2026-09-19 for the selected employee, so edit `INCREASE_DATE` before another complete A/B run. This single-employee rejection does not mark SI-026 batch atomicity coverage complete.
+**B. Duplicate-date flow ? reject another increase**
+
+1. After A succeeds, calculate again using the same date and select the same employee.
+2. Attempt another increase of 1, decline position updates, and confirm the save for 1 employee.
+3. Verify HTTP 400 `BAD_REQUEST` and the exact duplicate-date error in both the response and dialog, using the selected employee's name. Preserve the API message's trailing whitespace.
+4. Reload and locate the same employee. Verify the salary still equals the value saved in A; no second increase was applied.
+
+**Pass condition:** Both flows pass. The error in B is expected and proves the duplicate is blocked. An error during A does not count as success. The complete test makes three calculations and two save attempts: one successful and one rejected.
+
+**Run:** `npx playwright test tests/SalaryIncreases/save-single.spec.ts --project=chromium --workers=1 --retries=0 --trace=on`
+
+**Implementation summary:** Implemented with centralized authentication and SalaryIncreasesPage, runtime employee data, API/UI assertions, and salary evidence after each reload. No employee creation, deletion, or salary restoration. Retries are disabled. Focused Chromium verification passed on 2026-09-14: **1 passed (38.6s)**; scoped TypeScript validation passed. Verification used 2026-09-19, so choose another unused date before rerunning. SI-026 remains separate coverage for duplicate-date batch rejection.
 
 #### 5.4. SI-024: Successful selected batch and position-update branch [SUPPLIED; VERIFY]
 
