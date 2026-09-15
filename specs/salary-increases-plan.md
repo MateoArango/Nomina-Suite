@@ -501,35 +501,34 @@ Use document bounds 1 through 1, after verifying that the runtime baseline conta
 
 **Run:** `npx playwright test tests/SalaryIncreases/save-single.spec.ts --project=chromium --workers=1 --retries=0 --trace=on`
 
-**Implementation summary:** Consolidated the former SI-024 batch coverage into SI-023 and deleted its separate test and plan entry. Uses centralized authentication, runtime identities, selection across pages, and persisted salary assertions. Focused Chromium verification passed on 2026-09-15: **1 passed (47.8s)**; scoped TypeScript validation passed. The run used 2026-09-24, saved increases of 1 for three employees, and rejected the same-date repeat for one employee. Steps 6-7 were subsequently removed; the test now ends after the first reload and salary assertions. The shortened version passed discovery and scoped TypeScript validation; no additional mutation run was performed. Choose another unused supported date before rerunning; saved increases remain in QA.
+**Implementation summary:**  Uses centralized authentication, runtime identities, selection across pages, and persisted salary assertions. Focused Chromium verification passed on 2026-09-15: **1 passed (47.8s)**; scoped TypeScript validation passed. The run used 2026-09-24, saved increases of 1 for three employees, and rejected the same-date repeat for one employee. The shortened version passed discovery and scoped TypeScript validation; no additional mutation run was performed. Choose another unused supported date before rerunning; saved increases remain in QA.
 
-#### 5.5. SI-025: Duplicate dated history blocks the batch [SUPPLIED; ATOMICITY UNVERIFIED]
-
-**File:** `tests/SalaryIncreases/save-validation.spec.ts`
-weird
-**Steps:**
-  1. Start with a fresh authenticated browser context through auth.fixture and SalaryIncreasesPage.goto(). Independently prepare one test-owned duplicate-date employee and one valid employee, without depending on the successful-save test.
-    - expect: The seed is ready, initial module traffic has settled, and this scenario does not depend on a preceding test.
-  2. Record both baselines and attempt the batch with the invalid employee first, then independently last.
-    - expect: Capture the exact per-employee duplicate-history response and interpolated identity.
-    - expect: The supplied expectation is whole-batch rejection; verify ordering does not conceal partial commits.
-  3. Reload/read salary and history for every selected employee.
-    - expect: Neither employee changes if batch atomicity holds; any partial persistence is a product gap, not a passing expectation.
-    - expect: Restore owned fixtures including duplicate history.
-
-#### 5.6. SI-026: Increase date before hire date [SUPPLIED; VERIFY]
+#### 5.6. SI-024: Increase date before hire date ✅
 
 **File:** `tests/SalaryIncreases/save-validation.spec.ts`
-weird
+
+**Validation stage:** Verified HTTP 400 Bad Request from Save when the increase date precedes the employee's hire date. Calculate returns a successful preview; rejection occurs after completing both save confirmations.
+
 **Steps:**
-  1. Start with a fresh authenticated browser context through auth.fixture and SalaryIncreasesPage.goto(). Use a test-owned employee with a known hire date and a context-supported increase date before it.
-    - expect: The seed is ready, initial module traffic has settled, and this scenario does not depend on a preceding test.
-  2. Calculate and attempt Save only if calculation allows the candidate.
-    - expect: Record whether validation occurs at calculate or grabar; do not force past a current earlier guard.
-    - expect: The error identifies the employee and correctly formats both dates, using the actual response template.
-  3. Verify persistent state and independently try an increase on the hire date.
-    - expect: Rejected request changes neither salary nor history; establish inclusive-date acceptance without assuming it.
-    - expect: Restore any accepted boundary raise through the fixture mechanism.
+
+1. Start with a fresh authenticated browser context through auth.fixture and SalaryIncreasesPage.goto(). Settle all six startup responses, enter a supported baseline increase date and a positive fixed increase, and calculate with all employee filters empty.
+   - expect: HTTP 200 and the complete baseline response rows across all grid pages; no save request.
+2. Search the complete baseline for an existing employee with a valid nNit and hire date (ddIngreso). Derive an increase date one day before that hire date within the supported context.
+   - expect: Identity, document number, hire date, and current salary come from the response. Skip with a specific prerequisite reason if no employee supports this date combination; do not hardcode the example employee or create a record.
+3. Set both CC document fields (nitInicial and nitFinal) to the selected employee's nNit, set the derived increase date, and retain the positive fixed increase. Calculate again.
+   - expect: The calculate request contains the same nNit in both bounds and the derived increase date. HTTP 200 returns exactly one row matching the selected employee, with the increase date strictly earlier than ddIngreso.
+4. Select that employee, click Save, decline vacant-position updates, and confirm the save for exactly one employee. Capture the save request and response before the action that submits it.
+   - expect: Exactly one save request contains only the selected employee's identity and the derived increase date. The response is HTTP 400 Bad Request.
+5. Assert the exact date-validation message in both the response and the visible error dialog, building the expected message from the selected nNit, increase date, and hire date using the observed product wording and date format.
+   - expect: The message identifies the selected employee and explains that the increase date precedes the hire date. No success confirmation appears.
+6. Dismiss the error, reload, settle startup traffic, and recalculate for the same employee using the original supported baseline date and the same increase amount.
+   - expect: The employee's current salary matches the baseline. No additional save request occurs.
+
+**Pass condition:** Exactly one employee is targeted by identical CC bounds; one save attempt returns HTTP 400 with the exact employee/date-specific error in the API and UI; salary remains unchanged after reload.
+
+**Implementation summary:** Uses centralized authentication and SalaryIncreasesPage, settles all six startup responses, and derives a unique employee document and a date one day before hire within the supported startup year. Asserts three exact calculation requests, exactly one save request, HTTP 400 `BAD_REQUEST`, the complete employee/date-specific API and dialog message, and unchanged salary after reload. The baseline includes all API rows and matching DOM row count, with first-page UI salary checks; filtered previews check the single employee. Missing prerequisites produce a specific skip, and retries are disabled. Focused Chromium verification with tracing passed on 2026-09-15: **1 passed (19.0s)**.
+
+**Run:** `npx playwright test tests/SalaryIncreases/save-validation.spec.ts --project=chromium --workers=1 --retries=0 --trace=on`
 
 #### 5.7. SI-028: Pending save and duplicate submission [CONTROLLED; VERIFY]
 
