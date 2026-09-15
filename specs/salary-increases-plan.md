@@ -495,13 +495,14 @@ Use document bounds 1 through 1, after verifying that the runtime baseline conta
 2. Select three eligible runtime employees across pages.
 3. Save once, decline vacant-position updates, and confirm the count of three.
 4. Verify the exact three selected IDs in the request, HTTP 201, affectedEmployees 3, and updatedVacantCargos 0.
-5. Reload and verify all three salaries increased by 1 and unselected salaries stayed unchanged.
+5. Verify Save returns the grid to page one, all three saved rows display `-` in the Basic Assignment Increase column, and their checkboxes are cleared. Reselect those same employees across pages. Without recalculating or changing the date, click Save again, decline vacant-position updates, and confirm the count of three.
+6. Verify the repeat request contains the same command and three employee IDs. Expect HTTP 400 `BAD_REQUEST` and the exact duplicate-history message for the first selected employee in the API and error dialog, including the trailing space.
+7. Dismiss the error, reload, and verify all three salaries increased by exactly 1 and unselected salaries stayed unchanged.
 
-**Pass condition:** One successful batch save, two calculations, and exactly three updated employees. No restoration.
+**Pass condition:** Two save requests (one HTTP 201 batch save and one HTTP 400 duplicate rejection), two calculations, and exactly three employees increased once. No restoration.
 
-**Run:** `npx playwright test tests/SalaryIncreases/save-single.spec.ts --project=chromium --workers=1 --retries=0 --trace=on`
 
-**Implementation summary:**  Uses centralized authentication, runtime identities, selection across pages, and persisted salary assertions. Focused Chromium verification passed on 2026-09-15: **1 passed (47.8s)**; scoped TypeScript validation passed. The run used 2026-09-24, saved increases of 1 for three employees, and rejected the same-date repeat for one employee. The shortened version passed discovery and scoped TypeScript validation; no additional mutation run was performed. Choose another unused supported date before rerunning; saved increases remain in QA.
+**Implementation summary:** Uses centralized authentication, runtime identities, selection across pages, and persisted salary assertions. After the successful three-employee save, verifies the grid resets to page one, the saved preview cells show `-`, and selection is cleared. Reselects the same three employees without recalculation, completes both save confirmations again, and asserts the identical request payload, HTTP 400 `BAD_REQUEST`, and exact first-employee duplicate-history message in the API and UI, including trailing whitespace. Reload proves all three salaries increased by exactly 1 and every unselected salary remained unchanged. Focused Chromium verification with tracing passed on 2026-09-15: **1 passed (1.2m)** using **2026-10-03**. Scoped TypeScript validation and diff checks passed. Earlier runs saved successfully on 2026-10-01 and 2026-10-02 before exposing pager-reset and cleared-selection assumptions; those increases also remain in QA. Choose another unused supported date before rerunning.
 
 #### 5.6. SI-024: Increase date before hire date ✅
 
@@ -528,26 +529,12 @@ Use document bounds 1 through 1, after verifying that the runtime baseline conta
 
 **Implementation summary:** Uses centralized authentication and SalaryIncreasesPage, settles all six startup responses, and derives a unique employee document and a date one day before hire within the supported startup year. Asserts three exact calculation requests, exactly one save request, HTTP 400 `BAD_REQUEST`, the complete employee/date-specific API and dialog message, and unchanged salary after reload. The baseline includes all API rows and matching DOM row count, with first-page UI salary checks; filtered previews check the single employee. Missing prerequisites produce a specific skip, and retries are disabled. Focused Chromium verification with tracing passed on 2026-09-15: **1 passed (19.0s)**.
 
-**Run:** `npx playwright test tests/SalaryIncreases/save-validation.spec.ts --project=chromium --workers=1 --retries=0 --trace=on`
-
-#### 5.7. SI-028: Pending save and duplicate submission [CONTROLLED; VERIFY]
-
-**File:** `tests/SalaryIncreases/save-resilience.spec.ts`
-
-**Steps:**
-  1. Start with a fresh authenticated browser context through auth.fixture and SalaryIncreasesPage.goto(). Use an isolated fixture or an explicitly mocked save response; never hold and blindly retry a real save.
-    - expect: The seed is ready, initial module traffic has settled, and this scenario does not depend on a preceding test.
-  2. Delay completion after final confirmation and attempt repeated activation.
-    - expect: Processing state is visible; controls prevent duplicate submissions or the verified endpoint deduplicates them.
-    - expect: Exactly one intended save is issued; mock-only coverage makes no backend idempotency claim.
-  3. Complete the response and inspect final state.
-    - expect: Processing clears and actions recover; for real fixture coverage, salary/history shows exactly one raise.
 
 ### 6. P1 - Exported table contract
 
 **Seed:** `tests/SalaryIncreases/seed-test.spec.ts`
 
-#### 6.1. SI-029: Download format and all-page row mapping [LIVE]
+#### 6.1. SI-025: Download format and all-page row mapping [LIVE]
 
 **File:** `tests/SalaryIncreases/export.spec.ts`
 
@@ -561,7 +548,7 @@ Use document bounds 1 through 1, after verifying that the runtime baseline conta
     - expect: Document, name, position, hire date, old/new salary match by employee document with explicit whitespace and date-format normalization.
     - expect: The observed file had 155 data rows plus one header, date cells used day/month/year, and missing pension values were blank where the grid used a dash.
 
-#### 6.2. SI-030: Export ignores page size [SUPPLIED; PARTLY LIVE]
+#### 6.2. SI-026: Export ignores page size [SUPPLIED; PARTLY LIVE]
 
 **File:** `tests/SalaryIncreases/export.spec.ts`
 
@@ -572,7 +559,7 @@ Use document bounds 1 through 1, after verifying that the runtime baseline conta
     - expect: Every file contains the same complete identity set and values; page size does not truncate the export.
     - expect: No module endpoint is called by client-side export.
 
-#### 6.3. SI-031: Selection flags include selected and unselected rows [LIVE ALL; VERIFY MIXED]
+#### 6.3. SI-027: Selection flags include selected and unselected rows [LIVE ALL; VERIFY MIXED]
 
 **File:** `tests/SalaryIncreases/export.spec.ts`
 
@@ -585,7 +572,7 @@ Use document bounds 1 through 1, after verifying that the runtime baseline conta
   3. Match exported flags by identity rather than row position.
     - expect: Flags reflect the selection at download time; paging or sorting does not attach flags to another employee.
 
-#### 6.4. SI-032: Export with active filters and zero results [SUPPLIED; VERIFY]
+#### 6.4. SI-028: Export with active filters and zero results [SUPPLIED; VERIFY]
 
 **File:** `tests/SalaryIncreases/export-filtered.spec.ts`
 
@@ -602,7 +589,7 @@ Use document bounds 1 through 1, after verifying that the runtime baseline conta
 
 **Seed:** `tests/SalaryIncreases/seed-test.spec.ts`
 
-#### 7.1. SI-033: Context, lookup and calculation failures recover [CONTROLLED]
+#### 7.1. SI-029: Context, lookup and calculation failures recover [CONTROLLED]
 
 **File:** `tests/SalaryIncreases/api-errors.spec.ts`
 
@@ -615,7 +602,7 @@ Use document bounds 1 through 1, after verifying that the runtime baseline conta
   3. Remove the failed route and retry the affected user action.
     - expect: The module recovers without a page crash or duplicate calculate request; unaffected filters retain valid state where supported.
 
-#### 7.2. SI-034: Save rejection and ambiguous network failure [CONTROLLED]
+#### 7.2. SI-030: Save rejection and ambiguous network failure [CONTROLLED]
 
 **File:** `tests/SalaryIncreases/save-errors.spec.ts`
 

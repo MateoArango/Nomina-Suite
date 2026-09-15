@@ -6,7 +6,7 @@ import { SalaryIncreasesPage } from "../../pages/SalaryIncreases.page";
 // seed: tests/SalaryIncreases/seed-test.spec.ts
 
 // Edit before each run: use a supported YYYY-MM-DD date unused for all three selected employees.
-const INCREASE_DATE = "2026-09-27";
+const INCREASE_DATE = "2026-10-03";
 
 type Employee = {
   kaNlTercero: number;
@@ -163,7 +163,54 @@ test.describe("P0 - Save guards, confirmations and persistence - Mutation", () =
     }
     await expect(confirmation).toBeHidden();
 
-    // 5. Reload and calculate; verify every selected salary persisted and every unselected salary stayed unchanged.
+    // 5. Verify saved rows show a dash, then retry Save without recalculating or changing the date.
+    // Successful Save returns the grid to its first page.
+    await expect(screen.previousPageButton).toBeDisabled();
+    currentPage = 0;
+    for (const employee of selected) {
+      const targetPage = Math.floor(before.rows.indexOf(employee) / 25);
+      while (currentPage < targetPage) {
+        await screen.nextPageButton.click();
+        currentPage++;
+      }
+      await expect(screen.row(employee.kaNlTercero)).toBeVisible();
+      await expect(screen.row(employee.kaNlTercero).locator("td:nth-child(12)")).toHaveText("-");
+      await expect(screen.rowCheckbox(employee.kaNlTercero)).not.toBeChecked();
+      await screen.rowCheckbox(employee.kaNlTercero).check();
+      await expect(screen.rowCheckbox(employee.kaNlTercero)).toBeChecked();
+    }
+    await expect(allRows.locator('input[type="checkbox"]:checked')).toHaveCount(3);
+    await screen.saveButton.click();
+    await expect(screen.dialog("positions-confirmation")).toBeVisible();
+    await screen.dialogButton("positions-confirmation", "deny").click();
+    await expect(confirmation).toBeVisible();
+    await expect(confirmation.locator(".swal2-html-container")).toContainText(/:\s*3\s/);
+    expect(saves).toHaveLength(1);
+    const pendingRepeat = page.waitForResponse(response =>
+      response.request().method() === "POST" && response.url().split("?")[0] === savePath);
+    await screen.dialogButton("save-confirmation", "confirm").click();
+    const repeated = await pendingRepeat;
+    expect(await repeated.finished()).toBeNull();
+    expect(repeated.request().postDataJSON()).toEqual({
+      command, selectedEmployeeIds: selectedIds,
+      actualizarCargosVacantes: false, confirmarCambios: true,
+    });
+    const repeatBody = await repeated.json();
+    await testInfo.attach("completed-save-retry", {
+      body: JSON.stringify({ date, status: repeated.status(), body: repeatBody }, null, 2),
+      contentType: "application/json",
+    });
+    expect(repeated.status(), JSON.stringify(repeatBody)).toBe(400);
+    // Preserve the exact product contract, including its trailing space.
+    const expectedMessage = `No es posible registrar el aumento de sueldo al empleado ${selected[0]!.scNombre}, debido que ya cuenta con un registro en su histórico con la misma fecha del aumento a realizar. `;
+    expect(repeatBody).toMatchObject({ code: "BAD_REQUEST", message: expectedMessage });
+    await screen.expectApiErrorMessage(expectedMessage);
+    expect(calculations).toHaveLength(1);
+    expect(saves).toHaveLength(2);
+    await screen.dialogButton("api-error", "confirm").click();
+    await expect(screen.dialog("api-error")).toBeHidden();
+
+    // 6. Reload and calculate; verify each selected salary increased once and unselected salaries stayed unchanged.
     const reloadedContext = await settleStartup(() => page.reload());
     await expect(screen.visibleRows()).toHaveCount(0);
     await screen.startDateInput.fill(displayDate);
@@ -199,7 +246,7 @@ test.describe("P0 - Save guards, confirmations and persistence - Mutation", () =
       contentType: "application/json",
     });
     expect(calculations).toHaveLength(2);
-    expect(saves).toHaveLength(1);
+    expect(saves).toHaveLength(2);
     // Saved increases remain in QA. Choose an unused date before another execution.
   });
 });
