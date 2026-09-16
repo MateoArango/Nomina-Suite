@@ -534,7 +534,7 @@ Use document bounds 1 through 1, after verifying that the runtime baseline conta
 
 **Seed:** `tests/SalaryIncreases/seed-test.spec.ts`
 
-#### 6.1. SI-025: Download format and all-page row mapping [LIVE]
+#### 6.1. SI-025: Download format and all-page row mapping ✅
 
 **File:** `tests/SalaryIncreases/export.spec.ts`
 
@@ -542,15 +542,17 @@ Use document bounds 1 through 1, after verifying that the runtime baseline conta
   1. Start with a fresh authenticated browser context through auth.fixture and SalaryIncreasesPage.goto(). Calculate more than one page and establish the result identity set.
     - expect: The seed is ready, initial module traffic has settled, and this scenario does not depend on a preceding test.
   2. Start the download wait before clicking Export; save to testInfo.outputPath.
-    - expect: Download succeeds with the observed filename w_aumento_sueldo.xls; inspect bytes rather than assuming XLSX.
-  3. Parse the HTML table contained in the file and compare all employee rows to calculation results.
+    - expect: Download succeeds with the currently observed filename w_aumento_sueldo.xls.xlsx; verify the ZIP signature and parse the XLSX workbook. Live discovery on 2026-09-16 supersedes the earlier HTML export observation.
+  3. Parse the workbook and compare all employee rows to the full calculation response, keyed by employee document.
     - expect: Data-row count matches the full calculated set, independent of current page; headers are excluded from the count.
     - expect: Document, name, position, hire date, old/new salary match by employee document with explicit whitespace and date-format normalization.
-    - expect: The observed file had 155 data rows plus one header, date cells used day/month/year, and missing pension values were blank where the grid used a dash.
+    - expect: The current observation had 408 data rows plus one header and 12 columns; derive the expected count from the response. Date cells use day/month/year and missing pension values are blank. Selection-state combinations remain SI-027 coverage.
 
-#### 6.2. SI-026: Export ignores page size [SUPPLIED; PARTLY LIVE]
+**Implementation summary:** Implemented one standalone test in `tests/SalaryIncreases/export.spec.ts` with shared authentication, the existing POM, all six startup responses, a context-derived year, and exact calculation payload/context assertions. Requires more than 25 runtime employees, verifies the first UI page before and after export, and confirms an employee beyond that page is hidden. Pre-arms the download, saves and attaches the workbook under `testInfo.outputPath`, checks its current filename and ZIP signature, and parses it with the ExcelJS development dependency. Verifies one worksheet, all 12 headers, full response row count excluding the header, unique and complete document identities, every exported identity/text field, normalized hire dates, blank nullable fields, and exact numeric old/new salaries. The full calculation response is the export oracle; the test does not walk every UI page or assert mixed selection flags. Exactly one calculation and zero salary-save requests. Generator discovery compared all 408 employees with no mismatches. Focused Chromium verification with tracing on 2026-09-16: **1 passed (17.6s)**.
 
-**File:** `tests/SalaryIncreases/export.spec.ts`
+#### 6.2. SI-026: Export ignores page size [LIVE] ✅
+
+**File:** `tests/SalaryIncreases/export-page-size.spec.ts`
 
 **Steps:**
   1. Start with a fresh authenticated browser context through auth.fixture and SalaryIncreasesPage.goto(). Calculate a multi-page set without active search or column filters.
@@ -558,6 +560,8 @@ Use document bounds 1 through 1, after verifying that the runtime baseline conta
   2. Export at page sizes 10, 25, 50 and 100, including a non-first page.
     - expect: Every file contains the same complete identity set and values; page size does not truncate the export.
     - expect: No module endpoint is called by client-side export.
+
+**Implementation summary:** Implemented one standalone test using the existing authentication fixture, SalaryIncreasesPage, and ExcelJS dependency. Settles all six startup responses and asserts the context-derived calculation payload. Requires more than 100 runtime employees and exports from the second page at sizes 10, 25, 50 and 100. Each workbook is checked for its filename, ZIP signature, worksheet/header shape, complete row count, and every document, text, date and numeric salary against the full calculation response. All workbook cell values must also match across page sizes. Verifies visible employee identities and salaries before and after each export and after returning to the first page, with one calculation, zero saves, and zero salary-module requests during paging/export. Downloads remain in test output. Generator exploration found 408 identical exported rows at every size. Final focused Chromium verification with tracing, one worker and retries disabled on 2026-09-16: **1 passed (1.2m)**. `git diff --check` passed.
 
 #### 6.3. SI-027: Selection flags include selected and unselected rows [LIVE ALL; VERIFY MIXED]
 

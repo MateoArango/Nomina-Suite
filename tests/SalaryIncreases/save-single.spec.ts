@@ -6,7 +6,7 @@ import { SalaryIncreasesPage } from "../../pages/SalaryIncreases.page";
 // seed: tests/SalaryIncreases/seed-test.spec.ts
 
 // Edit before each run: use a supported YYYY-MM-DD date unused for all three selected employees.
-const INCREASE_DATE = "2026-10-03";
+const INCREASE_DATE = "2026-10-05";
 
 type Employee = {
   kaNlTercero: number;
