@@ -563,7 +563,7 @@ Use document bounds 1 through 1, after verifying that the runtime baseline conta
 
 **Implementation summary:** Implemented one standalone test using the existing authentication fixture, SalaryIncreasesPage, and ExcelJS dependency. Settles all six startup responses and asserts the context-derived calculation payload. Requires more than 100 runtime employees and exports from the second page at sizes 10, 25, 50 and 100. Each workbook is checked for its filename, ZIP signature, worksheet/header shape, complete row count, and every document, text, date and numeric salary against the full calculation response. All workbook cell values must also match across page sizes. Verifies visible employee identities and salaries before and after each export and after returning to the first page, with one calculation, zero saves, and zero salary-module requests during paging/export. Downloads remain in test output. Generator exploration found 408 identical exported rows at every size. Final focused Chromium verification with tracing, one worker and retries disabled on 2026-09-16: **1 passed (1.2m)**. `git diff --check` passed.
 
-#### 6.3. SI-027: Selection flags include selected and unselected rows [LIVE ALL; VERIFY MIXED]
+#### 6.3. SI-027: Selection flags include selected and unselected rows [LIVE ALL; VERIFY MIXED] ✅
 
 **File:** `tests/SalaryIncreases/export.spec.ts`
 
@@ -575,6 +575,8 @@ Use document bounds 1 through 1, after verifying that the runtime baseline conta
     - expect: All-selected 1 values were observed; verify mixed and zero cases explicitly.
   3. Match exported flags by identity rather than row position.
     - expect: Flags reflect the selection at download time; paging or sorting does not attach flags to another employee.
+
+**Implementation summary:** Implemented one standalone test in `tests/SalaryIncreases/export.spec.ts` with shared authentication, the existing POM, all six startup responses, a context-derived year, and exact calculation payload/context assertions. Requires more than 25 runtime employees and at least two selectable rows. Selects a known subset across pages and exports three workbooks: mixed selection, all selected, and all deselected. Each workbook is checked for its filename, ZIP signature, worksheet/header shape, complete row count, every document/text/date/numeric salary against the full calculation response, and numeric selection flags 1/0 by employee identity. Verifies visible employee identities and salaries before and after each export and after returning to the first page, with one calculation, zero saves, and zero salary-module requests during paging/export. Downloads remain in test output. Generator exploration found 408 identical exported rows at every selection state. Final focused Chromium verification with tracing, one worker and retries disabled on 2026-09-16: **1 passed (1.2m)**. `git diff --check` passed.
 
 #### 6.4. SI-028: Export with active filters and zero results [SUPPLIED; VERIFY]
 

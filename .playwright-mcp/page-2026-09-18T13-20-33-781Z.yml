@@ -1,0 +1,572 @@
+- generic [ref=f1e3]:
+  - generic [ref=f1e5]:
+    - generic [ref=f1e6]:
+      - button "menu" [ref=f1e8] [cursor=pointer]
+      - generic [ref=f1e10]:
+        - generic [ref=f1e12] [cursor=pointer]:
+          - generic [ref=f1e13]: home
+          - generic [ref=f1e14]: Inicio
+        - generic [ref=f1e15]:
+          - generic [ref=f1e16] [cursor=pointer]:
+            - generic [ref=f1e17]: manage_accounts
+            - generic [ref=f1e18]: Administrador ...
+            - generic [ref=f1e19]: "15"
+          - generic [ref=f1e20] [cursor=pointer]:
+            - generic [ref=f1e21]: grid_view
+            - generic [ref=f1e22]: Operación
+            - generic [ref=f1e23]: "5"
+          - generic [ref=f1e24] [cursor=pointer]:
+            - generic [ref=f1e25]: bar_chart
+            - generic [ref=f1e26]: Informes
+            - generic [ref=f1e27]: "8"
+          - generic [ref=f1e28] [cursor=pointer]:
+            - generic [ref=f1e29]: grid_view
+            - generic [ref=f1e30]: Seguridad soci...
+            - generic [ref=f1e31]: "8"
+          - generic [ref=f1e32] [cursor=pointer]:
+            - generic [ref=f1e33]: grid_view
+            - generic [ref=f1e34]: Prestaciones s...
+            - generic [ref=f1e35]: "4"
+          - generic [ref=f1e36] [cursor=pointer]:
+            - generic [ref=f1e37]: groups
+            - generic [ref=f1e38]: Novedades
+            - generic [ref=f1e39]: "11"
+          - generic [ref=f1e40] [cursor=pointer]:
+            - generic [ref=f1e41]: grid_view
+            - generic [ref=f1e42]: Configuración
+            - generic [ref=f1e43]: "12"
+          - generic [ref=f1e44] [cursor=pointer]:
+            - generic [ref=f1e45]: grid_view
+            - generic [ref=f1e46]: Utilidades
+            - generic [ref=f1e47]: "1"
+          - generic [ref=f1e48] [cursor=pointer]:
+            - generic [ref=f1e49]: receipt_long
+            - generic [ref=f1e50]: Nomina
+            - generic [ref=f1e51]: "1"
+          - generic [ref=f1e52] [cursor=pointer]:
+            - generic [ref=f1e53]: receipt_long
+            - generic [ref=f1e54]: Nomina electro...
+            - generic [ref=f1e55]: "4"
+    - generic:
+      - generic [ref=f1e56]:
+        - generic:
+          - generic:
+            - generic [ref=f1e57]: A
+            - generic: ADMINISTRADOR
+      - generic "Buscar..." [ref=f1e59]:
+        - generic [ref=f1e60]:
+          - generic [ref=f1e61]: search
+          - text: Buscar...
+        - generic [ref=f1e62]: Ctrl + K
+      - generic:
+        - generic:
+          - generic [ref=f1e63] [cursor=pointer]: keyboard_arrow_down
+          - text: Administrador del sistema
+        - generic:
+          - generic:
+            - generic [ref=f1e64] [cursor=pointer]:
+              - generic [ref=f1e65]: tune
+              - generic: Maestro conceptos formato 220 dian
+            - generic [ref=f1e66] [cursor=pointer]:
+              - generic [ref=f1e67]: trending_up
+              - generic: Históricos de salario mínimos
+            - generic [ref=f1e68] [cursor=pointer]:
+              - generic [ref=f1e69]: tune
+              - generic: Configuración formato 220 dian
+            - generic [ref=f1e70] [cursor=pointer]:
+              - generic [ref=f1e71]: manage_accounts
+              - generic: Asignación de módulos
+            - generic [ref=f1e72] [cursor=pointer]:
+              - generic [ref=f1e73]: badge
+              - generic: Empleados
+            - generic [ref=f1e74] [cursor=pointer]:
+              - generic [ref=f1e75]: domain
+              - generic: Empresa
+            - generic [ref=f1e76] [cursor=pointer]:
+              - generic [ref=f1e77]: trending_up
+              - generic: Aumento de sueldos
+            - generic [ref=f1e78] [cursor=pointer]:
+              - generic [ref=f1e79]: dataset
+              - generic: Maestros
+            - generic [ref=f1e80] [cursor=pointer]:
+              - generic [ref=f1e81]: balance
+              - generic: Juzgados
+            - generic [ref=f1e82] [cursor=pointer]:
+              - generic [ref=f1e83]: category
+              - generic: Cuentas por sección
+            - generic [ref=f1e84] [cursor=pointer]:
+              - generic [ref=f1e85]: receipt_long
+              - generic: Tipos de liquidaciones
+            - generic [ref=f1e86] [cursor=pointer]:
+              - generic [ref=f1e87]: contacts
+              - generic: Maestro terceros
+            - generic [ref=f1e88] [cursor=pointer]:
+              - generic [ref=f1e89]: bar_chart
+              - generic: Supervivencia
+            - generic [ref=f1e90] [cursor=pointer]:
+              - generic [ref=f1e91]: warning
+              - generic: Riesgos profesionales
+            - generic [ref=f1e92] [cursor=pointer]:
+              - generic [ref=f1e93]: payments
+              - generic: Provisiones
+  - generic [ref=f1e94]:
+    - generic [ref=f1e96]:
+      - generic "Nómina" [ref=f1e97]:
+        - generic [ref=f1e98]:
+          - generic [ref=f1e99]: Nómina
+          - generic [ref=f1e103]:
+            - separator [ref=f1e104]
+            - button "Aurora" [ref=f1e106] [cursor=pointer]
+            - generic "Logout" [ref=f1e111] [cursor=pointer]: logout
+      - generic [ref=f1e112]:
+        - button [ref=f1e114] [cursor=pointer]:
+          - img [ref=f1e115]: favorite_border
+        - button "Ayuda" [ref=f1e119]:
+          - generic [ref=f1e121]:
+            - img [ref=f1e122]: help
+            - generic [ref=f1e123]: Ayuda
+    - region "Ventanas abiertas" [ref=f1e126]:
+      - tablist "Ventanas de trabajo" [ref=f1e127]:
+        - generic [ref=f1e128]:
+          - tab "Aumento de sueldos" [selected] [ref=f1e129] [cursor=pointer]:
+            - generic [ref=f1e130]: article
+          - button "Cerrar Aumento de sueldos" [ref=f1e132] [cursor=pointer]:
+            - generic [ref=f1e133]: close
+    - generic [ref=f1e135]:
+      - generic "Aumento de sueldos" [ref=f1e137]:
+        - generic [ref=f1e138]:
+          - generic [ref=f1e139]: Aumento de sueldos
+          - separator [ref=f1e144]
+      - generic [ref=f1e146]:
+        - tablist [ref=f1e149]:
+          - generic [ref=f1e150]:
+            - tab "Filtro" [ref=f1e151] [cursor=pointer]
+            - tab "Incrementos" [selected] [ref=f1e155] [cursor=pointer]
+        - generic:
+          - tabpanel "Incrementos"
+      - main [ref=f1e160]:
+        - generic [ref=f1e392]:
+          - generic [ref=f1e393]:
+            - heading "Empleados para incremento salarial" [level=2] [ref=f1e395]
+            - generic [ref=f1e396]:
+              - button "Sel. / Desel. todo" [ref=f1e398]
+              - button "Exportar" [ref=f1e405]
+              - button "Deshacer" [ref=f1e412]
+              - button "Guardar" [ref=f1e419]
+          - generic [ref=f1e426]:
+            - generic [ref=f1e429] [cursor=pointer]:
+              - img [ref=f1e430]: search
+              - textbox "Buscar por identificacion, nombre, cargo, seccion, unidad, tipo o salarios"
+            - generic [ref=f1e431]:
+              - button "Buscar" [ref=f1e433]
+              - button "Siguiente" [ref=f1e440]
+          - table [ref=f1e447]:
+            - rowgroup [ref=f1e448]:
+              - row [ref=f1e449]:
+                - columnheader "Seleccionar Todo" [ref=f1e450]
+                - columnheader "Identificación Abrir filtro de Identificación" [ref=f1e451]:
+                  - generic [ref=f1e452]:
+                    - generic [ref=f1e453]: Identificación
+                    - button "Abrir filtro de Identificación" [ref=f1e454] [cursor=pointer]: v
+                - columnheader "Nombre Abrir filtro de Nombre" [ref=f1e455]:
+                  - generic [ref=f1e456]:
+                    - generic [ref=f1e457]: Nombre
+                    - button "Abrir filtro de Nombre" [ref=f1e458] [cursor=pointer]: v
+                - columnheader "Cargo Abrir filtro de Cargo" [ref=f1e459]:
+                  - generic [ref=f1e460]:
+                    - generic [ref=f1e461]: Cargo
+                    - button "Abrir filtro de Cargo" [ref=f1e462] [cursor=pointer]: v
+                - columnheader "Sección Abrir filtro de Sección" [ref=f1e463]:
+                  - generic [ref=f1e464]:
+                    - generic [ref=f1e465]: Sección
+                    - button "Abrir filtro de Sección" [ref=f1e466] [cursor=pointer]: v
+                - columnheader "Unidad Abrir filtro de Unidad" [ref=f1e467]:
+                  - generic [ref=f1e468]:
+                    - generic [ref=f1e469]: Unidad
+                    - button "Abrir filtro de Unidad" [ref=f1e470] [cursor=pointer]: v
+                - columnheader "Tipo Empleado Abrir filtro de Tipo Empleado" [ref=f1e471]:
+                  - generic [ref=f1e472]:
+                    - generic [ref=f1e473]: Tipo Empleado
+                    - button "Abrir filtro de Tipo Empleado" [ref=f1e474] [cursor=pointer]: v
+                - columnheader "Tipo Pensión Abrir filtro de Tipo Pensión" [ref=f1e475]:
+                  - generic [ref=f1e476]:
+                    - generic [ref=f1e477]: Tipo Pensión
+                    - button "Abrir filtro de Tipo Pensión" [ref=f1e478] [cursor=pointer]: v
+                - columnheader "Tipo Cotizante Abrir filtro de Tipo Cotizante" [ref=f1e479]:
+                  - generic [ref=f1e480]:
+                    - generic [ref=f1e481]: Tipo Cotizante
+                    - button "Abrir filtro de Tipo Cotizante" [ref=f1e482] [cursor=pointer]: v
+                - columnheader "Ingreso Abrir filtro de Ingreso" [ref=f1e483]:
+                  - generic [ref=f1e484]:
+                    - generic [ref=f1e485]: Ingreso
+                    - button "Abrir filtro de Ingreso" [ref=f1e486] [cursor=pointer]: v
+                - columnheader "Asignación Básica Mensual Abrir filtro de Asignación Básica Mensual" [ref=f1e487]:
+                  - generic [ref=f1e488]:
+                    - generic [ref=f1e489]: Asignación Básica Mensual
+                    - button "Abrir filtro de Asignación Básica Mensual" [ref=f1e490] [cursor=pointer]: v
+                - columnheader "Asignación Básica Incremento Abrir filtro de Asignación Básica Incremento" [ref=f1e491]:
+                  - generic [ref=f1e492]:
+                    - generic [ref=f1e493]: Asignación Básica Incremento
+                    - button "Abrir filtro de Asignación Básica Incremento" [ref=f1e494] [cursor=pointer]: v
+            - rowgroup [ref=f1e495]:
+              - row [ref=f1e496]:
+                - cell [ref=f1e497]:
+                  - checkbox [ref=f1e504] [cursor=pointer]
+                - cell "1121816023" [ref=f1e505]
+                - cell "A iure optio quo veritatis quos optio Veritatis cumque adipisci deleniti harum quos" [ref=f1e506]
+                - cell "DOCENTE OCASIONAL TIEMPO COMPLETO" [ref=f1e507]
+                - cell "DEPARTAMENTO DE PRODUCCION ANIMAL_DOCENTES OCASIONALES" [ref=f1e508]
+                - cell "PAGO ACH" [ref=f1e509]
+                - cell "DOCENTES OCASIONALES" [ref=f1e510]
+                - cell "-" [ref=f1e511]
+                - cell "Dependiente" [ref=f1e512]
+                - cell "2026-01-19" [ref=f1e513]
+                - cell "5.813.553" [ref=f1e514]
+                - cell "5.813.653" [ref=f1e515]
+              - row [ref=f1e516]:
+                - cell [ref=f1e517]:
+                  - checkbox [ref=f1e524] [cursor=pointer]
+                - cell "79756549" [ref=f1e525]
+                - cell "A nulla totam molestias cum ea ea Dolore eaque aperiam Nam autem quibusdam laboriosam nam" [ref=f1e526]
+                - cell "DOCENTE DE PLANTA ASISTENTE" [ref=f1e527]
+                - cell "ESCUELA DE INGENIERIA_DOCENTES DE PLANTA" [ref=f1e528]
+                - cell "PAGO ACH" [ref=f1e529]
+                - cell "DOCENTES DE PLANTA" [ref=f1e530]
+                - cell "-" [ref=f1e531]
+                - cell "Dependiente" [ref=f1e532]
+                - cell "2015-05-07" [ref=f1e533]
+                - cell "9.153.324" [ref=f1e534]
+                - cell "9.153.424" [ref=f1e535]
+              - row [ref=f1e536]:
+                - cell [ref=f1e537]:
+                  - checkbox [ref=f1e544] [cursor=pointer]
+                - cell "17309975" [ref=f1e545]
+                - cell "A perferendis quod aut fugit ipsam Totam praesentium dicta adipisci" [ref=f1e546]
+                - cell "DOCENTE DE PLANTA TITULAR" [ref=f1e547]
+                - cell "DEPARTAMENTO DE MATEMATICAS Y FISICA_DOCENTES DE PLANTA" [ref=f1e548]
+                - cell "PAGO ACH" [ref=f1e549]
+                - cell "DOCENTES DE PLANTA" [ref=f1e550]
+                - cell "-" [ref=f1e551]
+                - cell "Dependiente" [ref=f1e552]
+                - cell "1983-02-01" [ref=f1e553]
+                - cell "14.077.362" [ref=f1e554]
+                - cell "14.077.462" [ref=f1e555]
+              - row [ref=f1e556]:
+                - cell [ref=f1e557]:
+                  - checkbox [ref=f1e564] [cursor=pointer]
+                - cell "42690672" [ref=f1e565]
+                - cell "A soluta quo ad incidunt facilis rem doloribus Hic delectus atque alias necessitatibus" [ref=f1e566]
+                - cell "DOCENTE OCASIONAL TIEMPO COMPLETO" [ref=f1e567]
+                - cell "INSTITUTO DE ACUICULTURA DE LOS LLANOS(IALL)_DOC.OCASIONALES" [ref=f1e568]
+                - cell "PAGO ACH" [ref=f1e569]
+                - cell "DOCENTES OCASIONALES" [ref=f1e570]
+                - cell "-" [ref=f1e571]
+                - cell "Dependiente" [ref=f1e572]
+                - cell "2026-01-19" [ref=f1e573]
+                - cell "9.497.829" [ref=f1e574]
+                - cell "9.497.929" [ref=f1e575]
+              - row [ref=f1e576]:
+                - cell [ref=f1e577]:
+                  - checkbox [ref=f1e584] [cursor=pointer]
+                - cell "86000060" [ref=f1e585]
+                - cell "A veritatis architecto perferendis dolor Consectetur maiores culpa aperiam" [ref=f1e586]
+                - cell "DOCENTE DE PLANTA TITULAR" [ref=f1e587]
+                - cell "ESCUELA DE INGENIERIA_DOCENTES DE PLANTA" [ref=f1e588]
+                - cell "PAGO ACH" [ref=f1e589]
+                - cell "DOCENTES DE PLANTA" [ref=f1e590]
+                - cell "-" [ref=f1e591]
+                - cell "Dependiente" [ref=f1e592]
+                - cell "1988-03-25" [ref=f1e593]
+                - cell "32.549.560" [ref=f1e594]
+                - cell "32.549.660" [ref=f1e595]
+              - row [ref=f1e596]:
+                - cell [ref=f1e597]:
+                  - checkbox [ref=f1e604] [cursor=pointer]
+                - cell "17345016" [ref=f1e605]
+                - cell "Accusamus dolores optio rerum architecto dolore Dignissimos nesciunt nulla ratione" [ref=f1e606]
+                - cell "AUXILIAR DE GRANJA 08" [ref=f1e607]
+                - cell "GRANJAS Y UNIDADES RURALES_TRABAJADORES OFICIALES" [ref=f1e608]
+                - cell "PAGO ACH" [ref=f1e609]
+                - cell "NOMINA TRABAJADORES OFICIALES" [ref=f1e610]
+                - cell "-" [ref=f1e611]
+                - cell "Dependiente" [ref=f1e612]
+                - cell "1994-11-15" [ref=f1e613]
+                - cell "3.482.657" [ref=f1e614]
+                - cell "3.482.757" [ref=f1e615]
+              - row [ref=f1e616]:
+                - cell [ref=f1e617]:
+                  - checkbox [ref=f1e624] [cursor=pointer]
+                - cell "51942548" [ref=f1e625]
+                - cell "Accusamus eum soluta libero cum assumenda Iste praesentium est quas possimus debitis" [ref=f1e626]
+                - cell "DOCENTE DE PLANTA ASISTENTE" [ref=f1e627]
+                - cell "ESCUELA DE INGENIERIA_DOCENTES DE PLANTA" [ref=f1e628]
+                - cell "PAGO ACH" [ref=f1e629]
+                - cell "DOCENTES DE PLANTA" [ref=f1e630]
+                - cell "-" [ref=f1e631]
+                - cell "Dependiente" [ref=f1e632]
+                - cell "2006-01-24" [ref=f1e633]
+                - cell "10.295.934" [ref=f1e634]
+                - cell "10.296.034" [ref=f1e635]
+              - row [ref=f1e636]:
+                - cell [ref=f1e637]:
+                  - checkbox [ref=f1e644] [cursor=pointer]
+                - cell "86057826" [ref=f1e645]
+                - cell "Accusamus quaerat aperiam neque Rem amet optio maxime quas unde porro" [ref=f1e646]
+                - cell "SECRETARIA EJECUTIVA 20" [ref=f1e647]
+                - cell "Vicerrectoria de recursos" [ref=f1e648]
+                - cell "PAGO ACH" [ref=f1e649]
+                - cell "NOMINA ADMINISTRATIVOS PLANTA" [ref=f1e650]
+                - cell "-" [ref=f1e651]
+                - cell "Dependiente" [ref=f1e652]
+                - cell "2006-01-10" [ref=f1e653]
+                - cell "2.951.002" [ref=f1e654]
+                - cell "2.951.102" [ref=f1e655]
+              - row [ref=f1e656]:
+                - cell [ref=f1e657]:
+                  - checkbox [ref=f1e664] [cursor=pointer]
+                - cell "51792508" [ref=f1e665]
+                - cell "Accusantium perspiciatis aut distinctio necessitatibus eveniet eveniet" [ref=f1e666]
+                - cell "DOCENTE OCASIONAL TIEMPO COMPLETO" [ref=f1e667]
+                - cell "DEPARTAMENTO DE QUIMICA Y BIOLOGIA_DOCENTES OCASIONALES" [ref=f1e668]
+                - cell "PAGO ACH" [ref=f1e669]
+                - cell "DOCENTES OCASIONALES" [ref=f1e670]
+                - cell "-" [ref=f1e671]
+                - cell "Dependiente" [ref=f1e672]
+                - cell "2026-01-19" [ref=f1e673]
+                - cell "9.732.284" [ref=f1e674]
+                - cell "9.732.384" [ref=f1e675]
+              - row [ref=f1e676]:
+                - cell [ref=f1e677]:
+                  - checkbox [ref=f1e684] [cursor=pointer]
+                - cell "17340450" [ref=f1e685]
+                - cell "Accusantium rem earum voluptatibus In atque temporibus perspiciatis nemo ipsa" [ref=f1e686]
+                - cell "AUXILIAR DE SERVICIOS 06" [ref=f1e687]
+                - cell "SECCIÓN DE SERVICIOS GENERALES_TRABAJADORES OFICIALES" [ref=f1e688]
+                - cell "PAGO ACH" [ref=f1e689]
+                - cell "NOMINA TRABAJADORES OFICIALES" [ref=f1e690]
+                - cell "-" [ref=f1e691]
+                - cell "Dependiente" [ref=f1e692]
+                - cell "2006-10-11" [ref=f1e693]
+                - cell "3.051.599" [ref=f1e694]
+                - cell "3.051.699" [ref=f1e695]
+              - row [ref=f1e696]:
+                - cell [ref=f1e697]:
+                  - checkbox [ref=f1e704] [cursor=pointer]
+                - cell "79380265" [ref=f1e705]
+                - cell "Ad amet reiciendis nemo laboriosam est reprehenderit molestiae Totam dolores quasi nemo eaque" [ref=f1e706]
+                - cell "OPERARIO CALIFICADO" [ref=f1e707]
+                - cell "INSTITUTO DE ACUICULTURA DE LOS LLANOS (ALL)_ADMINISTRATIVOS" [ref=f1e708]
+                - cell "PAGO ACH" [ref=f1e709]
+                - cell "NOMINA ADMINISTRATIVOS PLANTA" [ref=f1e710]
+                - cell "-" [ref=f1e711]
+                - cell "Dependiente" [ref=f1e712]
+                - cell "2006-01-04" [ref=f1e713]
+                - cell "2.790.105" [ref=f1e714]
+                - cell "2.790.205" [ref=f1e715]
+              - row [ref=f1e716]:
+                - cell [ref=f1e717]:
+                  - checkbox [ref=f1e724] [cursor=pointer]
+                - cell "91521190" [ref=f1e725]
+                - cell "Ad distinctio quidem porro mollitia Sunt vel quaerat explicabo" [ref=f1e726]
+                - cell "DOCENTE DE PLANTA TITULAR" [ref=f1e727]
+                - cell "ESCUELA DE PEDAGOGIA Y BELLAS ARTES_DOCENTES PLANTA" [ref=f1e728]
+                - cell "PAGO ACH" [ref=f1e729]
+                - cell "DOCENTES DE PLANTA" [ref=f1e730]
+                - cell "-" [ref=f1e731]
+                - cell "Dependiente" [ref=f1e732]
+                - cell "2012-08-01" [ref=f1e733]
+                - cell "24.329.991" [ref=f1e734]
+                - cell "24.330.091" [ref=f1e735]
+              - row [ref=f1e736]:
+                - cell [ref=f1e737]:
+                  - checkbox [ref=f1e744] [cursor=pointer]
+                - cell "10306552" [ref=f1e745]
+                - cell "Ad id iure voluptatum repudiandae a maxime Voluptates pariatur pariatur consectetur aut" [ref=f1e746]
+                - cell "DOCENTE DE PLANTA ASISTENTE" [ref=f1e747]
+                - cell "ESCUELA DE INGENIERA EN CIENCIAS AGRICOLAS_DOCENTES PLANTA" [ref=f1e748]
+                - cell "PAGO ACH" [ref=f1e749]
+                - cell "DOCENTES DE PLANTA" [ref=f1e750]
+                - cell "-" [ref=f1e751]
+                - cell "Dependiente" [ref=f1e752]
+                - cell "2023-08-01" [ref=f1e753]
+                - cell "12.370.862" [ref=f1e754]
+                - cell "12.370.962" [ref=f1e755]
+              - row [ref=f1e756]:
+                - cell [ref=f1e757]:
+                  - checkbox [ref=f1e764] [cursor=pointer]
+                - cell "26253574" [ref=f1e765]
+                - cell "Adipisci nostrum at quisquam tempore sapiente Beatae voluptatum enim officia quae facere" [ref=f1e766]
+                - cell "PENSION DE JUBILACION 07" [ref=f1e767]
+                - cell "PENSIONADOS NVO CC" [ref=f1e768]
+                - cell "PAGO ACH" [ref=f1e769]
+                - cell "JUBILADOS" [ref=f1e770]
+                - cell "2-Sobrevivencia Vitalicia Riesgo Común" [ref=f1e771]
+                - cell "No Aplica" [ref=f1e772]
+                - cell "1900-01-01" [ref=f1e773]
+                - cell "6.114.206" [ref=f1e774]
+                - cell "6.114.306" [ref=f1e775]
+              - row [ref=f1e776]:
+                - cell [ref=f1e777]:
+                  - checkbox [ref=f1e784] [cursor=pointer]
+                - cell "40382445" [ref=f1e785]
+                - cell "Adipisci numquam doloremque eum laboriosam Error maiores asperiores eaque consectetur dignissimos" [ref=f1e786]
+                - cell "AUXILIAR DE SERVICIOS 22" [ref=f1e787]
+                - cell "SECCIÓN DE SERVICIOS GENERALES_TRABAJADORES OFICIALES" [ref=f1e788]
+                - cell "PAGO ACH" [ref=f1e789]
+                - cell "NOMINA TRABAJADORES OFICIALES" [ref=f1e790]
+                - cell "-" [ref=f1e791]
+                - cell "Dependiente" [ref=f1e792]
+                - cell "1995-09-01" [ref=f1e793]
+                - cell "3.482.657" [ref=f1e794]
+                - cell "3.482.757" [ref=f1e795]
+              - row [ref=f1e796]:
+                - cell [ref=f1e797]:
+                  - checkbox [ref=f1e804] [cursor=pointer]
+                - cell "86055365" [ref=f1e805]
+                - cell "Adipisci saepe minima veritatis Inventore quia illum laborum quod possimus expedita magnam" [ref=f1e806]
+                - cell "DOCENTE OCASIONAL TIEMPO COMPLETO" [ref=f1e807]
+                - cell "ESCUELA DE PEDAGOGIA Y BELLAS ARTES_DOCENTES OCASIONALES" [ref=f1e808]
+                - cell "PAGO ACH" [ref=f1e809]
+                - cell "DOCENTES OCASIONALES" [ref=f1e810]
+                - cell "-" [ref=f1e811]
+                - cell "Dependiente" [ref=f1e812]
+                - cell "2026-01-19" [ref=f1e813]
+                - cell "5.988.178" [ref=f1e814]
+                - cell "5.988.278" [ref=f1e815]
+              - row [ref=f1e816]:
+                - cell [ref=f1e817]:
+                  - checkbox [ref=f1e824] [cursor=pointer]
+                - cell "51977720" [ref=f1e825]
+                - cell "Alias ad quidem unde cumque dicta Vitae quos est pariatur Incidunt ipsum saepe" [ref=f1e826]
+                - cell "DOCENTE DE PLANTA AUXILIAR" [ref=f1e827]
+                - cell "ESCUELA DE INGENIERIA_DOCENTES DE PLANTA" [ref=f1e828]
+                - cell "PAGO ACH" [ref=f1e829]
+                - cell "DOCENTES DE PLANTA" [ref=f1e830]
+                - cell "-" [ref=f1e831]
+                - cell "Dependiente" [ref=f1e832]
+                - cell "2012-08-01" [ref=f1e833]
+                - cell "10.079.421" [ref=f1e834]
+                - cell "10.079.521" [ref=f1e835]
+              - row [ref=f1e836]:
+                - cell [ref=f1e837]:
+                  - checkbox [ref=f1e844] [cursor=pointer]
+                - cell "20638232" [ref=f1e845]
+                - cell "Alias cupiditate unde odit iste Quasi pariatur ad illo nostrum" [ref=f1e846]
+                - cell "SECRETARIA EJECUTIVA 18" [ref=f1e847]
+                - cell "ESCUELA DE CIENCIAS ANIMALES_ADMINISTRATIVOS" [ref=f1e848]
+                - cell "PAGO ACH" [ref=f1e849]
+                - cell "NOMINA ADMINISTRATIVOS PLANTA" [ref=f1e850]
+                - cell "No Aplica" [ref=f1e851]
+                - cell "Dependiente" [ref=f1e852]
+                - cell "2025-02-07" [ref=f1e853]
+                - cell "2.790.105" [ref=f1e854]
+                - cell "2.790.205" [ref=f1e855]
+              - row [ref=f1e856]:
+                - cell [ref=f1e857]:
+                  - checkbox [ref=f1e864] [cursor=pointer]
+                - cell "17340344" [ref=f1e865]
+                - cell "Alias nihil labore maiores eaque nemo alias Vitae eos voluptate commodi" [ref=f1e866]
+                - cell "DOCENTE OCASIONAL TIEMPO COMPLETO" [ref=f1e867]
+                - cell "ESCUELA DE ECONOMIA Y FINANZAS_DOCENTES OCASIONALES" [ref=f1e868]
+                - cell "PAGO ACH" [ref=f1e869]
+                - cell "DOCENTES OCASIONALES" [ref=f1e870]
+                - cell "-" [ref=f1e871]
+                - cell "Dependiente" [ref=f1e872]
+                - cell "2026-01-26" [ref=f1e873]
+                - cell "6.009.231" [ref=f1e874]
+                - cell "6.009.331" [ref=f1e875]
+              - row [ref=f1e876]:
+                - cell [ref=f1e877]:
+                  - checkbox [ref=f1e884] [cursor=pointer]
+                - cell "79685462" [ref=f1e885]
+                - cell "Aliquam molestias sit omnis repellendus ipsa labore Velit magnam corrupti delectus animi enim" [ref=f1e886]
+                - cell "DECANO-1" [ref=f1e887]
+                - cell "Decanatura de la Facultad de Ciencias Economicas" [ref=f1e888]
+                - cell "PAGO ACH" [ref=f1e889]
+                - cell "NOMINA ADMINISTRATIVOS PLANTA" [ref=f1e890]
+                - cell "-" [ref=f1e891]
+                - cell "Dependiente" [ref=f1e892]
+                - cell "2025-06-04" [ref=f1e893]
+                - cell "12.592.537" [ref=f1e894]
+                - cell "12.592.637" [ref=f1e895]
+              - row [ref=f1e896]:
+                - cell [ref=f1e897]:
+                  - checkbox [ref=f1e904] [cursor=pointer]
+                - cell "80513723" [ref=f1e905]
+                - cell "Aliquam veniam libero Natus voluptate magni aspernatur Aut rem cumque reiciendis animi" [ref=f1e906]
+                - cell "DOCENTE OCASIONAL TIEMPO COMPLETO" [ref=f1e907]
+                - cell "DEPARTAMENTO DE QUIMICA Y BIOLOGIA_DOCENTES OCASIONALES" [ref=f1e908]
+                - cell "PAGO ACH" [ref=f1e909]
+                - cell "DOCENTES OCASIONALES" [ref=f1e910]
+                - cell "-" [ref=f1e911]
+                - cell "Dependiente" [ref=f1e912]
+                - cell "2026-01-19" [ref=f1e913]
+                - cell "6.478.620" [ref=f1e914]
+                - cell "6.478.720" [ref=f1e915]
+              - row [ref=f1e916]:
+                - cell [ref=f1e917]:
+                  - checkbox [ref=f1e924] [cursor=pointer]
+                - cell "17316203" [ref=f1e925]
+                - cell "Aliquid laboriosam sint porro maxime Alias quae voluptate inventore" [ref=f1e926]
+                - cell "DOCENTE OCASIONAL TIEMPO COMPLETO" [ref=f1e927]
+                - cell "ESCUELA DE INGENIERIA EN CIENCIAS_DOCENTES OCASIONALES" [ref=f1e928]
+                - cell "PAGO ACH" [ref=f1e929]
+                - cell "DOCENTES OCASIONALES" [ref=f1e930]
+                - cell "No Aplica" [ref=f1e931]
+                - cell "Dependiente" [ref=f1e932]
+                - cell "2026-01-19" [ref=f1e933]
+                - cell "6.180.049" [ref=f1e934]
+                - cell "6.180.149" [ref=f1e935]
+              - row [ref=f1e936]:
+                - cell [ref=f1e937]:
+                  - checkbox [ref=f1e944] [cursor=pointer]
+                - cell "1056868261" [ref=f1e945]
+                - cell "Aliquid numquam quam nobis Facilis cumque blanditiis nemo explicabo" [ref=f1e946]
+                - cell "DOCENTE OCASIONAL TIEMPO COMPLETO" [ref=f1e947]
+                - cell "DEPARTAMENTO DE MATEMATICAS Y FISICA DOCENTES OCASIONALES" [ref=f1e948]
+                - cell "PAGO ACH" [ref=f1e949]
+                - cell "DOCENTES OCASIONALES" [ref=f1e950]
+                - cell "-" [ref=f1e951]
+                - cell "Dependiente" [ref=f1e952]
+                - cell "2026-01-19" [ref=f1e953]
+                - cell "6.173.350" [ref=f1e954]
+                - cell "6.173.450" [ref=f1e955]
+              - row [ref=f1e956]:
+                - cell [ref=f1e957]:
+                  - checkbox [ref=f1e964] [cursor=pointer]
+                - cell "86075388" [ref=f1e965]
+                - cell "Aliquid reprehenderit accusamus beatae illum Aperiam nesciunt inventore voluptatum voluptates" [ref=f1e966]
+                - cell "DOCENTE DE PLANTA TITULAR" [ref=f1e967]
+                - cell "ESCUELA DE SALUD PUBLICA_DOCENTES DE PLANTA" [ref=f1e968]
+                - cell "PAGO ACH" [ref=f1e969]
+                - cell "DOCENTES DE PLANTA" [ref=f1e970]
+                - cell "-" [ref=f1e971]
+                - cell "Dependiente" [ref=f1e972]
+                - cell "2015-05-07" [ref=f1e973]
+                - cell "15.228.584" [ref=f1e974]
+                - cell "15.228.684" [ref=f1e975]
+              - row [ref=f1e976]:
+                - cell [ref=f1e977]:
+                  - checkbox [ref=f1e984] [cursor=pointer]
+                - cell "43547677" [ref=f1e985]
+                - cell "Aliquid sequi harum Perspiciatis modi illo iusto" [ref=f1e986]
+                - cell "DOCENTE DE PLANTA AUXILIAR" [ref=f1e987]
+                - cell "ESCUELA DE ECONOMIA Y FINANZAS_DOCENTES DE PLANTA" [ref=f1e988]
+                - cell "PAGO ACH" [ref=f1e989]
+                - cell "DOCENTES DE PLANTA" [ref=f1e990]
+                - cell "-" [ref=f1e991]
+                - cell "Dependiente" [ref=f1e992]
+                - cell "2015-05-07" [ref=f1e993]
+                - cell "11.616.538" [ref=f1e994]
+                - cell "11.616.638" [ref=f1e995]
+          - generic [ref=f1e996]:
+            - generic [ref=f1e997]:
+              - generic [ref=f1e998]: Mostrar
+              - button "10" [ref=f1e999] [cursor=pointer]
+              - button "25" [pressed] [ref=f1e1000] [cursor=pointer]
+              - button "50" [ref=f1e1001] [cursor=pointer]
+              - button "100" [ref=f1e1002] [cursor=pointer]
+            - generic [ref=f1e1003]:
+              - button "Anterior" [disabled] [ref=f1e1004]
+              - generic [ref=f1e1005]: 1-25 de 408
+              - button "Siguiente" [ref=f1e1006] [cursor=pointer]
