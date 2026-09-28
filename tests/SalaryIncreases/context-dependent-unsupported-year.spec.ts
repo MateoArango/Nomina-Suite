@@ -5,7 +5,7 @@ import { SalaryIncreasesPage } from "../../pages/SalaryIncreases.page";
 // seed: tests/SalaryIncreases/seed-test.spec.ts
 
 test.describe("P0 - Initial state and calculation validation", () => {
-  test("SI-006: Context-dependent unsupported year", async ({ page }) => {
+  test("SI-005: Context-dependent unsupported year", async ({ page }) => {
     const salary = new SalaryIncreasesPage(page);
     const calculateUrl = salary.apiBase + "w-aumento-sueldo/actions/calculate";
     const calculations: string[] = [];

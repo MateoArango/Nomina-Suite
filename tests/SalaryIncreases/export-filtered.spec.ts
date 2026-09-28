@@ -11,7 +11,7 @@ type CalculatedRow = {
 } & Record<string, unknown>;
 
 test.describe("P1 - Exported table contract", () => {
-  test("SI-028: Export disabled when search shows no records", async ({
+  test("SI-025: Export disabled when search shows no records", async ({
     page,
   }) => {
     const screen = new SalaryIncreasesPage(page);

@@ -19,7 +19,7 @@ type Employee = {
 };
 
 test.describe("P1 - Filter controls and employee eligibility", () => {
-  test("SI-012: Reset restores defaults and clears preview", async ({ page }) => {
+  test("SI-011: Reset restores defaults and clears preview", async ({ page }) => {
     test.setTimeout(90_000);
     const screen = new SalaryIncreasesPage(page);
     const calculateUrl = screen.apiBase + "w-aumento-sueldo/actions/calculate";

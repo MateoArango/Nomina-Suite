@@ -15,7 +15,7 @@ type Employee = {
 };
 
 test.describe("P1 - Filter controls and employee eligibility", () => {
-  test("SI-008: Position and section searchable pickers", async ({ page }) => {
+  test("SI-007: Position and section searchable pickers", async ({ page }) => {
     test.setTimeout(90_000);
     const loginPage = new LoginPage(page);
     await loginPage.goto();

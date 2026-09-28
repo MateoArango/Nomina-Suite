@@ -16,7 +16,7 @@ type Employee = {
 test.describe("P0 - Save guards, confirmations and persistence - Mutation", () => {
   test.describe.configure({ retries: 0 });
 
-  test("SI-024: Increase date before hire date", async ({ page }, testInfo) => {
+  test("SI-021: Increase date before hire date", async ({ page }, testInfo) => {
     test.setTimeout(120_000);
     const screen = new SalaryIncreasesPage(page);
     const calculatePath = screen.apiBase + "w-aumento-sueldo/actions/calculate";

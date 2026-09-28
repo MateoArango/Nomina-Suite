@@ -15,7 +15,7 @@ type Employee = {
 };
 
 test.describe("P1 - Filter controls and employee eligibility", () => {
-  test("SI-007: Employee type, payment unit and profession", async ({ page }) => {
+  test("SI-006: Employee type, payment unit and profession", async ({ page }) => {
     test.setTimeout(90_000);
     const screen = new SalaryIncreasesPage(page);
     const calculateUrl = screen.apiBase + "w-aumento-sueldo/actions/calculate";

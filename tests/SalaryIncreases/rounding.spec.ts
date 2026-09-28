@@ -23,7 +23,7 @@ type PreviewRow = {
 };
 
 test.describe("P0 - Salary calculation and API-to-grid mapping", () => {
-  test("SI-015: Nearest-hundred payload and arithmetic", async ({ page }) => {
+  test("SI-014: Nearest-hundred payload and arithmetic", async ({ page }) => {
     test.setTimeout(90_000);
     const screen = new SalaryIncreasesPage(page);
     const saves: string[] = [];

@@ -15,7 +15,7 @@ type CalculatedRow = {
 } & Record<string, unknown>;
 
 test.describe("P1 - Exported table contract", () => {
-  test("SI-025: Download format and all-page row mapping", async ({ page }, testInfo) => {
+  test("SI-022: Download format and all-page row mapping", async ({ page }, testInfo) => {
     test.setTimeout(120_000);
     const screen = new SalaryIncreasesPage(page);
     const calculatePath = screen.apiBase + "w-aumento-sueldo/actions/calculate";

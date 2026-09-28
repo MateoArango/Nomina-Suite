@@ -23,7 +23,7 @@ type PreviewRow = {
 };
 
 test.describe("P0 - Salary calculation and API-to-grid mapping", () => {
-  test("SI-014: Percentage salary preview", async ({ page }) => {
+  test("SI-013: Percentage salary preview", async ({ page }) => {
     test.setTimeout(90_000);
     const screen = new SalaryIncreasesPage(page);
     const saves: string[] = [];

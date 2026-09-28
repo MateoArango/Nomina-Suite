@@ -12,7 +12,7 @@ type Preview = {
 };
 
 test.describe("P1 - Filter controls and employee eligibility", () => {
-  test("SI-010: Hire-date lower bound and equality", async ({ page }) => {
+  test("SI-009: Hire-date lower bound and equality", async ({ page }) => {
     test.setTimeout(60_000);
     const screen = new SalaryIncreasesPage(page);
     const calculateUrl = screen.apiBase + "w-aumento-sueldo/actions/calculate";

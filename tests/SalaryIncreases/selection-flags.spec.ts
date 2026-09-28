@@ -9,7 +9,7 @@ import { SalaryIncreasesPage } from "../../pages/SalaryIncreases.page";
 type Employee = { kaNlTercero: number; nNit: number };
 
 test.describe("P1 - Exported table contract", () => {
-  test("SI-027: Selection flags include selected and unselected rows", async ({ page }, testInfo) => {
+  test("SI-024: Selection flags include selected and unselected rows", async ({ page }, testInfo) => {
     test.setTimeout(120_000);
     const screen = new SalaryIncreasesPage(page);
     const calculatePath = screen.apiBase + "w-aumento-sueldo/actions/calculate";

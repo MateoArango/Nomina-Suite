@@ -6,7 +6,7 @@ import { SalaryIncreasesPage } from "../../pages/SalaryIncreases.page";
 // seed: tests/SalaryIncreases/seed-test.spec.ts
 
 // Edit before each run: use a supported YYYY-MM-DD date unused for all three selected employees.
-const INCREASE_DATE = "2026-10-05";
+const INCREASE_DATE = "2026-10-06";
 
 type Employee = {
   kaNlTercero: number;
@@ -23,7 +23,7 @@ test.describe("P0 - Save guards, confirmations and persistence - Mutation", () =
   // This test persists an increase. A retry must never repeat a successful save.
   test.describe.configure({ retries: 0 });
 
-  test("SI-023: Full salary-increase flow for three existing employees", async ({ page }, testInfo) => {
+  test("SI-020: Full salary-increase flow for three existing employees", async ({ page }, testInfo) => {
     test.setTimeout(120_000);
     const date = INCREASE_DATE;
     expect(date).toMatch(/^\d{4}-\d{2}-\d{2}$/);

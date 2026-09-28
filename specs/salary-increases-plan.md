@@ -2,7 +2,7 @@
 
 ## Application Overview
 
-Plan date: 2026-09-07. Status: planning complete; SI-001, SI-002, SI-003, SI-004, SI-005, SI-006 and SI-007 are implemented and verified. Remaining SI scenarios are planned.
+Plan date: 2026-09-07. Status: planning complete; SI-001, SI-002, SI-003, SI-004, SI-005 and SI-006 are implemented and verified. Remaining SI scenarios are planned.
 
 ## Scope and sources
 
@@ -25,7 +25,7 @@ LIVE means directly explored, PARTLY LIVE means only the named part was observed
 - Missing selection showed its dedicated dialog. First confirmation asks whether to update position salaries; choosing No still advances to final confirmation. That dialog uses success-sounding wording before persistence. Choosing No there emitted no salary-save request. No real salary-save request was sent during exploration; backend success, atomicity, duplicate-history and hire-date rejection remain unverified.
 - Export downloaded w_aumento_sueldo.xls containing HTML with an Excel wrapper, not a binary XLSX workbook. Its table had 155 data rows, 12 headers and all-selected flags equal to 1. It covered every calculated page. Active-filter export semantics and mixed selection remain to verify.
 - Undo returned to filters without a module request. Reset restored $0/0, blank dates/documents, rounding off and empty/unselected filters; reopening increases after reset had Export/Save disabled. Do not assume Undo and Reset are equivalent.
-- Position and section picker search, selection, clearing and calculation mappings were confirmed in SI-008 exploration on 2026-09-09; see its steps and evidence below.
+- Position and section picker search, selection, clearing and calculation mappings were confirmed in SI-007 exploration on 2026-09-09; see its steps and evidence below.
 - Exploration included a broad-checkbox locator that stalled on hidden controls; its incidental filter change was reset before subsequent inspection. Use the existing POM and short action timeouts. Exploratory results are not a substitute for focused test execution.
 
 ## Confirmed network shape
@@ -40,7 +40,7 @@ Startup GET endpoints:
 
 Level, grade and liquidation-type lookups were also loaded automatically; their traffic is not a reason to expand excluded control coverage.
 
-POST w-aumento-sueldo/actions/calculate accepts the observed keys tipoTercero, unidad, profesion, rango, fuerza, nivel, grado, nitInicial, nitFinal, salarioInicial, salarioFinal, porcentaje, valor, decreto, fechaDesde, fechaIngresoDesde, aproximarCien, aumentoPorPuntos. Unselected optional filters were null, inactive amount/percentage were 0, and date values were ISO date-only strings. SI-008 confirmed position selection maps lookup.id to rango and section selection maps lookup.kaNlSeccion to fuerza; clearing restores null.
+POST w-aumento-sueldo/actions/calculate accepts the observed keys tipoTercero, unidad, profesion, rango, fuerza, nivel, grado, nitInicial, nitFinal, salarioInicial, salarioFinal, porcentaje, valor, decreto, fechaDesde, fechaIngresoDesde, aproximarCien, aumentoPorPuntos. Unselected optional filters were null, inactive amount/percentage were 0, and date values were ISO date-only strings. SI-007 confirmed position selection maps lookup.id to rango and section selection maps lookup.kaNlSeccion to fuerza; clearing restores null.
 
 Successful response: { context, rows }. Context includes salarioMinimoActual, dobleMesada, dobleMesadaFlag. Row identity is kaNlTercero; document is nNit. Relevant row fields include scNombre, scDetalleCargo, ssSeccion, scUnidadDePago, sDescripcion, tipoPension, tipoCotizante, ddIngreso, ndSalarioMes, nuevoSalario, salarioFijo and nuevoSalarioFijo. Additional fields are available for filter eligibility. Fixed-salary/conditional-column business semantics are not established; add fixtures before asserting them.
 
@@ -60,13 +60,13 @@ Parse the observed exported HTML table with a suitable HTML parser or browser DO
 
 ## Order and completion criteria
 
-**Number one priority: SI-023, the complete salary-increase flow for three existing employee rows.** Verify one successful three-employee batch increase and all three persisted salaries. Keep scenario IDs stable. SI-023 uses three existing rows and increases their salaries; it requires no record creation, history assertions, deletion, or salary restoration. Run controlled failure cases separately. Implement and verify one numbered scenario at a time, then append its implementation summary and completion checkmark. Completion requires focused Chromium verification and runtime-derived assertions; apply restoration requirements only to scenarios that explicitly require restoration.
+**Number one priority: SI-020, the complete salary-increase flow for three existing employee rows.** Verify one successful three-employee batch increase and all three persisted salaries. SI-020 uses three existing rows and increases their salaries; it requires no record creation, history assertions, deletion, or salary restoration. Run controlled failure cases separately. Implement and verify one numbered scenario at a time, then append its implementation summary and completion checkmark. Completion requires focused Chromium verification and runtime-derived assertions; apply restoration requirements only to scenarios that explicitly require restoration.
 
 ## Scenario success and failure rules
 
 These rules apply to every scenario below. Success means all listed expected outcomes are met with the stated fixture prerequisites and evidence. Failure means any expected outcome differs, any unexpected salary-save request occurs, any stale or wrong-employee data is used, or required restoration cannot be verified. A missing fixture or unresolved discovery contract is blocked/unverified, never passed. For discovery cases, capture the response, UI state and agreed contract first; then convert that result into explicit regression assertions.
 
-Attachment coverage: filter/defaults SI-001/004/007-012; required inputs and errors SI-002/003/005/006; amount/percentage/rounding SI-013-015; empty results SI-016; grid/pagination/selection/search SI-017-021; save/duplicate/date guards SI-022-028; export SI-029-032; controlled failures SI-033-034. Repeated duplicate-history and before-hire-date items in the attachment are covered once with full persistence verification.
+Attachment coverage: filter/defaults SI-001/004/006-011; required inputs and errors SI-002/003/005; amount/percentage/rounding SI-012-014; empty results SI-015; grid/selection/search SI-016-018; save/duplicate/date guards SI-019-021; export SI-022-025. Repeated duplicate-history and before-hire-date items in the attachment are covered once with full persistence verification.
 
 ## Open contracts
 
@@ -143,22 +143,7 @@ Resolve numeric boundaries and rounding ties; supported context years; native ma
 
 **Implementation summary:** Implemented one standalone test with 18 independent matrix cases using auth.fixture and SalaryIncreasesPage. Each case navigates afresh, settles all six in-scope startup responses, and derives its date from the context request year. Verifies typing/paste normalization before and after blur, the unused zero mode, exactly one calculate POST with the full expected payload, exact 400 BAD_REQUEST/dialog text or successful response context, and visible employee identities and current/new salary values against the response. Batched POM assertions retain full visible-page coverage while reducing assertion overhead. Includes 14/15/16-digit amounts, 12/13-digit percentages and the pasted extreme exponent; no salary-save POST occurs. This characterizes current silent normalization and excessive-percentage acceptance without approving those business rules. Focused Chromium verification with trace passed on 2026-09-08: **1 passed (2.4m)**. Initial verification exposed matrix timeout overhead and unstable character-by-character exponent entry; the final test batches preview checks and uses clipboard paste for that exponent.
 
-#### 1.5. SI-005: Malformed date handling [LIVE] ✅
-
-**File:** `tests/SalaryIncreases/date-validation.spec.ts`
-
-**Steps:**
-  1. Start with a fresh authenticated browser context through auth.fixture and SalaryIncreasesPage.goto(). Keep one valid increase mode.
-    - expect: All six in-scope startup GET responses complete successfully; amount is 100 and percentage is zero.
-  2. Enter the supplied extended-year date 275760-09-09 through the native date input and blur it.
-    - expect: Chromium retains the exact value, the native input matches :valid, and aria-invalid is false. Use normal Playwright input interaction without DOM value injection.
-  3. Calculate and inspect the rejection.
-    - expect: Exactly one POST calculate submits the unchanged date and full expected payload, returning HTTP 400 BAD_REQUEST with message "Text '275760-09-09' could not be parsed at index 0".
-    - expect: The dialog exactly matches response.message. After dismissal, opening increases shows zero preview rows and disabled Export/Save; no salary-save POST occurs.
-
-**Implementation summary:** Implemented one standalone SI-005 test using auth.fixture and SalaryIncreasesPage, following live generator exploration. Confirms that the extended year is accepted by Chromium but rejected by the backend parser. Captures startup and calculation responses before their triggering actions and verifies the full request payload, exact API/dialog error, empty preview, and zero salary persistence requests. Focused Chromium verification with trace passed on 2026-09-08: **1 passed (15.3s)**. The initial run exposed serialization of the native validity object as an empty object; the final assertion uses the native :valid selector.
-
-#### 1.6. SI-006: Context-dependent unsupported year [LIVE] ✅
+#### 1.5. SI-005: Context-dependent unsupported year [LIVE] ✅
 
 **File:** `tests/SalaryIncreases/context-dependent-unsupported-year.spec.ts`
 
@@ -169,13 +154,13 @@ Resolve numeric boundaries and rounding ties; supported context years; native ma
     - expect: Missing context produces the actual minimum-wage configuration error and no successful preview; recovery succeeds.
     - expect: Do not hard-code the supplied 2021-to-current range or assume every future year is invalid.
 
-**Implementation summary:** Implemented one standalone test after live generator exploration, preserving SI-005. Settles all six in-scope startup GET responses and probes a bounded set of years relative to the startup context year, reusing authentication headers only in memory. Selects supported and unsupported years from positive and null minimum-wage context values; missing prerequisites fail explicitly. The unsupported year sends exactly one calculate POST with the full expected payload and returns 400 BAD_REQUEST with the exact observed configuration error, matched against the dialog. After dismissal, the preview is empty and Export/Save are disabled. Changing only the year produces a 200 response matching the supported context and verifies visible employee identities and salary values against runtime rows. Both calculations emit zero salary-save POSTs. Focused Chromium verification with trace passed on 2026-09-08: **1 passed (37.8s)**.
+**Implementation summary:** Implemented one standalone test after live generator exploration. Settles all six in-scope startup GET responses and probes a bounded set of years relative to the startup context year, reusing authentication headers only in memory. Selects supported and unsupported years from positive and null minimum-wage context values; missing prerequisites fail explicitly. The unsupported year sends exactly one calculate POST with the full expected payload and returns 400 BAD_REQUEST with the exact observed configuration error, matched against the dialog. After dismissal, the preview is empty and Export/Save are disabled. Changing only the year produces a 200 response matching the supported context and verifies visible employee identities and salary values against runtime rows. Both calculations emit zero salary-save POSTs. Focused Chromium verification with trace passed on 2026-09-08: **1 passed (37.8s)**.
 
 ### 2. P1 - Filter controls and employee eligibility
 
 **Seed:** `tests/SalaryIncreases/seed-test.spec.ts`
 
-#### 2.1. SI-007: Employee type, payment unit and profession [LIVE] ✅
+#### 2.1. SI-006: Employee type, payment unit and profession [LIVE] ✅
 
 **File:** `tests/SalaryIncreases/filter-lookups.spec.ts`
 
@@ -192,7 +177,7 @@ Resolve numeric boundaries and rounding ties; supported context years; native ma
 The test repeats the same process for employee type, payment unit and profession, selecting one runtime option per filter and testing each filter independently. It uses the initial unfiltered API results to identify the expected employees, checks that the filtered API response contains exactly that group, and compares the first page (up to 25 employees) with the UI by employee ID, row order, current salary and new salary. It then resets the filters and confirms that the API returns the original employee group before testing the next filter. Later UI pages and other options are not checked by this scenario.
 
 
-#### 2.2. SI-008: Position and section searchable pickers [LIVE] ✅
+#### 2.2. SI-007: Position and section searchable pickers [LIVE] ✅
 
 **File:** `tests/SalaryIncreases/filter-pickers.spec.ts`
 
@@ -219,11 +204,11 @@ The test repeats the same process for employee type, payment unit and profession
     - expect: Picker interactions do not trigger calculation by themselves; no salary-save POST occurs anywhere in this scenario. Finish with a fresh page so exploratory selections and previews are discarded.
 
 
-**Implementation summary (2026-09-09):** Implemented the single SI-008 test with reusable picker locators and retrying full-count assertions in `SalaryIncreasesPage`. Captures all six completed startup GET responses and derives each target from lookup IDs joined to baseline employees, requiring matching and excluded employees. Independently verifies search, exact empty-state text, zero no-match rows, query erasure, selection retention, reopening, and Clear with a query present. Five HTTP 200 calculations check full payloads (`rango = position.id`, `fuerza = section.kaNlSeccion`, otherwise null), exact baseline-subset/restored identities, and first-page employee order and preview salaries. Picker interactions cause no extra calculation and the entire scenario sends zero salary-save requests. Ends on a fresh page with empty picker selections and date. Focused Chromium verification with `--trace on`: **1 passed (20.1s)**. Earlier exploration counts are historical evidence; the test hard-codes no lookup IDs, labels, employee totals or subset sizes.
+**Implementation summary (2026-09-09):** Implemented the single SI-007 test with reusable picker locators and retrying full-count assertions in `SalaryIncreasesPage`. Captures all six completed startup GET responses and derives each target from lookup IDs joined to baseline employees, requiring matching and excluded employees. Independently verifies search, exact empty-state text, zero no-match rows, query erasure, selection retention, reopening, and Clear with a query present. Five HTTP 200 calculations check full payloads (`rango = position.id`, `fuerza = section.kaNlSeccion`, otherwise null), exact baseline-subset/restored identities, and first-page employee order and preview salaries. Picker interactions cause no extra calculation and the entire scenario sends zero salary-save requests. Ends on a fresh page with empty picker selections and date. Focused Chromium verification with `--trace on`: **1 passed (20.1s)**. Earlier exploration counts are historical evidence; the test hard-codes no lookup IDs, labels, employee totals or subset sizes.
 
 
 
-#### 2.3. SI-009: Inclusive document bounds [LIVE] ✅
+#### 2.3. SI-008: Inclusive document bounds [LIVE] ✅
 
 **File:** `tests/SalaryIncreases/document-range.spec.ts`
 
@@ -240,7 +225,7 @@ The test repeats the same process for employee type, payment unit and profession
 
 **Implementation summary:** Implemented in `tests/SalaryIncreases/document-range.spec.ts` using auth.fixture and the existing SalaryIncreasesPage. Settles six startup responses, fetches fresh unfiltered employee records using current authenticated request headers, validates eligible-population coverage, and sorts runtime document candidates numerically. Checks equal, lower-only, upper-only and ordered bounds against exact baseline identity subsets, full unchanged calculation payloads, response context and first-page salary previews. Reversed and non-matching ranges each clear a populated preview. Missing shared-QA baseline/candidate prerequisites are explicitly skipped. Eight calculate POSTs and zero salary-save POSTs are asserted. Generator exploration completed; focused Chromium verification with trace passed on 2026-09-10: **1 passed (15.0s)**.
 
-#### 2.4. SI-010: Hire-date lower bound and equality [LIVE] ✅
+#### 2.4. SI-009: Hire-date lower bound and equality [LIVE] ✅
 
 **File:** `tests/SalaryIncreases/hire-date.spec.ts`
 
@@ -256,7 +241,7 @@ The test repeats the same process for employee type, payment unit and profession
 
 **Implementation summary:** Implemented in `tests/SalaryIncreases/hire-date.spec.ts` using auth.fixture and the existing SalaryIncreasesPage. Settles six startup GET responses and derives the increase year from runtime context. Selects an interior date from distinct baseline hire dates, explicitly skipping when fewer than three dates are available. Enters and verifies dates in the UI's DD/MM/YYYY format while asserting ISO request dates. Verifies complete calculation payloads, response context, unique identities, date-only response values and first-page salary previews. The filtered identity set must exactly match employees hired on or after the threshold, with explicit before/equal/after checks; clearing restores a null bound and the complete baseline. Asserts three calculate POSTs and zero salary-save POSTs. Generator exploration confirmed inclusion and equality; focused Chromium verification with trace passed on 2026-09-10: **1 passed (16.3s)**.
 
-#### 2.5. SI-011: Combined filters intersect [LIVE INTERSECTION; BASELINE EXCLUSIONS] ✅
+#### 2.5. SI-010: Combined filters intersect [LIVE INTERSECTION; BASELINE EXCLUSIONS] ✅
 
 **File:** `tests/SalaryIncreases/combined-filters.spec.ts`
 
@@ -272,7 +257,7 @@ The test repeats the same process for employee type, payment unit and profession
 
 **Coverage boundary:** Live data provides baseline exclusions for every criterion, but exploration did not establish near-matches satisfying every other criterion for each filter. This verifies the combined intersection and empty-result transition; it does not independently prove every filter's necessity within the combination. The original isolated near-match fixture requirement remains unverified and requires suitable data. No shared-QA records were created or changed.
 
-#### 2.6. SI-012: Reset restores defaults and clears preview ✅
+#### 2.6. SI-011: Reset restores defaults and clears preview ✅
 
 **File:** `tests/SalaryIncreases/reset-filters.spec.ts`
 **Scope boundary:** Salary-range controls remain excluded. The previously reported salary-range reset issue is not covered by this scenario.
@@ -293,7 +278,7 @@ The test repeats the same process for employee type, payment unit and profession
 
 **Seed:** `tests/SalaryIncreases/seed-test.spec.ts`
 
-#### 3.1. SI-013: Fixed amount salary preview ✅
+#### 3.1. SI-012: Fixed amount salary preview ✅
 
 **File:** `tests/SalaryIncreases/fixed-amount-salary-preview.spec.ts`
 
@@ -309,7 +294,7 @@ The test repeats the same process for employee type, payment unit and profession
 
 **Implementation summary:** Shared authentication and settled startup responses; context-year date, fixed amount 100, percentage zero, rounding and points off. Asserts the exact calculate payload, HTTP 200/context, ordinary non-points salary arithmetic, unique runtime employee IDs, every visible identity/description/date/salary cell, selected increases tab, response-derived pagination total, and zero save requests. Live response contained 156 rows with 25 visible; hire dates render as ISO dates and null descriptions as hyphens. Focused Chromium run: **1 passed** (6.8s).
 
-#### 3.2. SI-014: Percentage salary preview [LIVE] ✅
+#### 3.2. SI-013: Percentage salary preview [LIVE] ✅
 
 **File:** `tests/SalaryIncreases/calculation.spec.ts`
 
@@ -318,12 +303,12 @@ Se debe registrar valor a incrementar o porcentaje a incrementar'
 
 - Percentages with decimal numbers
 
-**Rounding observation for SI-014 (2026-09-11):**
+**Rounding observation for SI-013 (2026-09-11):**
 
 - With nearest-hundred rounding disabled, percentage salary previews round to the nearest integer and display no decimals.
 - At **1.02%**, `9,545,928 × 1.0102 = 9,643,296.4656` displays as **9,643,296**.
 - At **1.02%**, `2,899,697 × 1.0102 = 2,929,273.9094` displays as **2,929,274**, confirming rounding rather than truncation.
-- Integer rounding is separate from the nearest-hundred checkbox. SI-014 covers integer rounding with the checkbox disabled; SI-015 covers rounding to hundreds with it enabled.
+- Integer rounding is separate from the nearest-hundred checkbox. SI-013 covers integer rounding with the checkbox disabled; SI-014 covers rounding to hundreds with it enabled.
 
 
 **Steps:**
@@ -338,7 +323,7 @@ Se debe registrar valor a incrementar o porcentaje a incrementar'
 
 **Implementation summary:** Implemented one standalone test in `tests/SalaryIncreases/calculation.spec.ts` with shared authentication and all six startup responses settled. Uses a context-supported date, amount zero, percentages 5 and 1.02, and rounding/points disabled. Asserts exact calculate method/path/payload, HTTP 200 and response context. Independently computes ordinary employee results using integer arithmetic: the API itself rounds to the nearest integer, with positive exact .5 ties rounded upward. Runtime coverage requires fractional results below and above .5 at 1.02%, plus exact ties with both even and odd integer parts to distinguish half-up from half-even; missing prerequisites explicitly skip. Verifies current and independently expected new salaries without decimals by employee identity across every grid page, and zero salary-save requests. Live generator exploration completed; focused Chromium verification with trace on 2026-09-11: **1 passed (21.6s)**. Negative percentage validation remains covered by SI-004.
 
-#### 3.3. SI-015: Nearest-hundred payload and arithmetic [LIVE] ✅
+#### 3.3. SI-014: Nearest-hundred payload and arithmetic [LIVE] ✅
 
 **File:** `tests/SalaryIncreases/rounding.spec.ts`
 
@@ -354,7 +339,7 @@ Se debe registrar valor a incrementar o porcentaje a incrementar'
 
 **Implementation summary:** Implemented one standalone test in `tests/SalaryIncreases/rounding.spec.ts` using shared authentication, the existing POM, six settled startup responses, and a context-supported date. Discovers an ordinary employee at runtime and derives four fixed amounts for paired rounding-off/on calculations, keeping percentage zero and points disabled. Asserts complete calculate payloads and that only `aproximarCien` changes within each pair, HTTP 200/context, unchanged full employee identity/current-salary sets, independent ordinary-row arithmetic, hundred alignment, and salary rendering across every grid page. Live generator exploration confirmed positive ties round upward for both even and odd hundreds; missing eligible employees explicitly skip. Zero salary-save requests. Discovery: **1 test**. Focused Chromium verification with trace on 2026-09-11: **1 passed (55.9s)**.
 
-#### 3.4. SI-016: No eligible employees clears stale calculation [LIVE] ✅
+#### 3.4. SI-015: No eligible employees clears stale calculation [LIVE] ✅
 
 **File:** `tests/SalaryIncreases/empty-results.spec.ts`
 
@@ -375,23 +360,7 @@ Use document bounds 1 through 1, after verifying that the runtime baseline conta
 
 **Seed:** `tests/SalaryIncreases/seed-test.spec.ts`
 
-#### 4.1. SI-017: All page sizes and navigation [LIVE] ✅
-
-**File:** `tests/SalaryIncreases/grid-pagination.spec.ts`
-
-**Steps:**
-  1. Start with a fresh authenticated browser context through auth.fixture and SalaryIncreasesPage.goto(). Calculate a runtime set larger than 100 or provision an explicit deterministic grid fixture.
-    - expect: The seed is ready, initial module traffic has settled, and this scenario does not depend on a preceding test.
-  2. Exercise page sizes 10, 25, 50 and 100, then navigate to last and first pages.
-    - expect: Visible rows equal the correct response slice and pager bounds; last-page remainder is correct.
-    - expect: Hidden DOM rows are excluded with visibleRows(); current DOM retains rows beyond the visible page.
-  3. Inspect first/last navigation buttons and request counts.
-    - expect: Previous/Next are disabled at their boundaries; pagination does not recalculate or save.
-    - expect: If data is insufficient, annotate the unavailable branch instead of passing unexercised cross-page assertions.
-
-**Implementation summary:** Implemented `tests/SalaryIncreases/grid-pagination.spec.ts` with the existing authentication fixture and SalaryIncreasesPage. Settles all six startup GETs, derives the increase date year from context, and verifies one successful calculate POST with the complete payload and matching response context. For sizes 10/25/50/100, compares every visible employee identity in response order on every forward and backward page, verifies pager ranges and final-page remainders, retained hidden DOM rows, and Previous/Next boundary states. Pagination sends no additional calculation or salary-save requests. Explicitly skips when runtime data has at most 100 rows. Generator exploration confirmed all branches with 156 runtime rows; totals and identities are not hard-coded. Focused Chromium verification with trace passed on 2026-09-11: **1 passed (3.6m)**. An initial run exceeded its timeout while repeating salary-format checks; the final test focuses on pagination and uses a four-minute timeout for the full traced matrix.
-
-#### 4.2. SI-018: Single selection and cross-page select-all [LIVE] ✅
+#### 4.1. SI-016: Single selection and cross-page select-all [LIVE] ✅
 
 **File:** `tests/SalaryIncreases/grid-selection.spec.ts`
 
@@ -406,7 +375,7 @@ Use document bounds 1 through 1, after verifying that the runtime baseline conta
 
 **Implementation summary:** Implemented `tests/SalaryIncreases/grid-selection.spec.ts` using the existing authentication fixture and SalaryIncreasesPage. Settles all six startup GETs, derives the increase date year from context, and verifies one successful calculate POST with its complete payload and matching response context. Uses runtime employee identities to verify initial deselection, single-row selection retained after navigating away and back, and select-all across every result, including hidden DOM rows. Inspects each later page through the final page, deselects all from the final page, and verifies every page while returning to the first. Selection and navigation emit no additional calculate or salary-save requests. Explicitly skips when QA has at most 25 calculated employees. Generator exploration confirmed the behavior with 156 runtime rows; no identities or counts are hard-coded. Focused Chromium verification with trace passed on 2026-09-11: **1 passed (1.3m)**.
 
-#### 4.3. SI-019: Client-side search and clearing [LIVE] ✅
+#### 4.2. SI-017: Client-side search and clearing [LIVE] ✅
 
 **File:** `tests/SalaryIncreases/grid-search.spec.ts`
 
@@ -422,26 +391,7 @@ Use document bounds 1 through 1, after verifying that the runtime baseline conta
 
 **Implementation summary:** Implemented one standalone test in `tests/SalaryIncreases/grid-search.spec.ts` using shared authentication, the existing POM, six completed startup responses, and a context-derived increase date. Verifies the complete calculate payload, HTTP 200 and response context. Derives document, name, multi-page position and accented-name queries from runtime employees; missing prerequisites explicitly skip. Checks exact filtered identities in response order across every result page for document, upper/lowercase name and position fragments, and accented versus unaccented name variants. Returns to the first page between independent searches because Clear preserves a valid current page. A guaranteed non-match leaves zero visible employees and disabled navigation; clearing and closing search restore the full baseline, verified across every page. Exactly one calculation and zero salary-save requests. Generator exploration and focused runs resolved case/accent and pagination behavior; earlier runs exposed incorrect test assumptions about Clear availability and page reset. Discovery: **1 test**. Focused Chromium verification with trace on 2026-09-11: **1 passed (1.6m)**.
 
-#### 4.4. SI-020: Identification column sorting and value filtering ✅ [LIVE]
-
-**File:** `tests/SalaryIncreases/grid-columns.spec.ts`
-
-**Steps:**
-  1. Start with a fresh authenticated browser context through auth.fixture and SalaryIncreasesPage.goto(). Calculate a runtime set with at least three distinct numeric Identification values, with no active search or column filters.
-    - expect: The seed is ready, initial module traffic has settled, and this scenario does not depend on a preceding test.
-    - expect: Missing runtime data prerequisites explicitly skip with a specific reason.
-  2. Open the Identification column menu and independently verify ascending and descending sorting on the unfiltered calculated set.
-    - expect: Identification values follow numeric order from lowest to highest, then highest to lowest, across result pages.
-  3. In the Identification column menu, use its select-all checkbox to uncheck all values, then check two or three distinct runtime-derived IDs, leaving at least one other ID excluded.
-    - expect: The complete filtered table contains exactly the chosen IDs, with no missing or extra records; compare identities independently of the preceding sort direction.
-    - expect: These column-menu checkboxes filter displayed records; they are separate from the grid's employee selection checkboxes.
-    - expect: Sorting and column filtering emit no additional calculate or save request.
-
-**Scope:** Identification only. Combined column filters and combinations with text search are outside this scenario. The reported issue where a second column filter overrides the first remains outside this coverage.
-
-**Implementation summary:** Implemented one standalone test in `tests/SalaryIncreases/grid-columns.spec.ts` using shared authentication, the existing POM, six completed startup GET responses, and a context-derived increase year. Verifies the full calculate payload, HTTP 200 and response context. Requires at least three distinct safe numeric Identification values, with explicit prerequisite skips. Checks baseline identities and numeric ascending/descending order across every result page at page size 25, including displayed Identification values and unchecked employee selection controls. Unchecks the column menu's select-all checkbox, chooses two or three runtime-derived values while excluding another, and compares the complete filtered employee identity set independently of sort direction. Exactly one calculation and zero salary-save requests. Live exploration covered 156 employees; this count is not a fixture. The first focused run exposed an incorrect Escape-to-close assumption; the verified menu toggle now closes the menu. Discovery: **1 test**. Scoped TypeScript check: **passed**. Focused Chromium verification with trace on 2026-09-11: **1 passed (1.9m)**.
-
-#### 4.5. SI-021: Column-filtered select-all targets the full calculated list ✅ [LIVE]
+#### 4.3. SI-018: Column-filtered select-all targets the full calculated list ✅ [LIVE]
 
 **File:** `tests/SalaryIncreases/filtered-selection.spec.ts`
 
@@ -467,7 +417,7 @@ Use document bounds 1 through 1, after verifying that the runtime baseline conta
 
 **Seed:** `tests/SalaryIncreases/seed-test.spec.ts`
 
-#### 5.1. SI-022: Save without selection and final cancellation [LIVE] ✅
+#### 5.1. SI-019: Save without selection and final cancellation [LIVE] ✅
 
 **File:** `tests/SalaryIncreases/save-confirmations.spec.ts`
 
@@ -483,7 +433,7 @@ Use document bounds 1 through 1, after verifying that the runtime baseline conta
 
 **Implementation summary:** Implemented one standalone test in `tests/SalaryIncreases/save-confirmations.spec.ts` using centralized authentication and SalaryIncreasesPage. Settles six startup GET responses, derives the context year, and validates the calculation request and response. Requires at least one runtime employee, with an explicit prerequisite skip for empty results. Selects then explicitly deselects all employees and verifies first-page checkbox states. Checks the dedicated missing-selection message and acknowledgment, selects exactly one runtime employee, declines position updates, asserts the literal confirmation count 1, and cancels through the visible deny action. Exactly one calculation and zero salary-save requests. Scoped TypeScript check passed. Focused Chromium verification with trace on 2026-09-14: **1 passed (34.5s)**.
 
-#### 5.3. SI-023: Full salary-increase flow for three existing employees [LIVE] ✅
+#### 5.2. SI-020: Full salary-increase flow for three existing employees [LIVE] ✅
 
 **File:** `tests/SalaryIncreases/save-single.spec.ts`
 
@@ -504,7 +454,7 @@ Use document bounds 1 through 1, after verifying that the runtime baseline conta
 
 **Implementation summary:** Uses centralized authentication, runtime identities, selection across pages, and persisted salary assertions. After the successful three-employee save, verifies the grid resets to page one, the saved preview cells show `-`, and selection is cleared. Reselects the same three employees without recalculation, completes both save confirmations again, and asserts the identical request payload, HTTP 400 `BAD_REQUEST`, and exact first-employee duplicate-history message in the API and UI, including trailing whitespace. Reload proves all three salaries increased by exactly 1 and every unselected salary remained unchanged. Focused Chromium verification with tracing passed on 2026-09-15: **1 passed (1.2m)** using **2026-10-03**. Scoped TypeScript validation and diff checks passed. Earlier runs saved successfully on 2026-10-01 and 2026-10-02 before exposing pager-reset and cleared-selection assumptions; those increases also remain in QA. Choose another unused supported date before rerunning.
 
-#### 5.6. SI-024: Increase date before hire date ✅
+#### 5.3. SI-021: Increase date before hire date ✅
 
 **File:** `tests/SalaryIncreases/save-validation.spec.ts`
 
@@ -534,7 +484,7 @@ Use document bounds 1 through 1, after verifying that the runtime baseline conta
 
 **Seed:** `tests/SalaryIncreases/seed-test.spec.ts`
 
-#### 6.1. SI-025: Download format and all-page row mapping ✅
+#### 6.1. SI-022: Download format and all-page row mapping ✅
 
 **File:** `tests/SalaryIncreases/export.spec.ts`
 
@@ -546,11 +496,11 @@ Use document bounds 1 through 1, after verifying that the runtime baseline conta
   3. Parse the workbook and compare all employee rows to the full calculation response, keyed by employee document.
     - expect: Data-row count matches the full calculated set, independent of current page; headers are excluded from the count.
     - expect: Document, name, position, hire date, old/new salary match by employee document with explicit whitespace and date-format normalization.
-    - expect: The current observation had 408 data rows plus one header and 12 columns; derive the expected count from the response. Date cells use day/month/year and missing pension values are blank. Selection-state combinations remain SI-027 coverage.
+    - expect: The current observation had 408 data rows plus one header and 12 columns; derive the expected count from the response. Date cells use day/month/year and missing pension values are blank. Selection-state combinations remain SI-024 coverage.
 
 **Implementation summary:** Implemented one standalone test in `tests/SalaryIncreases/export.spec.ts` with shared authentication, the existing POM, all six startup responses, a context-derived year, and exact calculation payload/context assertions. Requires more than 25 runtime employees, verifies the first UI page before and after export, and confirms an employee beyond that page is hidden. Pre-arms the download, saves and attaches the workbook under `testInfo.outputPath`, checks its current filename and ZIP signature, and parses it with the ExcelJS development dependency. Verifies one worksheet, all 12 headers, full response row count excluding the header, unique and complete document identities, every exported identity/text field, normalized hire dates, blank nullable fields, and exact numeric old/new salaries. The full calculation response is the export oracle; the test does not walk every UI page or assert mixed selection flags. Exactly one calculation and zero salary-save requests. Generator discovery compared all 408 employees with no mismatches. Focused Chromium verification with tracing on 2026-09-16: **1 passed (17.6s)**.
 
-#### 6.2. SI-026: Export ignores page size [LIVE] ✅
+#### 6.2. SI-023: Export ignores page size [LIVE] ✅
 
 **File:** `tests/SalaryIncreases/export-page-size.spec.ts`
 
@@ -563,7 +513,7 @@ Use document bounds 1 through 1, after verifying that the runtime baseline conta
 
 **Implementation summary:** Implemented one standalone test using the existing authentication fixture, SalaryIncreasesPage, and ExcelJS dependency. Settles all six startup responses and asserts the context-derived calculation payload. Requires more than 100 runtime employees and exports from the second page at sizes 10, 25, 50 and 100. Each workbook is checked for its filename, ZIP signature, worksheet/header shape, complete row count, and every document, text, date and numeric salary against the full calculation response. All workbook cell values must also match across page sizes. Verifies visible employee identities and salaries before and after each export and after returning to the first page, with one calculation, zero saves, and zero salary-module requests during paging/export. Downloads remain in test output. Generator exploration found 408 identical exported rows at every size. Final focused Chromium verification with tracing, one worker and retries disabled on 2026-09-16: **1 passed (1.2m)**. `git diff --check` passed.
 
-#### 6.3. SI-027: Selection flags include selected and unselected rows [LIVE ALL; VERIFY MIXED] ✅
+#### 6.3. SI-024: Selection flags include selected and unselected rows [LIVE ALL; VERIFY MIXED] ✅
 
 **File:** `tests/SalaryIncreases/selection-flags.spec.ts`
 
@@ -578,7 +528,7 @@ Use document bounds 1 through 1, after verifying that the runtime baseline conta
 
 **Implementation summary:** Implemented one standalone test in `tests/SalaryIncreases/export.spec.ts` with shared authentication, the existing POM, all six startup responses, a context-derived year, and exact calculation payload/context assertions. Requires more than 25 runtime employees and at least two selectable rows. Selects a known subset across pages and exports three workbooks: mixed selection, all selected, and all deselected. Each workbook is checked for its filename, ZIP signature, worksheet/header shape, complete row count, every document/text/date/numeric salary against the full calculation response, and numeric selection flags 1/0 by employee identity. Verifies visible employee identities and salaries before and after each export and after returning to the first page, with one calculation, zero saves, and zero salary-module requests during paging/export. Downloads remain in test output. Generator exploration found 408 identical exported rows at every selection state. Final focused Chromium verification with tracing, one worker and retries disabled on 2026-09-16: **1 passed (1.2m)**. `git diff --check` passed.
 
-#### 6.4. SI-028: Export disabled when search shows no records [SUPPLIED; VERIFY] ✅
+#### 6.4. SI-025: Export disabled when search shows no records [SUPPLIED; VERIFY] ✅
 
 **File:** `tests/SalaryIncreases/export-filtered.spec.ts`
 

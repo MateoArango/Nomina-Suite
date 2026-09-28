@@ -5,7 +5,7 @@ import { SalaryIncreasesPage } from "../../pages/SalaryIncreases.page";
 // seed: tests/SalaryIncreases/seed-test.spec.ts
 
 test.describe("P0 - Save guards, confirmations and persistence - Mutation", () => {
-  test("SI-022: Save without selection and final cancellation", async ({ page }) => {
+  test("SI-019: Save without selection and final cancellation", async ({ page }) => {
     test.setTimeout(180_000);
     const screen = new SalaryIncreasesPage(page);
     const calculatePath = screen.apiBase + "w-aumento-sueldo/actions/calculate";

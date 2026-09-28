@@ -5,7 +5,7 @@ import { SalaryIncreasesPage } from "../../pages/SalaryIncreases.page";
 // seed: tests/SalaryIncreases/seed-test.spec.ts
 
 test.describe("P1 - Grid, search, selection and undo", () => {
-  test("SI-019: Client-side search and clearing", async ({ page }) => {
+  test("SI-017: Client-side search and clearing", async ({ page }) => {
     test.setTimeout(180_000);
     const screen = new SalaryIncreasesPage(page);
     const calculatePath = screen.apiBase + "w-aumento-sueldo/actions/calculate";
@@ -77,6 +77,12 @@ test.describe("P1 - Grid, search, selection and undo", () => {
       .find(word => word.length >= 4 && matches(word).length > 25 && matches(word).length < rows.length);
     const accent = rows.flatMap(row => row.scNombre.split(/\s+/))
       .find(word => word.normalize("NFD").replace(/\p{Diacritic}/gu, "") !== word);
+    const missing = [];
+    if (!name) missing.push("distinctive name fragment");
+    if (!position) missing.push("position fragment spanning pages");
+    if (!accent) missing.push("accented name");
+
+    test.skip(missing.length > 0, `Shared QA missing: ${missing.join(", ")}`);
     test.skip(!name || !position || !accent,
       "Shared QA requires a name fragment, a position fragment spanning pages, and an accented name");
     const plainAccent = accent!.normalize("NFD").replace(/\p{Diacritic}/gu, "");

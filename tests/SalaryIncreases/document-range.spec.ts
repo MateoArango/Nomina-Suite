@@ -8,7 +8,7 @@ type Employee = { kaNlTercero: number; nNit: number | string | null };
 type Preview = Employee & { ndSalarioMes: number; nuevoSalario: number };
 
 test.describe("P1 - Filter controls and employee eligibility", () => {
-  test("SI-009: Inclusive document bounds", async ({ page }) => {
+  test("SI-008: Inclusive document bounds", async ({ page }) => {
     test.setTimeout(90_000);
     const screen = new SalaryIncreasesPage(page);
     const calculateUrl = screen.apiBase + "w-aumento-sueldo/actions/calculate";

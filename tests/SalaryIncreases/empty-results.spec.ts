@@ -12,7 +12,7 @@ type PreviewRow = {
 };
 
 test.describe("P0 - Salary calculation and API-to-grid mapping", () => {
-  test("SI-016: No eligible employees clears stale calculation", async ({ page }) => {
+  test("SI-015: No eligible employees clears stale calculation", async ({ page }) => {
     test.setTimeout(60_000);
     const screen = new SalaryIncreasesPage(page);
     const calculateUrl = screen.apiBase + "w-aumento-sueldo/actions/calculate";

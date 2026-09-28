@@ -15,7 +15,7 @@ type CalculatedRow = {
 } & Record<string, unknown>;
 
 test.describe("P1 - Exported table contract", () => {
-  test("SI-026: Export ignores page size", async ({ page }, testInfo) => {
+  test("SI-023: Export ignores page size", async ({ page }, testInfo) => {
     test.setTimeout(120_000);
     const screen = new SalaryIncreasesPage(page);
     const calculatePath = screen.apiBase + "w-aumento-sueldo/actions/calculate";

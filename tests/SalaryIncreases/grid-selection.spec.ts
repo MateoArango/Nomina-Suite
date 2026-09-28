@@ -5,7 +5,7 @@ import { SalaryIncreasesPage } from "../../pages/SalaryIncreases.page";
 // seed: tests/SalaryIncreases/seed-test.spec.ts
 
 test.describe("P1 - Grid, search, selection and undo", () => {
-  test("SI-018: Single selection and cross-page select-all", async ({ page }) => {
+  test("SI-016: Single selection and cross-page select-all", async ({ page }) => {
     test.setTimeout(120_000);
     const screen = new SalaryIncreasesPage(page);
     const calculatePath = screen.apiBase + "w-aumento-sueldo/actions/calculate";
