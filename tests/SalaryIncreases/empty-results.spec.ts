@@ -93,13 +93,13 @@ test.describe("P0 - Salary calculation and API-to-grid mapping", () => {
 
     // 2. Calculate the empty combination, verify the dialog and selected tab, then dismiss the dialog.
     expect(await calculate({ nitInicial: 1, nitFinal: 1 })).toEqual([]);
-    const dialog = screen.dialog("empty-results");
+    const dialog = screen.emptyResultsDialog;
     await expect(dialog).toBeVisible();
-    await expect(dialog.locator(".swal2-html-container"))
-      .toHaveText("No se encontraron empleados para el filtro actual");
+    await expect(dialog)
+      .toContainText("No se encontraron empleados para el filtro actual");
     await expect(screen.increasesTab).toHaveAttribute("aria-selected", "true");
     await expect(screen.filterTab).toHaveAttribute("aria-selected", "false");
-    await screen.dialogButton("empty-results", "confirm").click();
+    await screen.emptyResultsConfirmButton.click();
     await expect(dialog).toBeHidden();
 
     // 3. Inspect the increases grid and actions: remove old rows/selections and prevent empty-state export or save.

@@ -42,6 +42,8 @@ export class SalaryIncreasesPage {
   readonly exportButton: Locator;
   readonly undoButton: Locator;
   readonly saveButton: Locator;
+  readonly emptyResultsDialog: Locator;
+  readonly emptyResultsConfirmButton: Locator;
   readonly searchFindButton: Locator;
   readonly searchNextButton: Locator;
   readonly searchInput: Locator;
@@ -96,6 +98,8 @@ export class SalaryIncreasesPage {
     this.exportButton = this.control("export-button", "button");
     this.undoButton = this.control("undo-button", "button");
     this.saveButton = this.control("save-button", "button");
+    this.emptyResultsDialog = this.byId("empty-results-dialog");
+    this.emptyResultsConfirmButton = this.control("empty-results-confirm-button", "button");
     this.searchFindButton = this.control("search-find-button", "button");
     this.searchNextButton = this.control("search-next-button", "button");
     this.searchInput = this.control("search-input", "input");

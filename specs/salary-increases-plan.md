@@ -565,7 +565,7 @@ Use document bounds 1 through 1, after verifying that the runtime baseline conta
 
 #### 6.3. SI-027: Selection flags include selected and unselected rows [LIVE ALL; VERIFY MIXED] ✅
 
-**File:** `tests/SalaryIncreases/export.spec.ts`
+**File:** `tests/SalaryIncreases/selection-flags.spec.ts`
 
 **Steps:**
   1. Start with a fresh authenticated browser context through auth.fixture and SalaryIncreasesPage.goto(). Calculate a set with at least two rows and select a known subset across pages.
@@ -578,46 +578,16 @@ Use document bounds 1 through 1, after verifying that the runtime baseline conta
 
 **Implementation summary:** Implemented one standalone test in `tests/SalaryIncreases/export.spec.ts` with shared authentication, the existing POM, all six startup responses, a context-derived year, and exact calculation payload/context assertions. Requires more than 25 runtime employees and at least two selectable rows. Selects a known subset across pages and exports three workbooks: mixed selection, all selected, and all deselected. Each workbook is checked for its filename, ZIP signature, worksheet/header shape, complete row count, every document/text/date/numeric salary against the full calculation response, and numeric selection flags 1/0 by employee identity. Verifies visible employee identities and salaries before and after each export and after returning to the first page, with one calculation, zero saves, and zero salary-module requests during paging/export. Downloads remain in test output. Generator exploration found 408 identical exported rows at every selection state. Final focused Chromium verification with tracing, one worker and retries disabled on 2026-09-16: **1 passed (1.2m)**. `git diff --check` passed.
 
-#### 6.4. SI-028: Export with active filters and zero results [SUPPLIED; VERIFY]
+#### 6.4. SI-028: Export disabled when search shows no records [SUPPLIED; VERIFY]
 
 **File:** `tests/SalaryIncreases/export-filtered.spec.ts`
 
 **Steps:**
-  1. Start with a fresh authenticated browser context through auth.fixture and SalaryIncreasesPage.goto(). Calculate results, then apply text and column filters independently and together.
-    - expect: The seed is ready, initial module traffic has settled, and this scenario does not depend on a preceding test.
-  2. Export a narrowed visible set and compare identities with both visible-filtered and full-calculated sets.
-    - expect: Establish whether export follows client-side filters; the supplied full-filtered-list rule remains unverified.
-  3. Apply a non-match and inspect Export, then clear filters.
-    - expect: Verify whether client-side zero matches disables Export; initial/reset empty state was confirmed disabled.
-    - expect: No nonexistent dedicated export API or invented btn-exportar locator is used.
+1. Start with a fresh authenticated browser context through auth.fixture and SalaryIncreasesPage.goto(). Calculate a set with rows and assert the active 'Export' button.
 
-### 7. P2 - Controlled failures and recovery
+2. Return to 'Filtro' again and for both fields 'Cédula desde' ^ 'Cédula hasta' put 
+respectively 1231231231 ^ 12333333123123124 and click search again.
 
-**Seed:** `tests/SalaryIncreases/seed-test.spec.ts`
+3. Assert the export button.
 
-#### 7.1. SI-029: Context, lookup and calculation failures recover [CONTROLLED]
 
-**File:** `tests/SalaryIncreases/api-errors.spec.ts`
-
-**Steps:**
-  1. Start with a fresh authenticated browser context through auth.fixture and SalaryIncreasesPage.goto(). Use narrowly scoped route interception for one module endpoint at a time; restore routes in finally.
-    - expect: The seed is ready, initial module traffic has settled, and this scenario does not depend on a preceding test.
-  2. Independently fail context, one in-scope lookup and calculate with the actual response envelope or a transport failure.
-    - expect: Loading ends; errors are visible in the appropriate UI; no false success or stale completed calculation appears.
-    - expect: Capture current error handling before defining exact text for unobserved failures.
-  3. Remove the failed route and retry the affected user action.
-    - expect: The module recovers without a page crash or duplicate calculate request; unaffected filters retain valid state where supported.
-
-#### 7.2. SI-030: Save rejection and ambiguous network failure [CONTROLLED]
-
-**File:** `tests/SalaryIncreases/save-errors.spec.ts`
-
-**Steps:**
-  1. Start with a fresh authenticated browser context through auth.fixture and SalaryIncreasesPage.goto(). Use a locally intercepted save with zero backend forwarding, or isolated data with independent readback.
-    - expect: The seed is ready, initial module traffic has settled, and this scenario does not depend on a preceding test.
-  2. After both confirmations, return a business error, then independently a server error or connection failure.
-    - expect: No success state is shown; pending state clears and the response error is presented.
-    - expect: A mock validates UI behavior only and cannot prove transaction rollback.
-  3. For a real ambiguous outcome, read salary/history before any retry.
-    - expect: Do not assume a failed transport means no commit; prevent a duplicate raise through verified readback/retry policy.
-    - expect: Restore fixtures and routes after each case.
