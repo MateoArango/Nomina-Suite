@@ -578,7 +578,7 @@ Use document bounds 1 through 1, after verifying that the runtime baseline conta
 
 **Implementation summary:** Implemented one standalone test in `tests/SalaryIncreases/export.spec.ts` with shared authentication, the existing POM, all six startup responses, a context-derived year, and exact calculation payload/context assertions. Requires more than 25 runtime employees and at least two selectable rows. Selects a known subset across pages and exports three workbooks: mixed selection, all selected, and all deselected. Each workbook is checked for its filename, ZIP signature, worksheet/header shape, complete row count, every document/text/date/numeric salary against the full calculation response, and numeric selection flags 1/0 by employee identity. Verifies visible employee identities and salaries before and after each export and after returning to the first page, with one calculation, zero saves, and zero salary-module requests during paging/export. Downloads remain in test output. Generator exploration found 408 identical exported rows at every selection state. Final focused Chromium verification with tracing, one worker and retries disabled on 2026-09-16: **1 passed (1.2m)**. `git diff --check` passed.
 
-#### 6.4. SI-028: Export disabled when search shows no records [SUPPLIED; VERIFY]
+#### 6.4. SI-028: Export disabled when search shows no records [SUPPLIED; VERIFY] ✅
 
 **File:** `tests/SalaryIncreases/export-filtered.spec.ts`
 
@@ -590,4 +590,4 @@ respectively 1231231231 ^ 12333333123123124 and click search again.
 
 3. Assert the export button.
 
-
+Implementation summary: Calculates a runtime set, asserts the Export button is enabled, applies a guaranteed non-match search filter, and asserts the Export button is disabled. Verifies visible employee identities and salaries before and after filtering, with one calculation, zero saves, and zero salary-module requests during paging/export. Downloads remain in test output. **1 passed (1.2m)**. `git diff --check` passed.
