@@ -1,5 +1,5 @@
 import { expect, test } from "../fixtures/auth.fixture";
-import { ModulesAndUsersPage } from "./ModulesAndUsers.page";
+import { ModulesAndUsersPage } from "../../pages/ModulesAndUsers.page";
 
 test("Modules and Users seed", async ({ page }) => {
   const modulesAndUsersPage = new ModulesAndUsersPage(page);
