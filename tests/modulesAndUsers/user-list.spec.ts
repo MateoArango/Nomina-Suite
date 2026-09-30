@@ -100,6 +100,8 @@ test.describe("User list", () => {
     await activeRow.dblclick();
     await expect(modulesAndUsersPage.userTab).toHaveAttribute("aria-selected", "true");
     await expect(modulesAndUsersPage.modulesTab).toBeEnabled();
+    await modulesAndUsersPage.modulesTab.click();
+    await modulesAndUsersPage.moduleAssignmentHeading;
     await expect(modulesAndUsersPage.inheritTab).toBeEnabled();
     await expect(modulesAndUsersPage.userIdNumberField).toHaveValue(String(activeUser.cedula));
 

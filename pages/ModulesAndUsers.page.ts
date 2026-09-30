@@ -1,5 +1,5 @@
 import { expect, type Locator, type Page } from "@playwright/test";
-
+const msg_module_modules = "Asignación de módulos";
 /** Page object for the Users and Modules administration screen. */
 export class ModulesAndUsersPage {
   readonly routeHost: Locator;
@@ -30,6 +30,7 @@ export class ModulesAndUsersPage {
   readonly modulesTable: Locator;
   readonly expandAllModulesButton: Locator;
   readonly collapseAllModulesButton: Locator;
+  readonly moduleAssignmentHeading: Locator;
 
   constructor(readonly page: Page) {
     this.routeHost = page.getByTestId("app-shell-route-host");
@@ -60,6 +61,8 @@ export class ModulesAndUsersPage {
     this.userDependencySelect = page.getByTestId("usuarios-modulos-user-dependency-select");
     this.userStatusSelect = page.getByTestId("usuarios-modulos-user-status-select");
     this.modulesTable = page.getByTestId("usuarios-modulos-modules-table");
+    this.moduleAssignmentHeading = page.getByText(msg_module_modules, { exact: true });
+
     this.expandAllModulesButton = page.getByTestId("usuarios-modulos-modules-expand-all-button");
     this.collapseAllModulesButton = page.getByTestId("usuarios-modulos-modules-collapse-all-button");
   }
@@ -156,5 +159,10 @@ export class ModulesAndUsersPage {
   async expectLoaded(): Promise<void> {
     await expect(this.routeHost).toBeVisible();
     await expect(this.listTable).toBeVisible();
+  }
+
+  async expectModuleAssignmentText(): Promise<void> {
+    await expect(this.moduleAssignmentHeading).toBeVisible();
+    await expect(this.moduleAssignmentHeading).toHaveText(msg_module_modules);
   }
 }
