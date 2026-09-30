@@ -1,4 +1,9 @@
 # User and Module Assignment Test Plan
+## 0. Bugs
+THIS SUITE IS UNDER ACTIVE DEVELOPMENT. A LOTS OF BUGS AND IT DOESN'T ALLOW
+A NORMAL CRUD AUTOMATION.
+1. An error in Nuevo, could be an extra large value for the inputs
+like 50+ chars the error it makes disabled the buttons: grabar, nuevo, cargar, deshacer, eliminar.
 
 ## 1. Valid User IDs
 
@@ -41,7 +46,7 @@ Plan functional coverage for the authenticated administrator page that lists use
 **Implementation summary:** The user list is the default view and all the row items loads
 correctly.
 
-#### 1.2. Open a user and verify status filters
+#### 1.2. Open a user and verify status filters ✅
 
 **File:** `tests/usersModules/user-list.spec.ts`
 
@@ -55,6 +60,8 @@ Cambie estado o criterios de busqueda.'
     - Idea1: https://nomina-qa2-api.adacsc.co/api/v1/w-usuarios-modulos/bootstrap inside
     usuarios has the list of ussers shown in the ui. You can compare at least 3 records to see if the list is correct.
 
+**Implementation sumary:** The user list is the default view and all the row items loads correctly. The status filters work as expected and the tab Modulos is enabled.
+
 ### 3. User account lifecycle
 
 **Seed:** `tests/fixtures/auth.fixture.ts`
@@ -66,10 +73,12 @@ Cambie estado o criterios de busqueda.'
 **Steps:**
   1. Create a uniquely identified test-owned user with required fields, matching passwords, and optional email; save and reload.
     - expect: A success result appears and saved values persist. A subsequent new-user action clears the form.
-  2. Repeat validation with each required field empty, mismatched passwords, duplicate identity and login, invalid email, and empty password.
+    - expect: The new user appears in the list and can be opened. The test-owned user is deleted by cleanup.
+
+    #### 2.1.1. Validation checks
+  1. Repeat validation with each required field empty, mismatched passwords, duplicate identity and login, invalid email, and empty password.
     - expect: Each invalid case is rejected without creating a record; capture observed validation text and verify whether a save request was sent.
-  3. Check password visibility controls and supported input boundaries.
-    - expect: Visibility toggles work. Record accepted or rejected boundary values without saving unexpected data.
+
 
 #### 2.2. Edit, undo, block, and delete an owned user
 

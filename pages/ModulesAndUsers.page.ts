@@ -14,9 +14,7 @@ export class ModulesAndUsersPage {
   readonly inheritTab: Locator;
   readonly listTable: Locator;
   readonly searchInput: Locator;
-  readonly searchButton: Locator;
   readonly openSearchButton: Locator;
-  readonly nextSearchButton: Locator;
   readonly statusSelect: Locator;
   readonly userIdNumberField: Locator;
   readonly userNameField: Locator;
@@ -50,15 +48,16 @@ export class ModulesAndUsersPage {
     this.userIdNumberField = page.locator(
       'input[data-testid="usuarios-modulos-user-id-number-field"]',
     );
-    this.userNameField = page.getByTestId("usuarios-modulos-user-name-field");
-    this.userLoginField = page.getByTestId("usuarios-modulos-user-login-field");
-    this.userEmailField = page.getByTestId("usuarios-modulos-user-email-field");
-    this.userPasswordField = page.getByTestId("usuarios-modulos-user-password-field");
-    this.userPasswordConfirmationField = page.getByTestId(
-      "usuarios-modulos-user-password-confirmation-field",
-    );
-    this.userPositionSelect = page.getByTestId("usuarios-modulos-user-position-select");
-    this.userDependencySelect = page.getByTestId("usuarios-modulos-user-dependency-select");
+    this.userNameField = page.getByRole("textbox", { name: "Nombre", exact: true });
+    this.userLoginField = page.getByRole("textbox", { name: "Login", exact: true });
+    this.userEmailField = page.getByRole("textbox", { name: "E-Mail", exact: true });
+    this.userPasswordField = page.getByRole("textbox", { name: "Password", exact: true });
+    this.userPasswordConfirmationField = page.getByRole("textbox", {
+      name: "Confirmar Password",
+      exact: true,
+    });
+    this.userPositionSelect = page.getByRole("combobox", { name: "Cargo", exact: true });
+    this.userDependencySelect = page.getByRole("combobox", { name: "Dependencia", exact: true });
     this.userStatusSelect = page.getByTestId("usuarios-modulos-user-status-select");
     this.modulesTable = page.getByTestId("usuarios-modulos-modules-table");
 
