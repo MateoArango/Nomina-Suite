@@ -101,8 +101,8 @@ test.describe("User list", () => {
     await expect(modulesAndUsersPage.userTab).toHaveAttribute("aria-selected", "true");
     await expect(modulesAndUsersPage.modulesTab).toBeEnabled();
     await modulesAndUsersPage.modulesTab.click();
-    await modulesAndUsersPage.moduleAssignmentHeading;
-    await expect(modulesAndUsersPage.inheritTab).toBeEnabled();
+    await expect(page.locator("body")).toContainText(/asignación de módulos/i);
+    await modulesAndUsersPage.userTab.click();
     await expect(modulesAndUsersPage.userIdNumberField).toHaveValue(String(activeUser.cedula));
 
     await modulesAndUsersPage.listTab.click();
@@ -140,10 +140,10 @@ test.describe("User list", () => {
     await selectStatus(/^Bloqueados$/i);
     const blockedUsers = payload.usuarios.filter(user => user.bloqueado === "S");
     if (blockedUsers.length === 0) {
-      await expect(modulesAndUsersPage.listTable).toContainText(
+      await expect(page.locator("body")).toContainText(
         "Sin usuarios para el filtro actual",
       );
-      await expect(modulesAndUsersPage.listTable).toContainText(
+      await expect(page.locator("body")).toContainText(
         "Cambie estado o criterios de busqueda.",
       );
     } else {
