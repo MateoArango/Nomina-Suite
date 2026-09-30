@@ -45,8 +45,10 @@ export class ModulesAndUsersPage {
     this.listTable = page.getByTestId("usuarios-modulos-list-table");
     this.searchInput = page.getByTestId("usuarios-modulos-list-search-input");
     this.openSearchButton = page.getByTestId("usuarios-modulos-list-search-open-button");
-    this.statusSelect = page.getByTestId("usuarios-modulos-list-status-select");
-    this.userIdNumberField = page.getByTestId("usuarios-modulos-user-id-number-field");
+    this.statusSelect = page.getByRole("combobox", { name: "Estado" });
+    this.userIdNumberField = page.locator(
+      'input[data-testid="usuarios-modulos-user-id-number-field"]',
+    );
     this.userNameField = page.getByTestId("usuarios-modulos-user-name-field");
     this.userLoginField = page.getByTestId("usuarios-modulos-user-login-field");
     this.userEmailField = page.getByTestId("usuarios-modulos-user-email-field");
