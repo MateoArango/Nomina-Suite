@@ -14,9 +14,7 @@ export class ModulesAndUsersPage {
   readonly inheritTab: Locator;
   readonly listTable: Locator;
   readonly searchInput: Locator;
-  readonly searchButton: Locator;
   readonly openSearchButton: Locator;
-  readonly nextSearchButton: Locator;
   readonly statusSelect: Locator;
   readonly userIdNumberField: Locator;
   readonly userNameField: Locator;
@@ -30,6 +28,7 @@ export class ModulesAndUsersPage {
   readonly modulesTable: Locator;
   readonly expandAllModulesButton: Locator;
   readonly collapseAllModulesButton: Locator;
+
 
   constructor(readonly page: Page) {
     this.routeHost = page.getByTestId("app-shell-route-host");
@@ -45,19 +44,23 @@ export class ModulesAndUsersPage {
     this.listTable = page.getByTestId("usuarios-modulos-list-table");
     this.searchInput = page.getByTestId("usuarios-modulos-list-search-input");
     this.openSearchButton = page.getByTestId("usuarios-modulos-list-search-open-button");
-    this.statusSelect = page.getByTestId("usuarios-modulos-list-status-select");
-    this.userIdNumberField = page.getByTestId("usuarios-modulos-user-id-number-field");
-    this.userNameField = page.getByTestId("usuarios-modulos-user-name-field");
-    this.userLoginField = page.getByTestId("usuarios-modulos-user-login-field");
-    this.userEmailField = page.getByTestId("usuarios-modulos-user-email-field");
-    this.userPasswordField = page.getByTestId("usuarios-modulos-user-password-field");
-    this.userPasswordConfirmationField = page.getByTestId(
-      "usuarios-modulos-user-password-confirmation-field",
+    this.statusSelect = page.getByRole("combobox", { name: "Estado" });
+    this.userIdNumberField = page.locator(
+      'input[data-testid="usuarios-modulos-user-id-number-field"]',
     );
-    this.userPositionSelect = page.getByTestId("usuarios-modulos-user-position-select");
-    this.userDependencySelect = page.getByTestId("usuarios-modulos-user-dependency-select");
+    this.userNameField = page.getByRole("textbox", { name: "Nombre", exact: true });
+    this.userLoginField = page.getByRole("textbox", { name: "Login", exact: true });
+    this.userEmailField = page.getByRole("textbox", { name: "E-Mail", exact: true });
+    this.userPasswordField = page.getByRole("textbox", { name: "Password", exact: true });
+    this.userPasswordConfirmationField = page.getByRole("textbox", {
+      name: "Confirmar Password",
+      exact: true,
+    });
+    this.userPositionSelect = page.getByRole("combobox", { name: "Cargo", exact: true });
+    this.userDependencySelect = page.getByRole("combobox", { name: "Dependencia", exact: true });
     this.userStatusSelect = page.getByTestId("usuarios-modulos-user-status-select");
     this.modulesTable = page.getByTestId("usuarios-modulos-modules-table");
+
     this.expandAllModulesButton = page.getByTestId("usuarios-modulos-modules-expand-all-button");
     this.collapseAllModulesButton = page.getByTestId("usuarios-modulos-modules-collapse-all-button");
   }
@@ -155,4 +158,5 @@ export class ModulesAndUsersPage {
     await expect(this.routeHost).toBeVisible();
     await expect(this.listTable).toBeVisible();
   }
+
 }
