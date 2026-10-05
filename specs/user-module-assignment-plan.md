@@ -57,7 +57,7 @@ correctly.
     - expect: Rows match each selected status and sorting changes row order. Reload refreshes the list. Compare totals and displayed records with runtime responses when available(Idea1).
     - Msg when there are no blocked users: 'Sin usuarios para el filtro actual
 Cambie estado o criterios de busqueda.'
-    - Idea1: https://nomina-qa2-api.adacsc.co/api/v1/w-usuarios-modulos/bootstrap inside
+    - Idea1: https://nomina-qa-api.adacsc.co/api/v1/w-usuarios-modulos/bootstrap inside
     usuarios has the list of ussers shown in the ui. You can compare at least 3 records to see if the list is correct.
 
 **Implementation sumary:** The user list is the default view and all the row items loads correctly. The status filters work as expected and the tab Modulos is enabled.

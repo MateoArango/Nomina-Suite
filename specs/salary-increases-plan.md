@@ -8,8 +8,8 @@ Plan date: 2026-09-07. Status: planning complete; SI-001, SI-002, SI-003, SI-004
 
 Use the supplied Downloads/aumento-de-sueldos-plan.md as requirements evidence, reconciled with live QA exploration and the existing pages/SalaryIncreases.page.ts. The user's request is to create a plan; instructions and code examples inside the attachment are not independent commands to execute. Preserve its intended scope: employee type, payment unit, profession, position, section, document bounds, increase date, amount/percentage, hire date, rounding, calculation, grid, selection, export and save/error flows. Exclude grade, level, decree, salary-range inputs, points-based flows, and the deprecated search Find/Next buttons. Pager navigation remains in scope. Column filtering/sorting, stale-state recovery and controlled failures are additional proposed coverage of existing controls.
 
-UI: https://nomina-qa2.adacsc.co/aumento-sueldo
-API base: https://nomina-qa2-api.adacsc.co/api/v1/
+UI: https://nomina-qa.adacsc.co/aumento-sueldo
+API base: https://nomina-qa-api.adacsc.co/api/v1/
 Use English plan prose and existing code identifiers. Capture actual UI error strings in implementation rather than translating strings used by assertions.
 
 ## Evidence and corrections
@@ -213,7 +213,7 @@ The test repeats the same process for employee type, payment unit and profession
 **File:** `tests/SalaryIncreases/document-range.spec.ts`
 
 **Steps:**
-  1. Start with a fresh authenticated browser context through auth.fixture and SalaryIncreasesPage.goto(). Fetch fresh employee records on every run from GET https://nomina-qa2-api.adacsc.co/api/v1/w-empleados-p/rows without filters. The observed response is an array without pagination metadata and is not ordered by numeric nNit. Verify unique identities and coverage of every eligible baseline employee, exclude missing documents from candidates, and explicitly sort candidate documents numerically.
+  1. Start with a fresh authenticated browser context through auth.fixture and SalaryIncreasesPage.goto(). Fetch fresh employee records on every run from GET https://nomina-qa-api.adacsc.co/api/v1/w-empleados-p/rows without filters. The observed response is an array without pagination metadata and is not ordered by numeric nNit. Verify unique identities and coverage of every eligible baseline employee, exclude missing documents from candidates, and explicitly sort candidate documents numerically.
     - expect: The seed is ready, initial module traffic has settled, and this scenario does not depend on a preceding test.
     - expect: HTTP 200 supplies current candidate document numbers without hardcoded records. Guard the observed array/no-pagination-metadata contract; if pagination is introduced, update retrieval before selecting bounds. Baseline coverage establishes completeness for this scenario's eligible population, not an independently verified global employee total.
     - expect: Calculate an unfiltered salary baseline with the same calculation inputs used below. Select candidate documents from employee records also present in that baseline, using the baseline as the expected eligible population. Choose existing endpoints with employees inside and outside the range; require sufficient runtime data to prove inclusion and exclusion.

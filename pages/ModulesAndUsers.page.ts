@@ -106,7 +106,7 @@ export class ModulesAndUsersPage {
   }
 
   async goto(): Promise<void> {
-    await this.page.goto("https://nomina-qa2.adacsc.co/usuarios-modulos");
+    await this.page.goto("https://nomina-qa.adacsc.co/usuarios-modulos");
   }
 
   rows(): Locator {

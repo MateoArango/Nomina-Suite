@@ -1,27 +1,8 @@
-DescripcionDescripcionDescripcionDescripcionDescripcionDescripcionDescripcionDescripcionDescripcionDescripcionDescripcionDescripcionDescripcionDesii1234onDescripcioonDescripciocripcionDescripcionDescr
+#Psuedo Plan Permissions
 
-{"code":"BAD_REQUEST","message":"El empleado se encuentra en una incapacidad en el rango indicado.","timestamp":"2026-10-02T16:49:41.482529282Z"}
-{
-"kaNlPermiso": null,
-"kaNlEmpleado": 10236,
-"ddDesde": "2026-01-01",
-"ddHasta": "2026-01-20",
-"scCompensatorio": "N",
-"scPermiso": "S",
-"scDescripcion": "Testing the error vacations already selected on this date for 98452583",
-"ddFechaElab": "2026-10-02",
-"kaNlUsuario": 677,
-"ndActoAdministrativo": 1,
-"ddActoAdministrativo": "2026-01-01",
-"aprobada": "N",
-"fechaAprobacion": null,
-"usuarioAprueba": null,
-"ibcPermiso": null
-}
+### *Record base 98452583*
 
-on the record 98452583
-
-# ***Sumary***
+# ***Summary***
 
 This page is the Permisos (Leave Management) module of ADA’s Nómina (Payroll) system. It is used to record, view, and manage employee leaves of absence and special work permissions.
 
@@ -34,8 +15,6 @@ Leave Data Entry: Set start/end dates, add descriptions, mark approval statuses,
 
 Action Controls: Create new records, save updates, or delete existing permission entries.
 
-984525831213934212
-1111111111111022200
 
 | field | bound | ErrorMsg |
 | --- | --- | --- |
@@ -101,3 +80,86 @@ not allow to delete it, so Guardar and Eliminar are disabled).
 ### Datos del Permiso
 - https://nomina-qa-api.adacsc.co/api/v1/w-vacaciones-licencias-ascensos-permisos/rows/432
 - - This one is for all information for the main form.
+
+### When Guardar button is clicked
+- https://nomina-qa-api.adacsc.co/api/v1/errores-reporte/actions/grabar
+-- Saves the record
+
+### When Seleccionar button is clicked
+- https://nomina-qa-api.adacsc.co/api/v1/w-vacaciones-licencias-ascensos-permisos/lookups/empleados?limit=2000&query=
+-- This one is for the side panel 'Seleccionar Empleado' and brings a list of all employees.
+- https://nomina-qa-api.adacsc.co/api/v1/w-vacaciones-licencias-ascensos-permisos/empleados/11290
+-- When you select one employee is just a request from kanlTercero.
+
+### When you click on 'Eliminar' button
+Request URL
+https://nomina-qa-api.adacsc.co/api/v1/w-vacaciones-licencias-ascensos-permisos/rows/441
+Request method
+DELETE
+
+
+
+## Obligatory fields
+All fields less 'Fecha acto administrativo'
+
+
+## Error messages and additional information
+
+# *Acto administrativo*
+The 'Acto administrativo' field is required and it could be either value or a repeated one, his absence
+will trigger 'Error
+Debe ingresar el Acto Administrativo.'
+
+# *Repeated date or  relationed date with other modules -- Collision problems*
+When the date is repeated the endpoint rows will trigger 'Error
+El empleado se encuentra en un permiso y/o compensatorio ya registrado en el rango indicado.'
+
+For vacations it'll trigger 'Error
+Existe un registro de vacaciones que se cruza con las fechas registradas.'
+
+For incapacidades it'll trigger 'Error
+El empleado se encuentra en una incapacidad en el rango indicado.'
+
+For absence it'll trigger 'Error
+El empleado se encuentra en una ausencia/suspensión en el rango indicado.'
+
+For licence it'll trigger 'Error
+El empleado se encuentra en una licencia en el rango indicado.'
+
+For calamity licence it'll trigger 'Error
+El empleado se encuentra en licencia de calamidad en el rango indicado.'
+
+# *CC empty or invalid*
+When the CC is over bundle it will trigger Error
+For input string: "9845258312139342000"
+
+When the cc is inside the bundle and is not found 'Error
+Empleado no encontrado para nit=984525831213934200'
+
+# *Seleccionar*
+When there's no records found on 'Consultar' input
+Sin resultados
+
+No se encontraron empleados para la consulta actual.
+
+# *Listado de Permisos*
+The msg when there's no records is 'Sin permisos
+
+Busque o seleccione un empleado para consultar sus permisos.'
+
+# *Datos del Permiso*
+When the 'Desde' field is empty it will trigger
+Error
+Debe ingresar la Fecha Desde.
+
+When the 'Hasta' field is empty it will trigger
+Error
+Debe ingresar la Fecha Hasta.
+
+When description field is empty it will trigger
+Error
+Debe ingresar la Descripcion.
+
+When Fecha acto administrativo is greater than Desde it will trigger
+Error
+La Fecha Acto debe ser menor o igual a la Fecha Desde.

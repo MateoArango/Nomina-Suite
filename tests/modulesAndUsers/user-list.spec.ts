@@ -19,7 +19,7 @@ test.describe("User list", () => {
 
     // 1. Open the user and module assignment page from a fresh authenticated page.
     await modulesAndUsersPage.goto();
-    await expect(page).toHaveURL("https://nomina-qa2.adacsc.co/usuarios-modulos");
+    await expect(page).toHaveURL("https://nomina-qa.adacsc.co/usuarios-modulos");
     await modulesAndUsersPage.expectLoaded();
 
     await expect(modulesAndUsersPage.listTab).toHaveAttribute(

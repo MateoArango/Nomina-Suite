@@ -23,7 +23,7 @@ export class LoginPage {
   }
 
   async goto(): Promise<void> {
-    await this.page.goto("https://nomina-qa2.adacsc.co/inicio");
+    await this.page.goto("https://nomina-qa.adacsc.co/inicio");
   }
 
   async signIn(): Promise<void> {
