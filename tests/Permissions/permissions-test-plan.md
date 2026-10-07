@@ -46,7 +46,7 @@ Permission/compensatory accepted combinations from the source: (Yes,No), (No,No)
 
 **Seed:** `tests/Permissions/seed-test.spec.ts`
 
-#### 1.1. PER-001 — Fresh page and disabled record actions
+#### 1.1. PER-001 — Fresh page and disabled record actions ✅
 
 **File:** `tests/Permissions/initial-state.spec.ts`
 
@@ -61,6 +61,8 @@ Permission/compensatory accepted combinations from the source: (Yes,No), (No,No)
     - expect: Message contract: Empty title "Sin permisos"; body "Busque o seleccione un empleado para consultar sus permisos." No error dialog.
     - expect: No permission record is created, updated or deleted.
     - expect: Failure conditions: incorrect message, incorrect field/action state, wrong employee or row, incorrect response/persistence, or unmet prerequisite. Report missing prerequisites explicitly; never treat them as passing coverage.
+
+**Implementation summary:** Implemented in `initial-state.spec.ts` with the shared authentication fixture and PermissionsPage. Live discovery confirmed the exact empty-state messages, visible detail controls, disabled record actions, all six initial checkbox states, no history rows or error dialog, and no Permissions API requests. Independent Chromium run passed (1 test, 1 worker, retries=0); read-only.
 
 #### 1.2. PER-002 — Search an existing employee by document
 
