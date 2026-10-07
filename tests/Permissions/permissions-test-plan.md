@@ -64,12 +64,12 @@ Permission/compensatory accepted combinations from the source: (Yes,No), (No,No)
 
 **Implementation summary:** Implemented in `initial-state.spec.ts` with the shared authentication fixture and PermissionsPage. Live discovery confirmed the exact empty-state messages, visible detail controls, disabled record actions, all six initial checkbox states, no history rows or error dialog, and no Permissions API requests. Independent Chromium run passed (1 test, 1 worker, retries=0); read-only.
 
-#### 1.2. PER-002 — Search an existing employee by document
+#### 1.2. PER-002 — Search an existing employee by document ✅
 
 **File:** `tests/Permissions/search-existing-employee.spec.ts`
 
 **Steps:**
-  1. Start a fresh authenticated context using the shared fixture, construct PermissionsPage and call goto(). Resolve an existing employee document from lookup data; supplied 98452583 may be used only after confirming existence. Execution mode: Read-only.
+  1. Start a fresh authenticated context using the shared fixture, construct PermissionsPage and call goto(). Resolve an existing employee document from lookup data; supplied 43433798 may be used only after confirming existence. Execution mode: Read-only.
     - expect: URL ends in /permisos; heading and search controls are ready; no state is inherited from another test.
   2. Arm the document lookup and history response waits, fill employeeDocumentInput and click employeeSearchButton.
   3. Read employee key/name from the response; match history request kaNlTercero, limit=200 and calamidad=N.
@@ -80,6 +80,8 @@ Permission/compensatory accepted combinations from the source: (Yes,No), (No,No)
     - expect: Message contract: No error dialog. If this employee has empty history, verify its actual empty-state wording rather than assuming a populated table.
     - expect: No permission record is created, updated or deleted.
     - expect: Failure conditions: incorrect message, incorrect field/action state, wrong employee or row, incorrect response/persistence, or unmet prerequisite. Report missing prerequisites explicitly; never treat them as passing coverage.
+
+**Implementation summary:** Implemented in `search-existing-employee.spec.ts` using the shared authentication fixture and PermissionsPage. Resolves the document from live lookup data, matches runtime identity and history query parameters, verifies empty or populated history and record-dependent actions, and asserts no error dialog or permission mutations. Live discovery confirmed empty-history wording and approved-record action locks. Independent Chromium run passed (1 test, 1 worker, retries=0); read-only.
 
 #### 1.3. PER-003 — Search with an empty document
 

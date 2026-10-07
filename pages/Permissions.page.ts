@@ -12,6 +12,9 @@ export class PermissionsPage {
   readonly deleteButton: Locator;
   readonly employeeSection: Locator;
   readonly employeeHeading: Locator;
+  readonly employeeNameValue: Locator;
+  readonly historyTable: Locator;
+  readonly historyRows: Locator;
   readonly employeeDocumentInput: Locator;
   readonly employeeSearchButton: Locator;
   readonly employeeSelectorOpenButton: Locator;
@@ -79,12 +82,15 @@ export class PermissionsPage {
     this.employeeSelectorOpenButton = this.view.locator('button[data-testid="permisos-employee-selector-open-button"]');
     this.employeeSection = this.view.locator("bds-card").filter({ has: page.locator('input[data-testid="permisos-employee-document-search-input"]') });
     this.employeeHeading = this.employeeSection.getByRole("heading", { level: 2 });
+    this.employeeNameValue = this.employeeSection.locator(".field-pair__value").first();
 
     // The empty history in the supplied HTML has no table or record IDs.
     this.historySection = this.view.locator("bds-card").filter({
       hasNot: page.locator('input[data-testid="permisos-employee-document-search-input"]'),
     }).filter({ hasNot: page.getByTestId("permisos-form-start-date-input") });
     this.historyHeading = this.historySection.getByRole("heading", { level: 2 });
+    this.historyTable = this.historySection.getByTestId("permisos-list-table");
+    this.historyRows = this.historyTable.locator('tr[data-testid^="permisos-table-row--"]');
     this.historyEmptyState = this.historySection.locator(".empty-state");
     this.historyEmptyTitle = this.historyEmptyState.locator(".empty-state__title");
     this.historyEmptyMessage = this.historyEmptyState.locator(".empty-state__subtitle");
@@ -139,6 +145,10 @@ export class PermissionsPage {
 
   employeeSelectorRow(id: string | number): Locator {
     return this.employeeSelectorTable.getByTestId(`permisos-employee-selector-row--${id}`);
+  }
+
+  historyRow(id: string | number): Locator {
+    return this.historyTable.getByTestId(`permisos-table-row--${id}`);
   }
 
   employeeSelectorCell(
