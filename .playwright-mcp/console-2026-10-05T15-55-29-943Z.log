@@ -1,8 +1,9 @@
-[      33ms] TypeError: Cannot read properties of null (reading 'appendChild')
+[       4ms] TypeError: Cannot read properties of null (reading 'appendChild')
     at <anonymous>:6:32
     at <anonymous>:7:7
     at <anonymous>:8:7
-[ 5384074ms] [ERROR] ERROR TypeError: Cannot read properties of null (reading 'addControl')
+[   47656ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ https://nomina-qa-api.adacsc.co/api/v1/w-vacaciones-licencias-ascensos-permisos/empleados/by-nitsd/984525831213934200:0
+[ 7433625ms] [ERROR] ERROR TypeError: Cannot read properties of null (reading 'addControl')
     at t._setUpControl (https://nomina-qa.adacsc.co/chunk-TQPRGIKA.js:5:133114)
     at t.ngOnChanges (https://nomina-qa.adacsc.co/chunk-TQPRGIKA.js:5:132667)
     at t.$T (https://nomina-qa.adacsc.co/chunk-TQPRGIKA.js:4:19817)
@@ -13,4 +14,4 @@
     at eA (https://nomina-qa.adacsc.co/chunk-TQPRGIKA.js:4:60897)
     at Gh (https://nomina-qa.adacsc.co/chunk-TQPRGIKA.js:4:61938)
     at nD (https://nomina-qa.adacsc.co/chunk-TQPRGIKA.js:4:61770) @ https://nomina-qa.adacsc.co/chunk-TQPRGIKA.js:3
-[ 5384075ms] [ERROR] [test-id bridge][form-field-password] controles=0 @ https://nomina-qa.adacsc.co/chunk-C44TMRBX.js:0
+[ 7433626ms] [ERROR] [test-id bridge][form-field-password] controles=0 @ https://nomina-qa.adacsc.co/chunk-C44TMRBX.js:0
