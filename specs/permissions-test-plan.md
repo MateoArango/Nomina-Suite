@@ -83,7 +83,7 @@ Permission/compensatory accepted combinations from the source: (Yes,No), (No,No)
 
 **Implementation summary:** Implemented in `search-existing-employee.spec.ts` using the shared authentication fixture and PermissionsPage. Resolves the document from live lookup data, matches runtime identity and history query parameters, verifies empty or populated history and record-dependent actions, and asserts no error dialog or permission mutations. Live discovery confirmed empty-history wording and approved-record action locks. Independent Chromium run passed (1 test, 1 worker, retries=0); read-only.
 
-#### 1.3. PER-003 — Search with an empty document
+#### 1.3. PER-003 — Search with an empty document ✅
 
 **File:** `tests/Permissions/search-empty-document.spec.ts`
 
@@ -95,9 +95,11 @@ Permission/compensatory accepted combinations from the source: (Yes,No), (No,No)
   4. Assert the final UI and relevant network results.
     - expect: No employee is selected; record actions stay disabled; no unrelated history appears.
   5. Check message behavior and finish this scenario independently.
-    - expect: Message contract: Exact empty-document message is not supplied: discover and record the actual dialog/inline wording before generation. Do not reuse the not-found or overflow message.
+    - expect: Message contract: Runtime-confirmed local validation dialog with title "Error" and exact body asserted in `search-empty-document.spec.ts`; assert title and body separately before dismissing through `permisos-dialog-error-confirm-button`. No Permissions API request occurs.
     - expect: No permission record is created, updated or deleted.
     - expect: Failure conditions: incorrect message, incorrect field/action state, wrong employee or row, incorrect response/persistence, or unmet prerequisite. Report missing prerequisites explicitly; never treat them as passing coverage.
+
+**Implementation summary:** Implemented in `search-empty-document.spec.ts` using the shared authentication fixture and PermissionsPage. Live discovery confirmed local validation with an exact error body, no selected employee or history, disabled New/Save/Delete actions, and no Permissions API requests. The test asserts the message before dismissal and checks the final state afterward. Independent Chromium run passed (1 test, 1 worker, retries=0); read-only.
 
 #### 1.4. PER-004 — Numeric document within stated length is not found
 
