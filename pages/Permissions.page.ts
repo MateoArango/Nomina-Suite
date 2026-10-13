@@ -169,3 +169,5 @@ export class PermissionsPage {
     await this.page.goto("https://nomina-qa.adacsc.co/permisos");
   }
 }
+
+

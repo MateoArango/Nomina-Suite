@@ -1,0 +1,5 @@
+[       4ms] TypeError: Cannot read properties of null (reading 'appendChild')
+    at <anonymous>:6:32
+    at <anonymous>:7:7
+    at <anonymous>:8:7
+[     785ms] [ERROR] Failed to load resource: the server responded with a status of 400 () @ https://nomina-qa-api.adacsc.co/api/v1/w-vacaciones-licencias-ascensos-permisos/empleados/by-nitsd/9845258312139342000:0

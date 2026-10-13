@@ -101,7 +101,7 @@ Permission/compensatory accepted combinations from the source: (Yes,No), (No,No)
 
 **Implementation summary:** Implemented in `search-empty-document.spec.ts` using the shared authentication fixture and PermissionsPage. Live discovery confirmed local validation with an exact error body, no selected employee or history, disabled New/Save/Delete actions, and no Permissions API requests. The test asserts the message before dismissal and checks the final state afterward. Independent Chromium run passed (1 test, 1 worker, retries=0); read-only.
 
-#### 1.4. PER-004 — Numeric document within stated length is not found
+#### 1.4. PER-004 — Numeric document within stated length is not found ✅
 
 **File:** `tests/Permissions/search-not-found.spec.ts`
 
@@ -117,7 +117,9 @@ Permission/compensatory accepted combinations from the source: (Yes,No), (No,No)
     - expect: No permission record is created, updated or deleted.
     - expect: Failure conditions: incorrect message, incorrect field/action state, wrong employee or row, incorrect response/persistence, or unmet prerequisite. Report missing prerequisites explicitly; never treat them as passing coverage.
 
-#### 1.5. PER-005 — Document numeric overflow
+**Implementation summary:** Implemented in `search-not-found.spec.ts` using the shared authentication fixture and PermissionsPage. Verifies the exact 18-digit document produces a 404 NOT_FOUND lookup response and matching error dialog, separately checks the automatic error-report POST (200) and its error payload, and confirms no selected employee or history with New/Save/Delete disabled before and after dismissal. Only the failed GET reaches the Permissions API; no permission records are created, updated or deleted. Focused Chromium verification passed (1 test, 1 worker, retries=0).
+
+#### 1.5. PER-005 — Document numeric overflow ✅
 
 **File:** `tests/Permissions/search-overflow.spec.ts`
 
@@ -130,9 +132,11 @@ Permission/compensatory accepted combinations from the source: (Yes,No), (No,No)
     - expect: Overflow does not select an employee; no save/delete is enabled.
     - expect: If browser/backend rounds the digits, record the discrepancy instead of silently changing the assertion.
   5. Check message behavior and finish this scenario independently.
-    - expect: Message contract: Title "Error"; body 'For input string: "9845258312139342000"'. Supplied contract, not live-verified.
+    - expect: Message contract: Runtime-confirmed title "Error"; exact body 'For input string: "9845258312139342000"'. Lookup returns 400 BAD_REQUEST with the same message; assert title and body before dismissal.
     - expect: No permission record is created, updated or deleted.
     - expect: Failure conditions: incorrect message, incorrect field/action state, wrong employee or row, incorrect response/persistence, or unmet prerequisite. Report missing prerequisites explicitly; never treat them as passing coverage.
+
+**Implementation summary:** Implemented in `search-overflow.spec.ts` using the shared authentication fixture and PermissionsPage. Live QA preserved all 19 digits in the input, lookup URL and error message; no rounding discrepancy occurred for this sample. Asserts the 400 BAD_REQUEST response and exact dialog title/body before dismissal, verifies automatic error-report telemetry separately, and confirms no employee/history with New/Save/Delete disabled. Only the failed GET reaches the Permissions API; no permission mutation occurs. Independent Chromium run passed (1 test, 1 worker, retries=0); read-only.
 
 #### 1.6. PER-006 — Document length and precision boundary
 
