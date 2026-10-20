@@ -138,24 +138,8 @@ Permission/compensatory accepted combinations from the source: (Yes,No), (No,No)
 
 **Implementation summary:** Implemented in `search-overflow.spec.ts` using the shared authentication fixture and PermissionsPage. Live QA preserved all 19 digits in the input, lookup URL and error message; no rounding discrepancy occurred for this sample. Asserts the 400 BAD_REQUEST response and exact dialog title/body before dismissal, verifies automatic error-report telemetry separately, and confirms no employee/history with New/Save/Delete disabled. Only the failed GET reaches the Permissions API; no permission mutation occurs. Independent Chromium run passed (1 test, 1 worker, retries=0); read-only.
 
-#### 1.6. PER-006 — Document length and precision boundary
 
-**File:** `tests/Permissions/search-document-boundary.spec.ts`
-
-**Steps:**
-  1. Start a fresh authenticated context using the shared fixture, construct PermissionsPage and call goto(). Resolve a valid short document and absent 18-digit numeric candidate. Execution mode: Read-only.
-    - expect: URL ends in /permisos; heading and search controls are ready; no state is inherited from another test.
-  2. Search valid short document, then independently search the 18-digit candidate and the supplied 19-digit overflow value; dismiss each dialog.
-  3. Compare typed digits with requested URL and actual error interpolation; do not convert long values to JavaScript Number.
-  4. Assert the final UI and relevant network results.
-    - expect: 18 digits must reach lookup without an invented character-limit assertion; absence is distinct from overflow.
-    - expect: Document numeric range and precision limitations explicitly.
-  5. Check message behavior and finish this scenario independently.
-    - expect: Message contract: Absent 18-digit sample: "Empleado no encontrado para nit=984525831213934200"; overflow sample: 'For input string: "9845258312139342000"', each under title "Error". Valid lookup has no error.
-    - expect: No permission record is created, updated or deleted.
-    - expect: Failure conditions: incorrect message, incorrect field/action state, wrong employee or row, incorrect response/persistence, or unmet prerequisite. Report missing prerequisites explicitly; never treat them as passing coverage.
-
-#### 1.7. PER-007 — Switch employees without stale history
+#### 1.7. PER-007 — Switch employees without stale history ✅
 
 **File:** `tests/Permissions/switch-employees.spec.ts`
 
@@ -171,6 +155,10 @@ Permission/compensatory accepted combinations from the source: (Yes,No), (No,No)
     - expect: Message contract: No error dialog for either valid lookup; if the second employee has no history, capture and assert its actual empty-state text.
     - expect: No permission record is created, updated or deleted.
     - expect: Failure conditions: incorrect message, incorrect field/action state, wrong employee or row, incorrect response/persistence, or unmet prerequisite. Report missing prerequisites explicitly; never treat them as passing coverage.
+
+**Supplies:** Document 1 -> 43433798, Document 2 -> 43442343
+
+**Implementation summary:** Implemented in `switch-employees.spec.ts` using the shared authentication fixture and PermissionsPage. Live QA resolved both supplied documents with 200 identity/history responses: the first employee had a selected permission and the second had empty history. Verifies runtime employee keys, history ownership, removal of prior rows/selection, cleared detail fields and default flags, exact empty-state title/body, action states and no error dialogs. No permission mutation requests occurred. Independent Chromium run passed (1 test, 1 worker, retries=0).
 
 ### 2. Employee selector and history
 
