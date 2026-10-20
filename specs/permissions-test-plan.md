@@ -164,7 +164,7 @@ Permission/compensatory accepted combinations from the source: (Yes,No), (No,No)
 
 **Seed:** `tests/Permissions/seed-test.spec.ts`
 
-#### 2.1. PER-008 — Open and close employee selector
+#### 2.1. PER-008 — Open and close employee selector ✅
 
 **File:** `tests/Permissions/selector-open-close.spec.ts`
 
@@ -180,6 +180,8 @@ Permission/compensatory accepted combinations from the source: (Yes,No), (No,No)
     - expect: Message contract: No error dialog; do not confuse transient loading text with empty results.
     - expect: No permission record is created, updated or deleted.
     - expect: Failure conditions: incorrect message, incorrect field/action state, wrong employee or row, incorrect response/persistence, or unmet prerequisite. Report missing prerequisites explicitly; never treat them as passing coverage.
+
+**Implementation summary:** Implemented in `selector-open-close.spec.ts` using the shared authentication fixture and PermissionsPage. Live QA confirmed successful employee lookups on opening and reopening, four exact table headers, runtime employee identity and visible first-page counts. Closing hides selector content while its shell remains mounted. Verifies unchanged empty employee/history state, disabled record actions, usable search controls, no error dialogs, no employee/history selection requests and no permission mutations. Independent Chromium run passed (1 test, 1 worker, retries=0); read-only.
 
 #### 2.2. PER-009 — Search selector by document and name
 
