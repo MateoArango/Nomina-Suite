@@ -183,7 +183,7 @@ Permission/compensatory accepted combinations from the source: (Yes,No), (No,No)
 
 **Implementation summary:** Implemented in `selector-open-close.spec.ts` using the shared authentication fixture and PermissionsPage. Live QA confirmed successful employee lookups on opening and reopening, four exact table headers, runtime employee identity and visible first-page counts. Closing hides selector content while its shell remains mounted. Verifies unchanged empty employee/history state, disabled record actions, usable search controls, no error dialogs, no employee/history selection requests and no permission mutations. Independent Chromium run passed (1 test, 1 worker, retries=0); read-only.
 
-#### 2.2. PER-009 — Search selector by document and name
+#### 2.2. PER-009 — Search selector by document and name ✅
 
 **File:** `tests/Permissions/selector-query.spec.ts`
 
@@ -199,7 +199,9 @@ Permission/compensatory accepted combinations from the source: (Yes,No), (No,No)
     - expect: No permission record is created, updated or deleted.
     - expect: Failure conditions: incorrect message, incorrect field/action state, wrong employee or row, incorrect response/persistence, or unmet prerequisite. Report missing prerequisites explicitly; never treat them as passing coverage.
 
-#### 2.3. PER-010 — Selector no-results message and recovery
+**Implementation summary:** Implemented in `selector-query.spec.ts` using the shared authentication fixture and PermissionsPage. Live QA confirmed document matching, clearing the query and name-token matching. Resolves employee identity at runtime, matches query response parameters, compares visible row identities/names/documents with returned data, and verifies the latest query, unchanged employee/history state, no error dialogs and no permission mutations. Independent Chromium run passed (1 test, 1 worker, retries=0); read-only.
+
+#### 2.3. PER-010 — Selector no-results message and recovery ✅
 
 **File:** `tests/Permissions/selector-no-results.spec.ts`
 
@@ -211,9 +213,11 @@ Permission/compensatory accepted combinations from the source: (Yes,No), (No,No)
   4. Assert the final UI and relevant network results.
     - expect: No selectable matching row; clearing the query restores actual results without reloading the page.
   5. Check message behavior and finish this scenario independently.
-    - expect: Message contract: Title "Sin resultados"; body "No se encontraron empleados para la consulta actual." Supplied wording awaiting stable runtime verification. No error dialog.
+    - expect: Message contract: Title "Sin resultados"; body "No se encontraron empleados para la consulta actual." Runtime-confirmed exact wording. No error dialog.
     - expect: No permission record is created, updated or deleted.
     - expect: Failure conditions: incorrect message, incorrect field/action state, wrong employee or row, incorrect response/persistence, or unmet prerequisite. Report missing prerequisites explicitly; never treat them as passing coverage.
+
+**Implementation summary:** Implemented in `selector-no-results.spec.ts` using the shared authentication fixture and PermissionsPage. Live QA confirmed the exact empty-state title/body and recovery after clearing the query. Verifies the absent lookup returns an empty array, restored visible rows match runtime response identities/names/documents, no page reload or employee selection occurs, record actions remain disabled, and no error dialog or permission mutation occurs. Independent Chromium run passed (1 test, 1 worker, retries=0); focused TypeScript check passed; read-only.
 
 #### 2.4. PER-011 — Select an employee from lookup
 

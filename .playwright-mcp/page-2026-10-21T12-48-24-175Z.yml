@@ -1,0 +1,240 @@
+- generic [ref=f1e3]:
+  - generic [ref=f1e5]:
+    - generic [ref=f1e6]:
+      - button "menu" [ref=f1e8] [cursor=pointer]
+      - generic [ref=f1e10]:
+        - generic [ref=f1e12] [cursor=pointer]:
+          - generic [ref=f1e13]: home
+          - generic [ref=f1e14]: Inicio
+        - generic [ref=f1e15]:
+          - generic [ref=f1e16] [cursor=pointer]:
+            - generic [ref=f1e17]: manage_accounts
+            - generic [ref=f1e18]: Administrador ...
+            - generic [ref=f1e19]: "12"
+          - generic [ref=f1e20] [cursor=pointer]:
+            - generic [ref=f1e21]: grid_view
+            - generic [ref=f1e22]: Operación
+            - generic [ref=f1e23]: "5"
+          - generic [ref=f1e24] [cursor=pointer]:
+            - generic [ref=f1e25]: bar_chart
+            - generic [ref=f1e26]: Informes
+            - generic [ref=f1e27]: "7"
+          - generic [ref=f1e28] [cursor=pointer]:
+            - generic [ref=f1e29]: grid_view
+            - generic [ref=f1e30]: Seguridad soci...
+            - generic [ref=f1e31]: "6"
+          - generic [ref=f1e32] [cursor=pointer]:
+            - generic [ref=f1e33]: grid_view
+            - generic [ref=f1e34]: Prestaciones s...
+            - generic [ref=f1e35]: "4"
+          - generic [ref=f1e36] [cursor=pointer]:
+            - generic [ref=f1e37]: groups
+            - generic [ref=f1e38]: Novedades
+            - generic [ref=f1e39]: "10"
+          - generic [ref=f1e40] [cursor=pointer]:
+            - generic [ref=f1e41]: grid_view
+            - generic [ref=f1e42]: Configuración
+            - generic [ref=f1e43]: "10"
+          - generic [ref=f1e44] [cursor=pointer]:
+            - generic [ref=f1e45]: grid_view
+            - generic [ref=f1e46]: Utilidades
+            - generic [ref=f1e47]: "2"
+          - generic [ref=f1e48] [cursor=pointer]:
+            - generic [ref=f1e49]: receipt_long
+            - generic [ref=f1e50]: Nomina electro...
+            - generic [ref=f1e51]: "4"
+    - generic:
+      - generic [ref=f1e52]:
+        - generic:
+          - generic:
+            - generic [ref=f1e53]: AS
+            - generic: ADA S.A.
+      - generic "Buscar..." [ref=f1e55]:
+        - generic [ref=f1e56]:
+          - generic [ref=f1e57]: search
+          - text: Buscar...
+        - generic [ref=f1e58]: Ctrl + K
+      - generic:
+        - generic:
+          - generic [ref=f1e59] [cursor=pointer]: keyboard_arrow_down
+          - text: Administrador del sistema
+        - generic:
+          - generic:
+            - generic [ref=f1e60] [cursor=pointer]:
+              - generic [ref=f1e61]: trending_up
+              - generic: Históricos de salario mínimos
+            - generic [ref=f1e62] [cursor=pointer]:
+              - generic [ref=f1e63]: manage_accounts
+              - generic: Asignación de módulos
+            - generic [ref=f1e64] [cursor=pointer]:
+              - generic [ref=f1e65]: badge
+              - generic: Empleados
+            - generic [ref=f1e66] [cursor=pointer]:
+              - generic [ref=f1e67]: domain
+              - generic: Empresa
+            - generic [ref=f1e68] [cursor=pointer]:
+              - generic [ref=f1e69]: trending_up
+              - generic: Aumento de sueldos
+            - generic [ref=f1e70] [cursor=pointer]:
+              - generic [ref=f1e71]: dataset
+              - generic: Maestros
+            - generic [ref=f1e72] [cursor=pointer]:
+              - generic [ref=f1e73]: balance
+              - generic: Juzgados
+            - generic [ref=f1e74] [cursor=pointer]:
+              - generic [ref=f1e75]: receipt_long
+              - generic: Tipos de liquidaciones
+            - generic [ref=f1e76] [cursor=pointer]:
+              - generic [ref=f1e77]: contacts
+              - generic: Maestro terceros
+            - generic [ref=f1e78] [cursor=pointer]:
+              - generic [ref=f1e79]: warning
+              - generic: Riesgos profesionales
+            - generic [ref=f1e80] [cursor=pointer]:
+              - generic [ref=f1e81]: payments
+              - generic: Provisiones
+            - generic [ref=f1e82] [cursor=pointer]:
+              - generic [ref=f1e83]: money_off
+              - generic: Aumento de descuentos
+  - generic [ref=f1e84]:
+    - generic [ref=f1e86]:
+      - generic "Nómina" [ref=f1e87]:
+        - generic [ref=f1e88]:
+          - generic [ref=f1e89]: Nómina
+          - generic [ref=f1e93]:
+            - separator [ref=f1e94]
+            - button "Aurora" [ref=f1e96] [cursor=pointer]
+            - generic "Logout" [ref=f1e101] [cursor=pointer]: logout
+      - generic [ref=f1e102]:
+        - button [ref=f1e104] [cursor=pointer]:
+          - img [ref=f1e105]: favorite_border
+        - button "Ayuda" [ref=f1e109]:
+          - generic [ref=f1e111]:
+            - img [ref=f1e112]: help
+            - generic [ref=f1e113]: Ayuda
+    - region "Ventanas abiertas" [ref=f1e116]:
+      - tablist "Ventanas de trabajo" [ref=f1e117]:
+        - generic [ref=f1e118]:
+          - tab "Permisos" [selected] [ref=f1e119] [cursor=pointer]:
+            - generic [ref=f1e120]: article
+          - button "Cerrar Permisos" [ref=f1e122] [cursor=pointer]:
+            - generic [ref=f1e123]: close
+    - generic [ref=f1e125]:
+      - generic [ref=f1e127]:
+        - heading "Permisos" [level=1] [ref=f1e129]
+        - generic [ref=f1e130]:
+          - generic [ref=f1e131]:
+            - button "Nuevo" [disabled]:
+              - generic:
+                - generic:
+                  - img: add
+                  - generic: Nuevo
+          - generic [ref=f1e132]:
+            - button "Guardar" [disabled]:
+              - generic:
+                - generic:
+                  - img: save
+                  - generic: Guardar
+          - generic [ref=f1e133]:
+            - button "Eliminar" [disabled]:
+              - generic:
+                - generic:
+                  - img: delete
+                  - generic: Eliminar
+      - generic [ref=f1e134]:
+        - generic [ref=f1e136]:
+          - generic [ref=f1e137]:
+            - heading "Empleado" [level=2] [ref=f1e138]
+            - generic [ref=f1e139]:
+              - button "Buscar CC/NIT" [ref=f1e141]:
+                - generic [ref=f1e143]:
+                  - img [ref=f1e144]: search
+                  - generic [ref=f1e145]: Buscar CC/NIT
+              - button "Seleccionar" [ref=f1e149]:
+                - generic [ref=f1e151]:
+                  - img [ref=f1e152]: person_search
+                  - generic [ref=f1e153]: Seleccionar
+          - generic [ref=f1e163]:
+            - generic: CC/NIT
+            - spinbutton "CC/NIT" [ref=f1e166]
+        - generic [ref=f1e169]:
+          - heading "Listado de Permisos" [level=2] [ref=f1e171]
+          - generic [ref=f1e175]:
+            - generic [ref=f1e176]: event_busy
+            - paragraph [ref=f1e178]: Sin permisos
+            - paragraph [ref=f1e179]: Busque o seleccione un empleado para consultar sus permisos.
+        - generic [ref=f1e181]:
+          - heading "Datos del Permiso" [level=2] [ref=f1e183]
+          - generic [ref=f1e187]:
+            - generic [ref=f1e191]:
+              - generic [ref=f1e192]:
+                - text: Desde
+                - generic [ref=f1e193]: "*"
+              - textbox "Desde" [ref=f1e195]:
+                - /placeholder: DD/MM/YYYY
+              - button "Open calendar" [ref=f1e198] [cursor=pointer]
+            - generic [ref=f1e207]:
+              - generic [ref=f1e208]:
+                - text: Hasta
+                - generic [ref=f1e209]: "*"
+              - textbox "Hasta" [ref=f1e211]:
+                - /placeholder: DD/MM/YYYY
+              - button "Open calendar" [ref=f1e214] [cursor=pointer]
+            - generic [ref=f1e224]:
+              - generic [ref=f1e225]:
+                - text: Descripción
+                - generic [ref=f1e226]: "*"
+              - textbox "Descripción" [ref=f1e228]
+            - generic [ref=f1e230]:
+              - generic [ref=f1e231]: Compensatorio *
+              - group "Compensatorio" [ref=f1e232]:
+                - generic [ref=f1e236]:
+                  - checkbox "Sí" [ref=f1e239] [cursor=pointer]
+                  - generic [ref=f1e240] [cursor=pointer]: Sí
+                - generic [ref=f1e244]:
+                  - checkbox "No" [checked] [ref=f1e247] [cursor=pointer]
+                  - generic [ref=f1e248] [cursor=pointer]: "No"
+            - generic [ref=f1e249]:
+              - generic [ref=f1e250]: Permiso *
+              - group "Permiso" [ref=f1e251]:
+                - generic [ref=f1e255]:
+                  - checkbox "Sí" [checked] [ref=f1e258] [cursor=pointer]
+                  - generic [ref=f1e259] [cursor=pointer]: Sí
+                - generic [ref=f1e263]:
+                  - checkbox "No" [ref=f1e266] [cursor=pointer]
+                  - generic [ref=f1e267] [cursor=pointer]: "No"
+            - generic [ref=f1e271]:
+              - generic: Acto administrativo
+              - spinbutton "Acto administrativo" [ref=f1e274]
+            - generic [ref=f1e279]:
+              - generic: Fecha acto administrativo
+              - textbox "Fecha acto administrativo" [ref=f1e282]:
+                - /placeholder: DD/MM/YYYY
+              - button "Open calendar" [ref=f1e285] [cursor=pointer]
+            - generic [ref=f1e291]:
+              - generic [ref=f1e292]: Aprobada *
+              - group "Aprobada" [ref=f1e293]:
+                - generic [ref=f1e297]:
+                  - checkbox "Sí" [ref=f1e300] [cursor=pointer]
+                  - generic [ref=f1e301] [cursor=pointer]: Sí
+                - generic [ref=f1e305]:
+                  - checkbox "No" [checked] [ref=f1e308] [cursor=pointer]
+                  - generic [ref=f1e309] [cursor=pointer]: "No"
+            - generic [ref=f1e310]: IBC permiso$ 0
+        - dialog "Side sheets" [ref=f1e311]:
+          - banner [ref=f1e312]:
+            - heading "Seleccionar Empleado" [level=2] [ref=f1e313]
+            - generic "Cerrar" [ref=f1e314] [cursor=pointer]: close
+          - generic [ref=f1e319]:
+            - generic [ref=f1e320]:
+              - generic [ref=f1e322]:
+                - generic [ref=f1e324]:
+                  - generic: Consultar
+                  - textbox "Consultar" [active] [ref=f1e327]: PER010_NO_MATCH_20261021_XQZ
+                - generic [ref=f1e328]: Buscar por CC/NIT o nombre
+              - generic [ref=f1e335] [cursor=pointer]:
+                - generic: Tipo de tercero
+                - combobox "Tipo de tercero" [ref=f1e338]
+            - generic [ref=f1e420]:
+              - paragraph [ref=f1e421]: Sin resultados
+              - paragraph [ref=f1e422]: No se encontraron empleados para la consulta actual.
