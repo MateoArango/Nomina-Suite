@@ -238,7 +238,7 @@ Permission/compensatory accepted combinations from the source: (Yes,No), (No,No)
 
 **Implementation summary:** Implemented in `selector-select-employee.spec.ts` using the shared authentication fixture and PermissionsPage. Resolves a visible employee from runtime lookup, queries its document, selects its row with employee-detail and history waits registered first, and verifies the panel closes and identity/history match the selected key. Live QA confirmed GET `/empleados/{runtimeKey}`, the history query contract and exact empty-history wording. Asserts no error dialog or permission mutation. Independent Chromium run passed (1 test, 1 worker, retries=0); focused TypeScript check passed; read-only.
 
-#### 2.5. PER-012 — Selector page size and navigation
+#### 2.5. PER-012 — Selector page size and navigation ✅
 
 **File:** `tests/Permissions/selector-pagination.spec.ts`
 
@@ -254,6 +254,8 @@ Permission/compensatory accepted combinations from the source: (Yes,No), (No,No)
     - expect: Message contract: No error dialog; no empty-results message while current lookup has rows.
     - expect: No permission record is created, updated or deleted.
     - expect: Failure conditions: incorrect message, incorrect field/action state, wrong employee or row, incorrect response/persistence, or unmet prerequisite. Report missing prerequisites explicitly; never treat them as passing coverage.
+
+**Implementation summary:** Implemented in `selector-pagination.spec.ts` using the shared authentication fixture and PermissionsPage. Captures the successful employee lookup (`limit=2000`, empty query), requires multi-page data, and derives totals and ordered row identities from the runtime response. Verifies 10/25/50/100 page sizes, visible rows only, pager summaries, Next/Previous restoration, and first/last disabled boundaries. Live QA returned 882 employees; no selector empty state, error dialog or permission mutation. Independent Chromium run passed (1 test, 1 worker, retries=0; 31.2s); focused TypeScript check passed. Read-only; scenario timeout is 60 seconds for authenticated setup and final-page traversal.
 
 #### 2.6. PER-013 — Existing employee with no permission history
 
