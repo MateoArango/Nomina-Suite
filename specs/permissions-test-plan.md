@@ -319,7 +319,7 @@ Permission/compensatory accepted combinations from the source: (Yes,No), (No,No)
 
 **Implementation summary:** Implemented in `new-resets-form.spec.ts` using the shared authentication fixture and PermissionsPage. Verifies runtime employee/history/detail responses, both New resets, browser-local current-day dates, cleared description/act, all six default checkbox states, cleared row selection, preserved employee/history, New/Save enabled and Delete disabled. Asserts no error/reset confirmation and no permission mutation. Focused Chromium run passed (1 test, 1 worker, retries=0); read-only.
 
-#### 3.2. PER-016 — Compensatory and permission transitions
+#### 3.2. PER-016 — Compensatory and permission transitions ✅
 
 **File:** `tests/Permissions/compensatory-permission-flags.spec.ts`
 
@@ -331,11 +331,13 @@ Permission/compensatory accepted combinations from the source: (Yes,No), (No,No)
   4. Attempt permission Yes after compensatory Yes and inspect resulting mutual exclusion without saving.
   5. Assert the final UI and relevant network results.
     - expect: Accepted source pairs: (compensatory Yes, permission No), (No,No), (No,Yes); never retain (Yes,Yes).
-    - expect: One choice per group; preserve approval state. Only first transition is runtime-confirmed; remaining transitions require verification.
+    - expect: One choice per group; preserve approval state. All three permitted pairs and both directions of mutual exclusion are runtime-confirmed.
   6. Check message behavior and finish this scenario independently.
     - expect: Message contract: No error dialog for legal transitions. Any incompatibility message is unprovided: capture exactly if the UI uses a dialog instead of automatically enforcing the pair.
     - expect: No permission record is created, updated or deleted.
     - expect: Failure conditions: incorrect message, incorrect field/action state, wrong employee or row, incorrect response/persistence, or unmet prerequisite. Report missing prerequisites explicitly; never treat them as passing coverage.
+
+**Implementation summary:** Implemented in `compensatory-permission-flags.spec.ts` using the shared authentication fixture and PermissionsPage. Derives employee identity and history from runtime GET responses; verifies all three permitted pairs, automatic mutual exclusion in both directions, complementary native checkbox states and unchanged approval after every transition. Confirms preserved employee/history, draft action states, no error/incompatibility dialog and no permission mutations. Focused Chromium run passed (1 test, 1 worker, retries=0; 7.8s); focused TypeScript check passed. Read-only.
 
 #### 3.3. PER-017 — Approval choices in an unsaved draft
 
