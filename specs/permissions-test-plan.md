@@ -219,7 +219,7 @@ Permission/compensatory accepted combinations from the source: (Yes,No), (No,No)
 
 **Implementation summary:** Implemented in `selector-no-results.spec.ts` using the shared authentication fixture and PermissionsPage. Live QA confirmed the exact empty-state title/body and recovery after clearing the query. Verifies the absent lookup returns an empty array, restored visible rows match runtime response identities/names/documents, no page reload or employee selection occurs, record actions remain disabled, and no error dialog or permission mutation occurs. Independent Chromium run passed (1 test, 1 worker, retries=0); focused TypeScript check passed; read-only.
 
-#### 2.4. PER-011 — Select an employee from lookup
+#### 2.4. PER-011 — Select an employee from lookup ✅
 
 **File:** `tests/Permissions/selector-select-employee.spec.ts`
 
@@ -235,6 +235,8 @@ Permission/compensatory accepted combinations from the source: (Yes,No), (No,No)
     - expect: Message contract: No error dialog; if selected employee has empty history, capture and assert its actual empty-state wording.
     - expect: No permission record is created, updated or deleted.
     - expect: Failure conditions: incorrect message, incorrect field/action state, wrong employee or row, incorrect response/persistence, or unmet prerequisite. Report missing prerequisites explicitly; never treat them as passing coverage.
+
+**Implementation summary:** Implemented in `selector-select-employee.spec.ts` using the shared authentication fixture and PermissionsPage. Resolves a visible employee from runtime lookup, queries its document, selects its row with employee-detail and history waits registered first, and verifies the panel closes and identity/history match the selected key. Live QA confirmed GET `/empleados/{runtimeKey}`, the history query contract and exact empty-history wording. Asserts no error dialog or permission mutation. Independent Chromium run passed (1 test, 1 worker, retries=0); focused TypeScript check passed; read-only.
 
 #### 2.5. PER-012 — Selector page size and navigation
 
