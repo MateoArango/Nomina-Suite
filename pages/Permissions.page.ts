@@ -15,6 +15,11 @@ export class PermissionsPage {
   readonly employeeNameValue: Locator;
   readonly historyTable: Locator;
   readonly historyRows: Locator;
+  readonly historyVisibleRows: Locator;
+  readonly historyPager: Locator;
+  readonly historyPreviousPageButton: Locator;
+  readonly historyNextPageButton: Locator;
+  readonly historyPageSummary: Locator;
   readonly employeeDocumentInput: Locator;
   readonly employeeSearchButton: Locator;
   readonly employeeSelectorOpenButton: Locator;
@@ -91,6 +96,11 @@ export class PermissionsPage {
     this.historyHeading = this.historySection.getByRole("heading", { level: 2 });
     this.historyTable = this.historySection.getByTestId("permisos-list-table");
     this.historyRows = this.historyTable.locator('tr[data-testid^="permisos-table-row--"]');
+    this.historyVisibleRows = this.historyRows.filter({ visible: true });
+    this.historyPager = this.historySection.locator(".erp-table-pager");
+    this.historyPreviousPageButton = this.historyPager.getByTestId("permisos-list-pager-previous-page-button");
+    this.historyNextPageButton = this.historyPager.getByTestId("permisos-list-pager-next-page-button");
+    this.historyPageSummary = this.historyPager.locator(".erp-table-pager__summary");
     this.historyEmptyState = this.historySection.locator(".empty-state");
     this.historyEmptyTitle = this.historyEmptyState.locator(".empty-state__title");
     this.historyEmptyMessage = this.historyEmptyState.locator(".empty-state__subtitle");
@@ -149,6 +159,10 @@ export class PermissionsPage {
 
   historyRow(id: string | number): Locator {
     return this.historyTable.getByTestId(`permisos-table-row--${id}`);
+  }
+
+  historyPageSizeButton(size: 10 | 25 | 50 | 100): Locator {
+    return this.historyPager.getByTestId(`permisos-list-pager-page-size-button--${size}`);
   }
 
   employeeSelectorCell(

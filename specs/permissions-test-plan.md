@@ -278,12 +278,12 @@ Permission/compensatory accepted combinations from the source: (Yes,No), (No,No)
 
 **Implementation summary:** Implemented in `history-detail.spec.ts` using the shared authentication fixture and PermissionsPage. Verifies seven history columns, runtime row identities and values, disabled approval/compensatory indicators, and the selected row's successful detail GET. Compares ISO response dates with DD/MM/YYYY inputs, description, administrative act fields and all six flag states; verifies selected employee/row, no error dialog and no permission mutations. Focused Chromium run passed (1 test, 1 worker, retries=0; 16.5s); focused TypeScript check passed. Read-only.
 
-#### 2.7. PER-014 — Permission history pagination
+#### 2.7. PER-014 — Permission history pagination ✅
 
 **File:** `tests/Permissions/history-pagination.spec.ts`
 
 **Steps:**
-  1. Start a fresh authenticated context using the shared fixture, construct PermissionsPage and call goto(). Employee must have enough existing history for multiple pages. Execution mode: Read-only.
+  1. Start a fresh authenticated context using the shared fixture, construct PermissionsPage and call goto(). Employee 43433798 has 11 existing history for two pages. Execution mode: Read-only.
     - expect: URL ends in /permisos; heading and search controls are ready; no state is inherited from another test.
   2. Locate runtime permisos-list-pager controls; exercise page sizes and Next/Previous.
   3. Assert runtime summary, visible row counts and first/last-page disabled controls.
@@ -293,6 +293,8 @@ Permission/compensatory accepted combinations from the source: (Yes,No), (No,No)
     - expect: Message contract: No error dialog; if insufficient existing data, report prerequisite rather than create permission rows.
     - expect: No permission record is created, updated or deleted.
     - expect: Failure conditions: incorrect message, incorrect field/action state, wrong employee or row, incorrect response/persistence, or unmet prerequisite. Report missing prerequisites explicitly; never treat them as passing coverage.
+
+**Implementation summary:** Implemented in `history-pagination.spec.ts` using the shared authentication fixture and PermissionsPage. Live discovery confirmed 11 existing records and history page sizes 10/25/50/100. The test derives employee identity, row IDs and total from runtime responses; verifies visible row order/counts, pager summaries, Next/Previous boundaries, complete nonduplicate traversal and return to the first page. Confirms employee consistency, no error dialog and no permission mutations. Focused Chromium run passed (1 test, 1 worker, retries=0; 22.4s); focused TypeScript check passed. Read-only.
 
 ### 3. New form, flags and required validation
 
