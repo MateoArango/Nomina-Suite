@@ -300,12 +300,12 @@ Permission/compensatory accepted combinations from the source: (Yes,No), (No,No)
 
 **Seed:** `tests/Permissions/seed-test.spec.ts`
 
-#### 3.1. PER-015 — New resets details and preserves employee
+#### 3.1. PER-015 — New resets details and preserves employee ✅
 
 **File:** `tests/Permissions/new-resets-form.spec.ts`
 
 **Steps:**
-  1. Start a fresh authenticated context using the shared fixture, construct PermissionsPage and call goto(). Select an employee and inspect one existing record first. Execution mode: Read-only.
+  1. Start a fresh authenticated context using the shared fixture, construct PermissionsPage and call goto(). Select 43433798 and inspect one existing record first. Execution mode: Read-only.
     - expect: URL ends in /permisos; heading and search controls are ready; no state is inherited from another test.
   2. Click New; inspect dates, description, act number and native flag checkboxes.
   3. Type an unsaved description/act and click New again without Save.
@@ -316,6 +316,8 @@ Permission/compensatory accepted combinations from the source: (Yes,No), (No,No)
     - expect: Message contract: No error dialog; any reset confirmation wording must be captured if encountered.
     - expect: No permission record is created, updated or deleted.
     - expect: Failure conditions: incorrect message, incorrect field/action state, wrong employee or row, incorrect response/persistence, or unmet prerequisite. Report missing prerequisites explicitly; never treat them as passing coverage.
+
+**Implementation summary:** Implemented in `new-resets-form.spec.ts` using the shared authentication fixture and PermissionsPage. Verifies runtime employee/history/detail responses, both New resets, browser-local current-day dates, cleared description/act, all six default checkbox states, cleared row selection, preserved employee/history, New/Save enabled and Delete disabled. Asserts no error/reset confirmation and no permission mutation. Focused Chromium run passed (1 test, 1 worker, retries=0); read-only.
 
 #### 3.2. PER-016 — Compensatory and permission transitions
 
