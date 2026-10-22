@@ -356,14 +356,14 @@ Permission/compensatory accepted combinations from the source: (Yes,No), (No,No)
     - expect: Read back history/details after reload; rejected operations preserve the original records. Clean up only this test's disposable data when applicable.
     - expect: Failure conditions: incorrect message, incorrect field/action state, wrong employee or row, incorrect response/persistence, or unmet prerequisite. Report missing prerequisites explicitly; never treat them as passing coverage.
 
-**Implementation summary:** Implemented in `required-start-date.spec.ts` using the shared authentication fixture and PermissionsPage. Derives employee identity, history and draft dates at runtime; clears and blurs only the start date with all other required values populated. Runtime-verified exact error title/body before dismissal. Save validates locally with no Permissions API request or mutation. Reloads, reselects the same employee and compares complete history responses and visible rows; confirms New remains usable. Focused Chromium passed (1 test, 1 worker, retries=0; 8.9s). No records created or changed.
+**Implementation summary:** Implemented in `required-start-date.spec.ts` using the shared authentication fixture and PermissionsPage. Opens the employee selector and searches for fixed document `43442343`, resolving its internal identity, history and draft dates at runtime; clears and blurs only the start date with all other required values populated. Runtime-verified exact error title/body before dismissal. Save validates locally with no Permissions API request or mutation. Reloads, reselects document `43442343` through the employee selector and compares complete history responses and visible rows; confirms New remains usable. Both required-date tests passed in focused Chromium (2 tests, 1 worker, retries=0; 22.9s). No records created or changed.
 
-#### 3.4. PER-018 — End date is required
+#### 3.4. PER-018 — End date is required ✅
 
 **File:** `tests/Permissions/required-end-date.spec.ts`
 
 **Steps:**
-  1. Start a fresh authenticated context using the shared fixture, construct PermissionsPage and call goto(). Select an existing employee and click newButton. Prepare a conflict-free range, nonempty description, valid small numeric act, optional act date <= start, compensatory No, permission Yes, approval No. Explicitly clear auto-filled dates when testing missing values. Execution mode: Controlled negative Save.
+  1. Start a fresh authenticated context using the shared fixture, construct PermissionsPage and call goto(). Enter document `43442343` directly and click employeeSearchButton without opening the employee selector, then click newButton. Prepare a conflict-free range, nonempty description, valid small numeric act, optional act date <= start, compensatory No, permission Yes, approval No. Explicitly clear auto-filled dates when testing missing values. Execution mode: Controlled negative Save.
     - expect: URL ends in /permisos; heading and search controls are ready; no state is inherited from another test.
   2. Fill every other required value correctly; clear only endDateInput and blur to commit the empty value.
   3. Click Save; await the exact error dialog and underlying validation response if issued; dismiss once asserted.
@@ -375,12 +375,14 @@ Permission/compensatory accepted combinations from the source: (Yes,No), (No,No)
     - expect: Read back history/details after reload; rejected operations preserve the original records. Clean up only this test's disposable data when applicable.
     - expect: Failure conditions: incorrect message, incorrect field/action state, wrong employee or row, incorrect response/persistence, or unmet prerequisite. Report missing prerequisites explicitly; never treat them as passing coverage.
 
-#### 3.5. PER-019 — Description is required
+**Implementation summary:** Uses `http://10.1.40.34:4200/` for login and Permissions navigation. Searches directly for document `43442343` using the document input and Search button, both initially and after reload; the employee selector stays closed. Resolves employee identity and history from runtime responses, verifies history ownership, clears only end date, asserts the exact required-field error before dismissal, and compares complete history after reload. No permission mutation occurred. Focused Chromium run passed (PER-018 and PER-019: 2 tests, 1 worker, retries=0; 28.6s); focused TypeScript checking passed.
+
+#### 3.5. PER-019 — Description is required ✅
 
 **File:** `tests/Permissions/required-description.spec.ts`
 
 **Steps:**
-  1. Start a fresh authenticated context using the shared fixture, construct PermissionsPage and call goto(). Select an existing employee and click newButton. Prepare a conflict-free range, nonempty description, valid small numeric act, optional act date <= start, compensatory No, permission Yes, approval No. Explicitly clear auto-filled dates when testing missing values. Execution mode: Controlled negative Save.
+  1. Start a fresh authenticated context using the shared fixture, construct PermissionsPage and call goto(). Enter document `43442343` directly and click employeeSearchButton without opening the employee selector, then click newButton. Prepare a conflict-free range, nonempty description, valid small numeric act, optional act date <= start, compensatory No, permission Yes, approval No. Explicitly clear auto-filled dates when testing missing values. Execution mode: Controlled negative Save.
     - expect: URL ends in /permisos; heading and search controls are ready; no state is inherited from another test.
   2. Fill every other required value correctly; clear only descriptionInput and blur to commit the empty value.
   3. Click Save; await the exact error dialog and underlying validation response if issued; dismiss once asserted.
@@ -391,6 +393,8 @@ Permission/compensatory accepted combinations from the source: (Yes,No), (No,No)
     - expect: Message contract: Title "Error"; exact body "Debe ingresar la Descripcion.". Supplied contract awaiting runtime verification.
     - expect: Read back history/details after reload; rejected operations preserve the original records. Clean up only this test's disposable data when applicable.
     - expect: Failure conditions: incorrect message, incorrect field/action state, wrong employee or row, incorrect response/persistence, or unmet prerequisite. Report missing prerequisites explicitly; never treat them as passing coverage.
+
+**Implementation summary:** Uses `http://10.1.40.34:4200/` for login and Permissions navigation. Searches directly for document `43442343` using the document input and Search button, both initially and after reload; the employee selector stays closed. Resolves employee identity and history from runtime responses, verifies history ownership, clears only description, asserts the exact required-field error before dismissal, and compares complete history after reload. No permission mutation occurred. Focused Chromium run passed (PER-018 and PER-019: 2 tests, 1 worker, retries=0; 28.6s); focused TypeScript checking passed.
 
 #### 3.6. PER-020 — Administrative act is required despite no asterisk
 

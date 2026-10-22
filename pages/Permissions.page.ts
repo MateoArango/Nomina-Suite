@@ -179,8 +179,8 @@ export class PermissionsPage {
     );
   }
 
-  async goto(): Promise<void> {
-    await this.page.goto("https://nomina-qa.adacsc.co/permisos");
+  async goto(baseURL = "https://nomina-qa.adacsc.co/"): Promise<void> {
+    await this.page.goto(new URL("/permisos", baseURL).href);
   }
 }
 

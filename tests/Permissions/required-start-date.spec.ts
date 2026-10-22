@@ -23,28 +23,42 @@ test.describe("New form, flags and required validation", () => {
       has: page.getByRole("heading", { name: "Error", exact: true }),
     });
 
-    // 1. Start a fresh authenticated context, select an existing employee and click New.
+    // 1. Start a fresh authenticated context, select document 43442343 through the employee selector and click New.
     await permissions.goto();
     await expect(page).toHaveURL(/\/permisos$/);
     await expect(permissions.heading).toBeVisible();
     await expect(permissions.employeeDocumentInput).toHaveValue("");
     await expect(permissions.employeeSearchButton).toBeEnabled();
     await expect(permissions.historyRows).toHaveCount(0);
-    const lookupWait = page.waitForResponse(response =>
-      response.request().method() === "GET" &&
-      new URL(response.url()).pathname === api + "/lookups/empleados" &&
-      new URL(response.url()).searchParams.get("limit") === "2000");
-    await permissions.employeeSelectorOpenButton.click();
-    const lookup = await lookupWait;
-    expect(lookup.status()).toBe(200);
-    const employees: Employee[] = await lookup.json();
-    expect(employees.length, "Prerequisite: an existing employee is required").toBeGreaterThan(0);
-    const firstRow = permissions.employeeSelectorVisibleRows.first();
-    await expect(firstRow).toBeVisible();
-    const rowId = await firstRow.getAttribute("data-testid");
-    const employee = employees.find(item =>
-      rowId === "permisos-employee-selector-row--" + item.kaNlTercero);
-    if (!employee) throw new Error("Prerequisite: visible employee must match runtime lookup");
+    const employeeDocument = "43442343";
+    const openEmployeeSelector = async () => {
+      const initialLookup = page.waitForResponse(response => {
+        const url = new URL(response.url());
+        return response.request().method() === "GET" &&
+          url.pathname === api + "/lookups/empleados" &&
+          url.searchParams.get("limit") === "2000";
+      });
+      await permissions.employeeSelectorOpenButton.click();
+      expect((await initialLookup).status()).toBe(200);
+      const filteredLookup = page.waitForResponse(response => {
+        const url = new URL(response.url());
+        return response.request().method() === "GET" &&
+          url.pathname === api + "/lookups/empleados" &&
+          url.searchParams.get("limit") === "2000" &&
+          url.searchParams.get("query") === employeeDocument;
+      });
+      await permissions.employeeSelectorQueryInput.fill(employeeDocument);
+      const response = await filteredLookup;
+      expect(response.status()).toBe(200);
+      const employees: Employee[] = await response.json();
+      const employee = employees.find(item => String(item.nNit) === employeeDocument);
+      if (!employee) throw new Error("Prerequisite: employee " + employeeDocument + " must exist");
+      const row = permissions.employeeSelectorRow(employee.kaNlTercero);
+      await expect(row).toBeVisible();
+      await expect(row.getByRole("cell", { name: employeeDocument, exact: true })).toBeVisible();
+      return { employee, row };
+    };
+    const { employee, row: employeeRow } = await openEmployeeSelector();
     const waitForHistory = () => page.waitForResponse(response => {
       const url = new URL(response.url());
       return response.request().method() === "GET" && url.pathname === api + "/rows" &&
@@ -52,7 +66,7 @@ test.describe("New form, flags and required validation", () => {
         url.searchParams.get("limit") === "200" && url.searchParams.get("calamidad") === "N";
     });
     const historyWait = waitForHistory();
-    await firstRow.dblclick();
+    await employeeRow.dblclick();
     const historyResponse = await historyWait;
     expect(historyResponse.status()).toBe(200);
     const history: HistoryRow[] = await historyResponse.json();
@@ -121,9 +135,10 @@ test.describe("New form, flags and required validation", () => {
     if (history.length) await expect(permissions.historyRows).toHaveText(historyBefore);
     await page.reload();
     await expect(permissions.heading).toBeVisible();
-    await permissions.employeeDocumentInput.fill(String(employee.nNit));
+    const { employee: reloadedEmployee, row: selectedRow } = await openEmployeeSelector();
+    expect(reloadedEmployee.kaNlTercero).toBe(employee.kaNlTercero);
     const readbackWait = waitForHistory();
-    await permissions.employeeSearchButton.click();
+    await selectedRow.dblclick();
     const readback = await readbackWait;
     expect(readback.status()).toBe(200);
     expect(await readback.json(), "Rejected Save must preserve complete history").toEqual(history);

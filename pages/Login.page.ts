@@ -22,8 +22,8 @@ export class LoginPage {
     );
   }
 
-  async goto(): Promise<void> {
-    await this.page.goto("https://nomina-qa.adacsc.co/inicio");
+  async goto(baseURL = "http://10.1.40.34:4200/"): Promise<void> {
+    await this.page.goto(new URL("/inicio", baseURL).href);
   }
 
   async signIn(): Promise<void> {

@@ -19,7 +19,7 @@ const disableAnimationsCss = `
 
 export const test = base.extend<AuthFixtures>({
   authenticated: [
-    async ({ page }, use) => {
+    async ({ page, baseURL }, use) => {
       await page.addInitScript(css => {
         const style = document.createElement("style");
         style.dataset.playwrightDisableAnimations = "true";
@@ -29,7 +29,7 @@ export const test = base.extend<AuthFixtures>({
 
       const loginPage = new LoginPage(page);
 
-      await loginPage.goto();
+      await loginPage.goto(baseURL);
       await loginPage.signIn();
       await use();
     },
