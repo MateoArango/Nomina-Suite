@@ -56,7 +56,7 @@ test.describe("New form, flags and required validation", () => {
     await permissions.newButton.click();
     const historyBefore = await permissions.historyRows.allTextContents();
     const rowIdsBefore = await permissions.historyRows.evaluateAll(rows =>
-      rows.map(row => row.getAttribute("data-testid")));--HERE--
+      rows.map(row => row.getAttribute("data-testid")));
     const assertPair = async (compensatory: boolean, permission: boolean) => {
       expect(compensatory && permission, "Both Yes choices must never coexist").toBe(false);
       await expect(permissions.compensatoryYesCheckbox).toBeChecked({ checked: compensatory });
