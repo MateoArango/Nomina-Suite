@@ -1,0 +1,11 @@
+[       6ms] TypeError: Cannot read properties of null (reading 'appendChild')
+    at <anonymous>:6:32
+    at <anonymous>:7:7
+    at <anonymous>:8:7
+[    8431ms] [ERROR] Failed to load resource: net::ERR_FAILED @ https://nomina-qa-api.adacsc.co/api/v1/w-vacaciones-licencias-ascensos-permisos/rows:0
+[    9560ms] [ERROR] Failed to load resource: net::ERR_FAILED @ https://nomina-qa-api.adacsc.co/api/v1/w-vacaciones-licencias-ascensos-permisos/rows:0
+[   10346ms] TypeError: Cannot read properties of null (reading 'appendChild')
+    at <anonymous>:6:32
+    at <anonymous>:7:7
+    at <anonymous>:8:7
+[   27740ms] [ERROR] Failed to load resource: net::ERR_FAILED @ https://nomina-qa-api.adacsc.co/api/v1/w-vacaciones-licencias-ascensos-permisos/rows:0

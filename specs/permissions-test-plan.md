@@ -415,12 +415,12 @@ Permission/compensatory accepted combinations from the source: (Yes,No), (No,No)
 
 **Implementation summary:** Implemented `required-administrative-act.spec.ts` through the generator workflow using the shared authentication fixture and PermissionsPage on QA. Directly searches document `43442343` initially and after reload, derives identity/history and conflict-free dates at runtime, clears only the administrative act, and verifies the exact error title/body before dismissal. Save validates locally without a Permissions request; unexpected permission mutations are blocked and asserted absent. Complete history and visible rows remain unchanged after reload; New remains usable. Focused Chromium passed (1 test, 1 worker, retries=0; 11.4s); focused TypeScript checking passed. No records created or changed.
 
-#### 3.7. PER-021 — Missing-field validation order
+#### 3.7. PER-021 — Missing-field validation order ✅
 
 **File:** `tests/Permissions/required-validation-order.spec.ts`
 
 **Steps:**
-  1. Start a fresh authenticated context using the shared fixture, construct PermissionsPage and call goto(). Select employee and click New; controlled negative fixture. Execution mode: Controlled negative Save.
+  1. Start a fresh authenticated context using the shared fixture, construct PermissionsPage and call goto(). Search directly for document `43442343` without opening the employee selector and click New; controlled negative fixture. Execution mode: Controlled negative Save.
     - expect: URL ends in /permisos; heading and search controls are ready; no state is inherited from another test.
   2. Clear all required date/text/act inputs, including auto-filled dates; leave groups at valid defaults.
   3. Save and capture the first error. Fill only its field and repeat until each documented required-field error is exposed; supply conflict-free values.
@@ -432,28 +432,13 @@ Permission/compensatory accepted combinations from the source: (Yes,No), (No,No)
     - expect: Read back history/details after reload; rejected operations preserve the original records. Clean up only this test's disposable data when applicable.
     - expect: Failure conditions: incorrect message, incorrect field/action state, wrong employee or row, incorrect response/persistence, or unmet prerequisite. Report missing prerequisites explicitly; never treat them as passing coverage.
 
+**Implementation summary:** Implemented `required-validation-order.spec.ts` through the generator workflow with the shared authentication fixture and PermissionsPage on QA. Runtime discovery confirmed the order: start date, end date, description, administrative act. Clears all four required fields, verifies each exact error title/body before dismissal, and fills only the reported field between four rejected Saves. Stops before a valid final Save. Resolves identity/history and conflict-free dates at runtime, asserts local validation with no Permissions request or mutation, and reloads/directly searches the same document to compare complete history and visible rows. New remains usable. Focused Chromium passed (1 test, 1 worker, retries=0; 27.1s); focused TypeScript checking passed. No records created or changed.
+
 ### 4. Dates, description and numeric boundaries
 
 **Seed:** `tests/Permissions/seed-test.spec.ts`
 
-#### 4.1. PER-022 — Date input and calendar behavior
-
-**File:** `tests/Permissions/date-calendars.spec.ts`
-
-**Steps:**
-  1. Start a fresh authenticated context using the shared fixture, construct PermissionsPage and call goto(). Select employee and click New; do not save. Execution mode: Read-only.
-    - expect: URL ends in /permisos; heading and search controls are ready; no state is inherited from another test.
-  2. Use startDateCalendarButton, endDateCalendarButton and administrativeActDateCalendarButton separately to pick identifiable dates.
-  3. Compare typed DD/MM/YYYY with calendar selection; dismiss calendar and change values via input.
-  4. Assert the final UI and relevant network results.
-    - expect: Each calendar updates only its own field; date values match selections; date inputs are limited to observed display format.
-    - expect: No permission persistence.
-  5. Check message behavior and finish this scenario independently.
-    - expect: Message contract: No error dialog for valid dates; capture any inline date validation exactly if encountered.
-    - expect: No permission record is created, updated or deleted.
-    - expect: Failure conditions: incorrect message, incorrect field/action state, wrong employee or row, incorrect response/persistence, or unmet prerequisite. Report missing prerequisites explicitly; never treat them as passing coverage.
-
-#### 4.2. PER-023 — End date before start date
+#### 4.1. PER-022 — End date before start date ✅
 
 **File:** `tests/Permissions/end-before-start.spec.ts`
 
@@ -466,16 +451,18 @@ Permission/compensatory accepted combinations from the source: (Yes,No), (No,No)
     - expect: Reversed range must not persist; unchanged history after reload.
     - expect: Exact ordering rule must be confirmed at runtime.
   5. Check message behavior and finish this scenario independently.
-    - expect: Message contract: No supplied exact message: capture actual end-before-start dialog/inline wording before generation; never substitute the act-date error.
+    - expect: Message contract: titled: 'Error' and the description is: La Fecha Hasta no puede ser inferior a la Fecha Desde. Never substitute the act-date error.
     - expect: Read back history/details after reload; rejected operations preserve the original records. Clean up only this test's disposable data when applicable.
     - expect: Failure conditions: incorrect message, incorrect field/action state, wrong employee or row, incorrect response/persistence, or unmet prerequisite. Report missing prerequisites explicitly; never treat them as passing coverage.
 
-#### 4.3. PER-024 — Malformed and impossible dates
+**Implementation summary:** Implemented in `end-before-start.spec.ts` using the shared authentication fixture and PermissionsPage. Live discovery confirmed local rejection of an end date one day before start, with the exact ordering-error body and Error title asserted separately before dismissal. Uses runtime employee identity/history and conflict-free dates, keeps all other required fields valid, guards shared QA against unexpected mutations, asserts no Permissions request on Save, and compares complete history after reload. Focused Chromium verification passed (1 test, 1 worker, retries=0); no permission mutation occurred.
+
+#### 4.2. PER-023 — Malformed and impossible dates ✅
 
 **File:** `tests/Permissions/invalid-date-input.spec.ts`
 
 **Steps:**
-  1. Start a fresh authenticated context using the shared fixture, construct PermissionsPage and call goto(). Select an existing employee and click newButton. Prepare a conflict-free range, nonempty description, valid small numeric act, optional act date <= start, compensatory No, permission Yes, approval No. Explicitly clear auto-filled dates when testing missing values. Execution mode: Controlled negative Save.
+  1. Start a fresh authenticated context using the shared fixture, construct PermissionsPage and call goto(). Search directly for document `43442343` without opening the employee selector and click newButton. Prepare a conflict-free range, nonempty description, valid small numeric act, optional act date <= start, compensatory No, permission Yes, approval No. Explicitly clear auto-filled dates when testing missing values. Execution mode: Controlled negative Save.
     - expect: URL ends in /permisos; heading and search controls are ready; no state is inherited from another test.
   2. Independently enter an impossible date such as 31/02/2026 and malformed date text into each date input; blur.
   3. Inspect input normalization and inline errors; attempt Save only in the controlled fixture if enabled.
@@ -487,7 +474,9 @@ Permission/compensatory accepted combinations from the source: (Yes,No), (No,No)
     - expect: Read back history/details after reload; rejected operations preserve the original records. Clean up only this test's disposable data when applicable.
     - expect: Failure conditions: incorrect message, incorrect field/action state, wrong employee or row, incorrect response/persistence, or unmet prerequisite. Report missing prerequisites explicitly; never treat them as passing coverage.
 
-#### 4.4. PER-025 — Administrative act date after start
+**Implementation summary:** Implemented `invalid-date-input.spec.ts` through the generator workflow with the shared authentication fixture and PermissionsPage on QA. Independently exercises impossible `31/02/2026` and malformed `not-a-date` in all three date inputs, plus an empty optional act-date control. Required dates normalize to empty and Save raises the exact runtime-required-field error locally; no Permissions request occurs. The impossible optional act date remains visible after blur, while malformed text normalizes to empty. All three optional act-date cases attempt POST with `ddActoAdministrativo: null`; the test intercepts and aborts these requests before persistence. The exact generic operation error is a consequence of that deliberate abort, not evidence of backend rejection. No inline mat-error appears. Runtime identity/history and conflict-free draft dates are verified; reload confirms complete history and visible rows unchanged. Focused Chromium passed (1 test, 1 worker, retries=0; 21.6s); focused TypeScript checking passed. No records changed. Product limitation: invalid optional act-date text can be submitted as null; backend acceptance was intentionally not tested.
+
+#### 4.3. PER-024 — Administrative act date after start
 
 **File:** `tests/Permissions/act-date-after-start.spec.ts`
 
@@ -503,7 +492,7 @@ Permission/compensatory accepted combinations from the source: (Yes,No), (No,No)
     - expect: Read back history/details after reload; rejected operations preserve the original records. Clean up only this test's disposable data when applicable.
     - expect: Failure conditions: incorrect message, incorrect field/action state, wrong employee or row, incorrect response/persistence, or unmet prerequisite. Report missing prerequisites explicitly; never treat them as passing coverage.
 
-#### 4.5. PER-026 — Administrative act date equal to or before start
+#### 4.4. PER-025 — Administrative act date equal to or before start
 
 **File:** `tests/Permissions/act-date-allowed.spec.ts`
 
@@ -519,7 +508,7 @@ Permission/compensatory accepted combinations from the source: (Yes,No), (No,No)
     - expect: Read back history/details after reload; rejected operations preserve the original records. Clean up only this test's disposable data when applicable.
     - expect: Failure conditions: incorrect message, incorrect field/action state, wrong employee or row, incorrect response/persistence, or unmet prerequisite. Report missing prerequisites explicitly; never treat them as passing coverage.
 
-#### 4.6. PER-027 — Administrative act date is optional
+#### 4.5. PER-026 — Administrative act date is optional
 
 **File:** `tests/Permissions/optional-act-date.spec.ts`
 
@@ -535,7 +524,7 @@ Permission/compensatory accepted combinations from the source: (Yes,No), (No,No)
     - expect: Read back history/details after reload; rejected operations preserve the original records. Clean up only this test's disposable data when applicable.
     - expect: Failure conditions: incorrect message, incorrect field/action state, wrong employee or row, incorrect response/persistence, or unmet prerequisite. Report missing prerequisites explicitly; never treat them as passing coverage.
 
-#### 4.7. PER-028 — Description accepts exactly 200 characters
+#### 4.6. PER-027 — Description accepts exactly 200 characters
 
 **File:** `tests/Permissions/description-max-200.spec.ts`
 
@@ -551,7 +540,7 @@ Permission/compensatory accepted combinations from the source: (Yes,No), (No,No)
     - expect: Read back history/details after reload; rejected operations preserve the original records. Clean up only this test's disposable data when applicable.
     - expect: Failure conditions: incorrect message, incorrect field/action state, wrong employee or row, incorrect response/persistence, or unmet prerequisite. Report missing prerequisites explicitly; never treat them as passing coverage.
 
-#### 4.8. PER-029 — Description rejects 201 characters
+#### 4.7. PER-028 — Description rejects 201 characters
 
 **File:** `tests/Permissions/description-over-200.spec.ts`
 
@@ -567,7 +556,7 @@ Permission/compensatory accepted combinations from the source: (Yes,No), (No,No)
     - expect: Read back history/details after reload; rejected operations preserve the original records. Clean up only this test's disposable data when applicable.
     - expect: Failure conditions: incorrect message, incorrect field/action state, wrong employee or row, incorrect response/persistence, or unmet prerequisite. Report missing prerequisites explicitly; never treat them as passing coverage.
 
-#### 4.9. PER-030 — Whitespace-only description
+#### 4.8. PER-029 — Whitespace-only description
 
 **File:** `tests/Permissions/description-whitespace.spec.ts`
 
@@ -583,7 +572,7 @@ Permission/compensatory accepted combinations from the source: (Yes,No), (No,No)
     - expect: Read back history/details after reload; rejected operations preserve the original records. Clean up only this test's disposable data when applicable.
     - expect: Failure conditions: incorrect message, incorrect field/action state, wrong employee or row, incorrect response/persistence, or unmet prerequisite. Report missing prerequisites explicitly; never treat them as passing coverage.
 
-#### 4.10. PER-031 — Administrative act numeric range and precision
+#### 4.9. PER-030 — Administrative act numeric range and precision
 
 **File:** `tests/Permissions/act-number-boundary.spec.ts`
 
@@ -601,7 +590,7 @@ Permission/compensatory accepted combinations from the source: (Yes,No), (No,No)
     - expect: Read back history/details after reload; rejected operations preserve the original records. Clean up only this test's disposable data when applicable.
     - expect: Failure conditions: incorrect message, incorrect field/action state, wrong employee or row, incorrect response/persistence, or unmet prerequisite. Report missing prerequisites explicitly; never treat them as passing coverage.
 
-#### 4.11. PER-032 — Act number signs, decimals and nonnumeric input
+#### 4.10. PER-031 — Act number signs, decimals and nonnumeric input
 
 **File:** `tests/Permissions/act-number-invalid.spec.ts`
 
@@ -622,7 +611,7 @@ Permission/compensatory accepted combinations from the source: (Yes,No), (No,No)
 
 **Seed:** `tests/Permissions/seed-test.spec.ts`
 
-#### 5.1. PER-033 — Overlap with existing permission or compensatory
+#### 5.1. PER-032 — Overlap with existing permission or compensatory
 
 **File:** `tests/Permissions/collision-permission.spec.ts`
 
@@ -639,7 +628,7 @@ Permission/compensatory accepted combinations from the source: (Yes,No), (No,No)
     - expect: Read back history/details after reload; rejected operations preserve the original records. Clean up only this test's disposable data when applicable.
     - expect: Failure conditions: incorrect message, incorrect field/action state, wrong employee or row, incorrect response/persistence, or unmet prerequisite. Report missing prerequisites explicitly; never treat them as passing coverage.
 
-#### 5.2. PER-034 — Overlap with vacation
+#### 5.2. PER-033 — Overlap with vacation
 
 **File:** `tests/Permissions/collision-vacation.spec.ts`
 
@@ -656,7 +645,7 @@ Permission/compensatory accepted combinations from the source: (Yes,No), (No,No)
     - expect: Read back history/details after reload; rejected operations preserve the original records. Clean up only this test's disposable data when applicable.
     - expect: Failure conditions: incorrect message, incorrect field/action state, wrong employee or row, incorrect response/persistence, or unmet prerequisite. Report missing prerequisites explicitly; never treat them as passing coverage.
 
-#### 5.3. PER-035 — Overlap with incapacity
+#### 5.3. PER-034 — Overlap with incapacity
 
 **File:** `tests/Permissions/collision-incapacity.spec.ts`
 
@@ -673,7 +662,7 @@ Permission/compensatory accepted combinations from the source: (Yes,No), (No,No)
     - expect: Read back history/details after reload; rejected operations preserve the original records. Clean up only this test's disposable data when applicable.
     - expect: Failure conditions: incorrect message, incorrect field/action state, wrong employee or row, incorrect response/persistence, or unmet prerequisite. Report missing prerequisites explicitly; never treat them as passing coverage.
 
-#### 5.4. PER-036 — Overlap with absence or suspension
+#### 5.4. PER-035 — Overlap with absence or suspension
 
 **File:** `tests/Permissions/collision-absence.spec.ts`
 
@@ -690,7 +679,7 @@ Permission/compensatory accepted combinations from the source: (Yes,No), (No,No)
     - expect: Read back history/details after reload; rejected operations preserve the original records. Clean up only this test's disposable data when applicable.
     - expect: Failure conditions: incorrect message, incorrect field/action state, wrong employee or row, incorrect response/persistence, or unmet prerequisite. Report missing prerequisites explicitly; never treat them as passing coverage.
 
-#### 5.5. PER-037 — Overlap with ordinary leave
+#### 5.5. PER-036 — Overlap with ordinary leave
 
 **File:** `tests/Permissions/collision-license.spec.ts`
 
@@ -707,7 +696,7 @@ Permission/compensatory accepted combinations from the source: (Yes,No), (No,No)
     - expect: Read back history/details after reload; rejected operations preserve the original records. Clean up only this test's disposable data when applicable.
     - expect: Failure conditions: incorrect message, incorrect field/action state, wrong employee or row, incorrect response/persistence, or unmet prerequisite. Report missing prerequisites explicitly; never treat them as passing coverage.
 
-#### 5.6. PER-038 — Overlap with calamity leave
+#### 5.6. PER-037 — Overlap with calamity leave
 
 **File:** `tests/Permissions/collision-calamity.spec.ts`
 
@@ -724,7 +713,7 @@ Permission/compensatory accepted combinations from the source: (Yes,No), (No,No)
     - expect: Read back history/details after reload; rejected operations preserve the original records. Clean up only this test's disposable data when applicable.
     - expect: Failure conditions: incorrect message, incorrect field/action state, wrong employee or row, incorrect response/persistence, or unmet prerequisite. Report missing prerequisites explicitly; never treat them as passing coverage.
 
-#### 5.7. PER-039 — Inclusive overlap boundaries and adjacent valid dates
+#### 5.7. PER-038 — Inclusive overlap boundaries and adjacent valid dates
 
 **File:** `tests/Permissions/collision-boundaries.spec.ts`
 
@@ -746,7 +735,7 @@ Permission/compensatory accepted combinations from the source: (Yes,No), (No,No)
 
 **Seed:** `tests/Permissions/seed-test.spec.ts`
 
-#### 6.1. PER-040 — Approved existing record cannot be saved or deleted
+#### 6.1. PER-039 — Approved existing record cannot be saved or deleted
 
 **File:** `tests/Permissions/approved-protection.spec.ts`
 
@@ -765,7 +754,7 @@ Permission/compensatory accepted combinations from the source: (Yes,No), (No,No)
     - expect: No permission record is created, updated or deleted.
     - expect: Failure conditions: incorrect message, incorrect field/action state, wrong employee or row, incorrect response/persistence, or unmet prerequisite. Report missing prerequisites explicitly; never treat them as passing coverage.
 
-#### 6.2. PER-041 — Create unapproved permission and prove persistence
+#### 6.2. PER-040 — Create unapproved permission and prove persistence
 
 **File:** `tests/Permissions/create-permission.spec.ts`
 
@@ -783,7 +772,7 @@ Permission/compensatory accepted combinations from the source: (Yes,No), (No,No)
     - expect: Read back history/details after reload; rejected operations preserve the original records. Clean up only this test's disposable data when applicable.
     - expect: Failure conditions: incorrect message, incorrect field/action state, wrong employee or row, incorrect response/persistence, or unmet prerequisite. Report missing prerequisites explicitly; never treat them as passing coverage.
 
-#### 6.3. PER-042 — Create compensatory record and prove flags persist
+#### 6.3. PER-041 — Create compensatory record and prove flags persist
 
 **File:** `tests/Permissions/create-compensatory.spec.ts`
 
@@ -799,7 +788,7 @@ Permission/compensatory accepted combinations from the source: (Yes,No), (No,No)
     - expect: Read back history/details after reload; rejected operations preserve the original records. Clean up only this test's disposable data when applicable.
     - expect: Failure conditions: incorrect message, incorrect field/action state, wrong employee or row, incorrect response/persistence, or unmet prerequisite. Report missing prerequisites explicitly; never treat them as passing coverage.
 
-#### 6.4. PER-043 — Update an existing unapproved permission
+#### 6.4. PER-042 — Update an existing unapproved permission
 
 **File:** `tests/Permissions/update-unapproved.spec.ts`
 
@@ -817,7 +806,7 @@ Permission/compensatory accepted combinations from the source: (Yes,No), (No,No)
     - expect: Read back history/details after reload; rejected operations preserve the original records. Clean up only this test's disposable data when applicable.
     - expect: Failure conditions: incorrect message, incorrect field/action state, wrong employee or row, incorrect response/persistence, or unmet prerequisite. Report missing prerequisites explicitly; never treat them as passing coverage.
 
-#### 6.5. PER-044 — Administrative act number may be reused
+#### 6.5. PER-043 — Administrative act number may be reused
 
 **File:** `tests/Permissions/reused-administrative-act.spec.ts`
 
@@ -833,7 +822,7 @@ Permission/compensatory accepted combinations from the source: (Yes,No), (No,No)
     - expect: Read back history/details after reload; rejected operations preserve the original records. Clean up only this test's disposable data when applicable.
     - expect: Failure conditions: incorrect message, incorrect field/action state, wrong employee or row, incorrect response/persistence, or unmet prerequisite. Report missing prerequisites explicitly; never treat them as passing coverage.
 
-#### 6.6. PER-045 — Persist approval then verify record locks
+#### 6.6. PER-044 — Persist approval then verify record locks
 
 **File:** `tests/Permissions/approve-and-lock.spec.ts`
 
@@ -851,7 +840,7 @@ Permission/compensatory accepted combinations from the source: (Yes,No), (No,No)
     - expect: Read back history/details after reload; rejected operations preserve the original records. Clean up only this test's disposable data when applicable.
     - expect: Failure conditions: incorrect message, incorrect field/action state, wrong employee or row, incorrect response/persistence, or unmet prerequisite. Report missing prerequisites explicitly; never treat them as passing coverage.
 
-#### 6.7. PER-046 — Cancel deletion preserves an unapproved record
+#### 6.7. PER-045 — Cancel deletion preserves an unapproved record
 
 **File:** `tests/Permissions/delete-cancel.spec.ts`
 
@@ -868,7 +857,7 @@ Permission/compensatory accepted combinations from the source: (Yes,No), (No,No)
     - expect: Read back history/details after reload; rejected operations preserve the original records. Clean up only this test's disposable data when applicable.
     - expect: Failure conditions: incorrect message, incorrect field/action state, wrong employee or row, incorrect response/persistence, or unmet prerequisite. Report missing prerequisites explicitly; never treat them as passing coverage.
 
-#### 6.8. PER-047 — Delete an unapproved disposable record
+#### 6.8. PER-046 — Delete an unapproved disposable record
 
 **File:** `tests/Permissions/delete-unapproved.spec.ts`
 
