@@ -7,7 +7,7 @@ type Employee = { kaNlTercero: number; nNit: string | number; scNombre: string }
 type HistoryRow = { kaNlDato: number; kaNlEmpleado: number; [key: string]: unknown };
 
 test.describe("New form, flags and required validation", () => {
-  test.use({ baseURL: "http://10.1.40.34:4200/" });
+  test.use({ baseURL: "https://nomina-qa.adacsc.co/" });
 
   test("PER-018 — End date is required", async ({ page, baseURL }) => {
     const permissions = new PermissionsPage(page);

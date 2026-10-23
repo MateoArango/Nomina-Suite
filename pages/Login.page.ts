@@ -22,7 +22,7 @@ export class LoginPage {
     );
   }
 
-  async goto(baseURL = "http://10.1.40.34:4200/"): Promise<void> {
+  async goto(baseURL = "https://nomina-qa.adacsc.co/"): Promise<void> {
     await this.page.goto(new URL("/inicio", baseURL).href);
   }
 
