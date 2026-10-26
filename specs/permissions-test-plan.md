@@ -551,7 +551,7 @@ Permission/compensatory accepted combinations from the source: (Yes,No), (No,No)
 
 **Implementation summary:** Implemented `description-whitespace.spec.ts` through the generator workflow with the shared authentication fixture and PermissionsPage. Direct-searches document `43442343`, derives identity/history/details and conflict-free dates at runtime, fills all other required values, and verifies five ASCII spaces remain after blur and Save. Asserts the exact required-description dialog before dismissal and no Permissions request during Save. Blocks unexpected permission writes, compares complete history and baseline details after reload, and verifies continued usability with no mutation. This proves client validation; no backend rejection is claimed. Focused Chromium passed (1 test, 1 worker, retries=0; 10.5s); focused TypeScript checking passed.
 
-#### 4.7. PER-027 — Administrative act numeric range and precision
+#### 4.7. PER-027 — Administrative act numeric range and precision — Implemented; defect confirmed
 
 **File:** `tests/Permissions/act-number-boundary.spec.ts`
 
@@ -568,6 +568,8 @@ Permission/compensatory accepted combinations from the source: (Yes,No), (No,No)
     - expect: Message contract: Rejected overflow supplied body template "Numeric value ({input value}) out of range" under "Error". Verify actual backend formatting/extra parser text and use actual transmitted value. Accepted values have no overflow error; success text must be captured.
     - expect: Read back history/details after reload; rejected operations preserve the original records. Clean up only this test's disposable data when applicable.
     - expect: Failure conditions: incorrect message, incorrect field/action state, wrong employee or row, incorrect response/persistence, or unmet prerequisite. Report missing prerequisites explicitly; never treat them as passing coverage.
+
+**Implementation summary:** Implemented `act-number-boundary.spec.ts` through the generator workflow with the shared authentication fixture and PermissionsPage. User authorized shared-QA saves and cleanup for document `70852942`. Tests `1`, exactly representable `9007199254740992`, supplied `1111111111111022200`, and overflow `9999999999999999999` independently with runtime identity/history and conflict-free dates. Compares raw JSON numeric tokens before parsing, verifies accepted values in create responses, reloaded detail responses and UI, and asserts exact success/error messages before dismissal. Overflow returns HTTP 400 with signed-long limits and parser-location text, but the client changes its digits to `10000000000000000000`: a soft assertion reports this precision defect while allowing rejection and cleanup verification to finish. Focused Chromium completed with one failure solely on that precision assertion (1 test, 1 worker, retries=0); all accepted records were deleted and full baseline history was restored after every value, including rejection. Focused TypeScript checking passed. Coverage is implemented; the scenario is not passing until precision loss is resolved.
 
 #### 4.8. PER-028 — Act number signs, decimals and nonnumeric input
 
