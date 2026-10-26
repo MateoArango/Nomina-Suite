@@ -24,7 +24,7 @@ Sources: tests/Permissions/Pseudo_Plan_Permissions.md; tests/Permissions/seed-te
 - Shared-QA record creation, updates, approval and deletion are planning coverage only; this request does not authorize executing those mutations. Generator must obtain explicit mutation authorization or use a disposable test environment, one worker, retries=0, and minimal scope. Negative saves also need a controlled fixture because an unexpected acceptance could persist data. Do not create employee or other-module records to manufacture collisions.
 - Tests needing absent records/conflicts must report the missing prerequisite explicitly. Use existing approved/unapproved records or controlled isolated fixtures; do not silently replace end-to-end coverage with mocked evidence. Each lifecycle test creates its own disposable record only when authorized and cleans it up; approval can prevent cleanup and requires a disposable environment or agreed restoration procedure.
 
-**Supplies:** Document 1 -> 43433798, Document 2 -> 43442343
+**Supplies:** Document 1 -> 43433798, Document 2 -> 43442343, Document 3 -> 70852942
 
 ## Network contracts
 
@@ -497,12 +497,12 @@ Permission/compensatory accepted combinations from the source: (Yes,No), (No,No)
 
 **Implementation summary:** Implemented in `optional-act-date.spec.ts` using the shared authentication fixture and PermissionsPage. Directly searches document 43442343, derives employee identity/history and an unused date range at runtime, and creates one uniquely identified unapproved record. Captures the actual POST /rows payload and 201 response as an attachment: the omitted act date is serialized and persisted as null. Reloads and compares the returned detail, asserts the exact save message and delete confirmation, explicitly deletes only the returned ID (204), and reloads to prove original history is unchanged. Owned-record-only finally cleanup verifies absence on failure. Runtime behavior: deletion has no success dialog and selects the next existing record; New explicitly resets the draft/actions. Focused Chromium passed (1 test, 1 worker, retries=0; 20.1s).
 
-#### 4.4. PER-024 — Description accepts exactly 200 characters
+#### 4.4. PER-024 — Description accepts exactly 200 characters ✅
 
 **File:** `tests/Permissions/description-max-200.spec.ts`
 
 **Steps:**
-  1. Start a fresh authenticated context using the shared fixture, construct PermissionsPage and call goto(). Authorized disposable fixture; valid new form with unused date range. Execution mode: Authorized mutation.
+  1. Start a fresh authenticated context using the shared fixture, construct PermissionsPage and call goto(). Search directly for document `70852942` without opening the employee selector. Authorized disposable fixture; valid new form with unused date range. Execution mode: Authorized mutation.
     - expect: URL ends in /permisos; heading and search controls are ready; no state is inherited from another test.
   2. Generate deterministic ASCII descriptions of 199 and 200 characters in separate independent runs; verify input length.
   3. Save and reload each created detail; compare complete stored strings and clean up owned rows.
@@ -512,6 +512,8 @@ Permission/compensatory accepted combinations from the source: (Yes,No), (No,No)
     - expect: Message contract: No "scDescripcion debe tener máximo 200 caracteres" error. Capture exact success text before generation.
     - expect: Read back history/details after reload; rejected operations preserve the original records. Clean up only this test's disposable data when applicable.
     - expect: Failure conditions: incorrect message, incorrect field/action state, wrong employee or row, incorrect response/persistence, or unmet prerequisite. Report missing prerequisites explicitly; never treat them as passing coverage.
+
+**Implementation summary:** Implemented `description-max-200.spec.ts` through the generator workflow with the shared authentication fixture and PermissionsPage. Tests deterministic 199- and 200-character ASCII descriptions in independent browser contexts for document `70852942`. Derives employee identity, history and unused dates at runtime; verifies complete DOM values, actual POST payloads and 201 responses, exact success/confirmation messages, and unchanged strings in history, detail GET and UI after reload. Attaches both create contracts. Explicitly deletes only each returned ID (204), reloads to compare original history, and provides authenticated owned-record fallback cleanup. Focused Chromium passed (1 test covering both lengths, 1 worker, retries=0; 28.6s); focused TypeScript checking passed.
 
 #### 4.5. PER-025 — Description rejects 201 characters
 
