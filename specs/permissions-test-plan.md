@@ -533,7 +533,7 @@ Permission/compensatory accepted combinations from the source: (Yes,No), (No,No)
 
 **Implementation summary:** Implemented `description-over-200.spec.ts` through the generator workflow using the shared authentication fixture and PermissionsPage. With explicit controlled-Save/cleanup authorization, verified exactly 201 deterministic ASCII characters in the DOM and real POST payload, HTTP 400 VALIDATION_ERROR with the exact field-specific message, and matching Error dialog before dismissal. Uses direct document search, runtime identity/history and conflict-free dates; compares complete history and baseline detail responses after reload. Includes cleanup only for an unexpectedly accepted test record. Focused Chromium passed (1 test, 1 worker, retries=0; 7.5s).
 
-#### 4.6. PER-026 — Whitespace-only description
+#### 4.6. PER-026 — Whitespace-only description ✅
 
 **File:** `tests/Permissions/description-whitespace.spec.ts`
 
@@ -545,9 +545,11 @@ Permission/compensatory accepted combinations from the source: (Yes,No), (No,No)
   4. Assert the final UI and relevant network results.
     - expect: Determine whether required validation rejects whitespace; document acceptance as a product gap if that occurs instead of inventing behavior.
   5. Check message behavior and finish this scenario independently.
-    - expect: Message contract: Exact whitespace behavior unverified; if trimmed to empty, expected supplied body is "Debe ingresar la Descripcion." under "Error". Capture actual wording otherwise.
+    - expect: Message contract: Runtime-confirmed local rejection under title "Error" with exact body "Debe ingresar la Descripcion.". Five ASCII spaces remain in the DOM after blur and Save; validation treats them as empty without issuing a Permissions API request.
     - expect: Read back history/details after reload; rejected operations preserve the original records. Clean up only this test's disposable data when applicable.
     - expect: Failure conditions: incorrect message, incorrect field/action state, wrong employee or row, incorrect response/persistence, or unmet prerequisite. Report missing prerequisites explicitly; never treat them as passing coverage.
+
+**Implementation summary:** Implemented `description-whitespace.spec.ts` through the generator workflow with the shared authentication fixture and PermissionsPage. Direct-searches document `43442343`, derives identity/history/details and conflict-free dates at runtime, fills all other required values, and verifies five ASCII spaces remain after blur and Save. Asserts the exact required-description dialog before dismissal and no Permissions request during Save. Blocks unexpected permission writes, compares complete history and baseline details after reload, and verifies continued usability with no mutation. This proves client validation; no backend rejection is claimed. Focused Chromium passed (1 test, 1 worker, retries=0; 10.5s); focused TypeScript checking passed.
 
 #### 4.7. PER-027 — Administrative act numeric range and precision
 
