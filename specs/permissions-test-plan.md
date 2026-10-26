@@ -515,7 +515,7 @@ Permission/compensatory accepted combinations from the source: (Yes,No), (No,No)
 
 **Implementation summary:** Implemented `description-max-200.spec.ts` through the generator workflow with the shared authentication fixture and PermissionsPage. Tests deterministic 199- and 200-character ASCII descriptions in independent browser contexts for document `70852942`. Derives employee identity, history and unused dates at runtime; verifies complete DOM values, actual POST payloads and 201 responses, exact success/confirmation messages, and unchanged strings in history, detail GET and UI after reload. Attaches both create contracts. Explicitly deletes only each returned ID (204), reloads to compare original history, and provides authenticated owned-record fallback cleanup. Focused Chromium passed (1 test covering both lengths, 1 worker, retries=0; 28.6s); focused TypeScript checking passed.
 
-#### 4.5. PER-025 — Description rejects 201 characters
+#### 4.5. PER-025 — Description rejects 201 characters ✅
 
 **File:** `tests/Permissions/description-over-200.spec.ts`
 
@@ -530,6 +530,8 @@ Permission/compensatory accepted combinations from the source: (Yes,No), (No,No)
     - expect: Message contract: Supplied exact body "scDescripcion debe tener máximo 200 caracteres". Capture actual dialog title/wrapping and retain this field-specific body; do not replace with a generic maximum-length assertion.
     - expect: Read back history/details after reload; rejected operations preserve the original records. Clean up only this test's disposable data when applicable.
     - expect: Failure conditions: incorrect message, incorrect field/action state, wrong employee or row, incorrect response/persistence, or unmet prerequisite. Report missing prerequisites explicitly; never treat them as passing coverage.
+
+**Implementation summary:** Implemented `description-over-200.spec.ts` through the generator workflow using the shared authentication fixture and PermissionsPage. With explicit controlled-Save/cleanup authorization, verified exactly 201 deterministic ASCII characters in the DOM and real POST payload, HTTP 400 VALIDATION_ERROR with the exact field-specific message, and matching Error dialog before dismissal. Uses direct document search, runtime identity/history and conflict-free dates; compares complete history and baseline detail responses after reload. Includes cleanup only for an unexpectedly accepted test record. Focused Chromium passed (1 test, 1 worker, retries=0; 7.5s).
 
 #### 4.6. PER-026 — Whitespace-only description
 
