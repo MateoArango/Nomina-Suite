@@ -475,21 +475,27 @@ Permission/compensatory accepted combinations from the source: (Yes,No), (No,No)
 
 **Implementation summary:** Implemented in `act-date-after-start.spec.ts` with the shared authentication fixture and PermissionsPage. Searches document 43442343 initially and after reload, derives employee identity/history and conflict-free dates at runtime, and sets the administrative-act date one day after start with end equal to start. Confirms the exact local error before dismissal, no Permissions request on Save, preserved draft and complete history after reload, continued usability, and no permission mutation; unexpected writes are blocked to protect shared QA. Focused Chromium verification passed (1 test, 1 worker, retries=0; 8.5s).
 
-#### 4.3. PER-023 — Administrative act date is optional
+#### 4.3. PER-023 — Create with optional administrative act date, verify persistence and delete ✅
 
 **File:** `tests/Permissions/optional-act-date.spec.ts`
 
 **Steps:**
-  1. Start a fresh authenticated context using the shared fixture, construct PermissionsPage and call goto(). Authorized disposable fixture; independent fresh form with valid required values and unused range. Execution mode: Authorized mutation.
+  1. Start a fresh authenticated context using the shared fixture, construct PermissionsPage and call goto(). Authorized disposable fixture; independent fresh form with valid required values, approval No and an unused range. Capture the runtime employee identity and original history. Execution mode: Authorized mutation.
     - expect: URL ends in /permisos; heading and search controls are ready; no state is inherited from another test.
-  2. Clear administrativeActDateInput, blur and Save.
-  3. Reload returned record and compare stored act date to captured payload/response.
-  4. Assert the final UI and relevant network results.
-    - expect: Save succeeds with omitted/empty act date under the source contract; do not assume how API represents absence; clean up owned row.
-  5. Check message behavior and finish this scenario independently.
-    - expect: Message contract: No act-date required error is supplied or expected. Success wording is unprovided and must be captured. If backend rejects omission, record the exact product discrepancy.
-    - expect: Read back history/details after reload; rejected operations preserve the original records. Clean up only this test's disposable data when applicable.
+  2. Clear administrativeActDateInput, blur and Save once. Capture the actual create method, URL, payload, response and returned record ID.
+    - expect: Save succeeds with omitted/empty act date under the source contract; no act-date required error occurs. Do not assume how the API represents absence.
+  3. Reload employee history and select the returned record. Compare stored fields and act date to the captured payload/response.
+    - expect: Exactly one intended unapproved record persists for the runtime employee; its administrative act date remains absent.
+  4. Select this test's owned row and click Delete; confirm only if the runtime UI requests confirmation. Register the DELETE /rows/{runtimeRowId} response wait before triggering deletion and verify the response.
+    - expect: The DELETE targets only the ID returned by this test's creation; no hard-coded record ID is used. Deletion is an explicit assertion in this scenario.
+  5. Reload employee history and verify the created row is absent, unrelated records remain unchanged, and the selected form/action state resets appropriately.
+    - expect: Readback proves deletion of only the intended record; a successful response alone is insufficient.
+  6. Check message behavior and finish this scenario independently. Use finally cleanup as a fallback if an earlier assertion fails, deleting only this test's owned record if it still exists and verifying its absence.
+    - expect: Message contract: Capture exact save-success, delete confirmation (if present) and delete-success wording before generation. No collision/approved-protection error is expected. If the backend rejects the omitted act date, record the exact product discrepancy.
+    - expect: Cleanup does not replace the explicit deletion assertions or turn an earlier failure into a passing result.
     - expect: Failure conditions: incorrect message, incorrect field/action state, wrong employee or row, incorrect response/persistence, or unmet prerequisite. Report missing prerequisites explicitly; never treat them as passing coverage.
+
+**Implementation summary:** Implemented in `optional-act-date.spec.ts` using the shared authentication fixture and PermissionsPage. Directly searches document 43442343, derives employee identity/history and an unused date range at runtime, and creates one uniquely identified unapproved record. Captures the actual POST /rows payload and 201 response as an attachment: the omitted act date is serialized and persisted as null. Reloads and compares the returned detail, asserts the exact save message and delete confirmation, explicitly deletes only the returned ID (204), and reloads to prove original history is unchanged. Owned-record-only finally cleanup verifies absence on failure. Runtime behavior: deletion has no success dialog and selects the next existing record; New explicitly resets the draft/actions. Focused Chromium passed (1 test, 1 worker, retries=0; 20.1s).
 
 #### 4.4. PER-024 — Description accepts exactly 200 characters
 
@@ -821,22 +827,5 @@ Permission/compensatory accepted combinations from the source: (Yes,No), (No,No)
     - expect: If Delete immediately dispatches without confirmation, report that behavior and do not fabricate a cancel flow; run only in disposable environment.
   5. Check message behavior and finish this scenario independently.
     - expect: Message contract: Confirmation title/body/action labels are unprovided: capture exact runtime text before generation. No success-deletion message after cancel.
-    - expect: Read back history/details after reload; rejected operations preserve the original records. Clean up only this test's disposable data when applicable.
-    - expect: Failure conditions: incorrect message, incorrect field/action state, wrong employee or row, incorrect response/persistence, or unmet prerequisite. Report missing prerequisites explicitly; never treat them as passing coverage.
-
-#### 6.8. PER-043 — Delete an unapproved disposable record
-
-**File:** `tests/Permissions/delete-unapproved.spec.ts`
-
-**Steps:**
-  1. Start a fresh authenticated context using the shared fixture, construct PermissionsPage and call goto(). Authorized environment; independently prepare this test's disposable unapproved permission row and capture ID. Execution mode: Authorized mutation.
-    - expect: URL ends in /permisos; heading and search controls are ready; no state is inherited from another test.
-  2. Select owned row and click Delete; confirm only if runtime UI requests confirmation.
-  3. Wait for supplied DELETE /rows/{runtimeRowId}, verify response, reload employee history and confirm row absence.
-  4. Verify no unrelated row disappeared and selected form/action state is reset appropriately.
-  5. Assert the final UI and relevant network results.
-    - expect: Only intended record is removed; reloading proves deletion; no hard-coded ID 441.
-  6. Check message behavior and finish this scenario independently.
-    - expect: Message contract: Capture exact delete confirmation and delete-success text before generation; no collision/approved-protection error is expected.
     - expect: Read back history/details after reload; rejected operations preserve the original records. Clean up only this test's disposable data when applicable.
     - expect: Failure conditions: incorrect message, incorrect field/action state, wrong employee or row, incorrect response/persistence, or unmet prerequisite. Report missing prerequisites explicitly; never treat them as passing coverage.
