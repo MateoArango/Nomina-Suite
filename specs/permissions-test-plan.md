@@ -650,7 +650,7 @@ Permission/compensatory accepted combinations from the source: (Yes,No), (No,No)
 
 **Implementation summary:** Implemented `collision-license.spec.ts` through the generator workflow with the shared authentication fixture and PermissionsPage. Direct-searches `43433798` and uses the supplied `18/11/2025` for start/end/act dates. Live ordinary leave history/detail confirms the existing November 18–20, 2025 interval. Asserts valid transmitted fields, HTTP 400 BAD_REQUEST, and the exact Error title and supplied leave-overlap body separately before dismissal. Reload compares complete permission history and baseline detail; authenticated GETs confirm leave history/detail unchanged. Exactly one rejected Permissions POST and continued usability are verified; unexpected acceptance cleanup is limited to the returned owned record. Focused Chromium passed (1 test, 1 worker, retries=0; 18.2s); focused TypeScript and git diff checks passed. Covers the supplied one-day overlap; separate full-containment and partial-overlap variants were not exercised.
 
-#### 5.6. PER-032 — Overlap with calamity leave
+#### 5.6. PER-032 — Overlap with calamity leave ✅
 
 **File:** `tests/Permissions/collision-calamity.spec.ts`
 
@@ -666,6 +666,8 @@ Permission/compensatory accepted combinations from the source: (Yes,No), (No,No)
     - expect: Message contract: Title "Error"; body "El empleado se encuentra en licencia de calamidad en el rango indicado.". Supplied contract awaiting runtime verification.
     - expect: Read back history/details after reload; rejected operations preserve the original records. Clean up only this test's disposable data when applicable.
     - expect: Failure conditions: incorrect message, incorrect field/action state, wrong employee or row, incorrect response/persistence, or unmet prerequisite. Report missing prerequisites explicitly; never treat them as passing coverage.
+
+**Implementation summary:** Implemented `collision-calamity.spec.ts` through the generator workflow with the shared authentication fixture and PermissionsPage. Direct-searches `43433798` and uses the supplied `16/01/2026` for start/end/act dates. Authenticated GETs confirm an existing calamity leave on that date; IDs and ownership come from live responses. Asserts valid transmitted fields, HTTP 400 BAD_REQUEST, and the exact Error title and calamity-overlap body separately before dismissal. Reload compares complete permission history and baseline detail, plus calamity history/detail, proving no persisted change. Verifies exactly one rejected Permissions POST and continued usability; unexpected acceptance cleanup is limited to the returned owned record. Focused Chromium passed (1 test, 1 worker, retries=0; 28.7s); focused TypeScript passed. Covers the supplied one-day overlap; separate full-containment and partial-overlap variants were not exercised.
 
 #### 5.7. PER-033 — Inclusive overlap boundaries and adjacent valid dates
 
