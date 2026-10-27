@@ -555,22 +555,24 @@ Permission/compensatory accepted combinations from the source: (Yes,No), (No,No)
 
 **Seed:** `tests/Permissions/seed-test.spec.ts`
 
-#### 5.1. PER-027 — Overlap with existing permission or compensatory
+#### 5.1. PER-027 — Overlap with existing permission or compensatory ✅
 
 **File:** `tests/Permissions/collision-permission.spec.ts`
 
 **Steps:**
-  1. Start a fresh authenticated context using the shared fixture, construct PermissionsPage and call goto(). Discover an existing employee and existing permission/compensatory range without creating other-module data. Start fresh, select that employee and open New. Isolate this collision type; all other required fields must be valid. Execution mode: Controlled negative Save.
+  1. Start a fresh authenticated context using the shared fixture, construct PermissionsPage and call goto(). Search document 43433798 directly and select the first visible history row. Read its existing permission/compensatory start date at runtime, then open New. Isolate this collision type; all other required fields must be valid. Execution mode: Controlled negative Save, explicitly authorized for this scenario.
     - expect: URL ends in /permisos; heading and search controls are ready; no state is inherited from another test.
-  2. Use a candidate range that overlaps the discovered permission/compensatory interval; set act date <= start and valid description/act/flags.
+  2. Reuse the selected first row's start date for both candidate start/end dates and the administrative-act date; fill valid description/act/flags.
   3. Register validation response capture, click Save and assert exact error; dismiss and reload history.
   4. Assert the final UI and relevant network results.
     - expect: Existing permission/compensatory record remains untouched; proposed permission is absent; no successful create/update.
     - expect: Repeat full containment and partial overlap as independent parameterized runs if suitable controlled data exists; do not rely on a preceding test.
   5. Check message behavior and finish this scenario independently.
-    - expect: Message contract: Title "Error"; body "El empleado se encuentra en un permiso y/o compensatorio ya registrado en el rango indicado.". Supplied contract awaiting runtime verification.
+    - expect: Message contract: Title "Error"; body "El empleado se encuentra en un permiso y/o compensatorio ya registrado en el rango indicado.". Runtime-confirmed HTTP 400 BAD_REQUEST and matching error dialog.
     - expect: Read back history/details after reload; rejected operations preserve the original records. Clean up only this test's disposable data when applicable.
     - expect: Failure conditions: incorrect message, incorrect field/action state, wrong employee or row, incorrect response/persistence, or unmet prerequisite. Report missing prerequisites explicitly; never treat them as passing coverage.
+
+**Implementation summary:** Implemented in `collision-permission.spec.ts` using the shared authentication fixture and PermissionsPage. Searches 43433798 directly, selects the first visible history row and derives the overlap date from its detail (11/01/2026 during discovery; not hard-coded). Authorized negative Save returned HTTP 400 BAD_REQUEST with the supplied exact overlap message; title and body are asserted separately before dismissal. Reload confirms complete history and selected detail are unchanged, with exactly one rejected POST. Independent Chromium run passed (1 test, 1 worker, retries=0). Covers a contained one-day overlap; the current first row is a one-day interval, so a distinct partial-overlap case was not exercised. Cleanup is restricted to a test-owned record returned by unexpected acceptance.
 
 #### 5.2. PER-028 — Overlap with vacation
 
