@@ -631,7 +631,7 @@ Permission/compensatory accepted combinations from the source: (Yes,No), (No,No)
 
 **Implementation summary:** Implemented `collision-absence.spec.ts` through the generator workflow with the shared authentication fixture and PermissionsPage. Direct-searches `43433798`; fixes start/end/act dates to the supplied `15/01/2026`. Runtime absence history/detail confirms an existing one-day absence for that employee. Controlled negative Save asserts transmitted dates and valid remaining fields, HTTP 400 BAD_REQUEST, and the exact supplied dialog title/body before dismissal. Reload compares complete permission history and baseline detail; authenticated GETs compare absence history/detail unchanged. Exactly one rejected Permissions POST and continued usability are asserted; cleanup is restricted to an owned record returned by unexpected acceptance. Focused Chromium passed (1 test, 1 worker, retries=0); `git diff --check` passed. Covers the supplied one-day overlap; distinct full-containment and partial-overlap ranges were not exercised.
 
-#### 5.5. PER-031 — Overlap with ordinary leave
+#### 5.5. PER-031 — Overlap with ordinary leave ✅
 
 **File:** `tests/Permissions/collision-license.spec.ts`
 
@@ -647,6 +647,8 @@ Permission/compensatory accepted combinations from the source: (Yes,No), (No,No)
     - expect: Message contract: Title "Error"; body "El empleado se encuentra en una licencia en el rango indicado.". Supplied contract awaiting runtime verification.
     - expect: Read back history/details after reload; rejected operations preserve the original records. Clean up only this test's disposable data when applicable.
     - expect: Failure conditions: incorrect message, incorrect field/action state, wrong employee or row, incorrect response/persistence, or unmet prerequisite. Report missing prerequisites explicitly; never treat them as passing coverage.
+
+**Implementation summary:** Implemented `collision-license.spec.ts` through the generator workflow with the shared authentication fixture and PermissionsPage. Direct-searches `43433798` and uses the supplied `18/11/2025` for start/end/act dates. Live ordinary leave history/detail confirms the existing November 18–20, 2025 interval. Asserts valid transmitted fields, HTTP 400 BAD_REQUEST, and the exact Error title and supplied leave-overlap body separately before dismissal. Reload compares complete permission history and baseline detail; authenticated GETs confirm leave history/detail unchanged. Exactly one rejected Permissions POST and continued usability are verified; unexpected acceptance cleanup is limited to the returned owned record. Focused Chromium passed (1 test, 1 worker, retries=0; 18.2s); focused TypeScript and git diff checks passed. Covers the supplied one-day overlap; separate full-containment and partial-overlap variants were not exercised.
 
 #### 5.6. PER-032 — Overlap with calamity leave
 
