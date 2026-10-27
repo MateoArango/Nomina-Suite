@@ -574,22 +574,24 @@ Permission/compensatory accepted combinations from the source: (Yes,No), (No,No)
 
 **Implementation summary:** Implemented in `collision-permission.spec.ts` using the shared authentication fixture and PermissionsPage. Searches 43433798 directly, selects the first visible history row and derives the overlap date from its detail (11/01/2026 during discovery; not hard-coded). Authorized negative Save returned HTTP 400 BAD_REQUEST with the supplied exact overlap message; title and body are asserted separately before dismissal. Reload confirms complete history and selected detail are unchanged, with exactly one rejected POST. Independent Chromium run passed (1 test, 1 worker, retries=0). Covers a contained one-day overlap; the current first row is a one-day interval, so a distinct partial-overlap case was not exercised. Cleanup is restricted to a test-owned record returned by unexpected acceptance.
 
-#### 5.2. PER-028 — Overlap with vacation
+#### 5.2. PER-028 — Overlap with vacation ✅
 
 **File:** `tests/Permissions/collision-vacation.spec.ts`
 
 **Steps:**
-  1. Start a fresh authenticated context using the shared fixture, construct PermissionsPage and call goto(). Discover an existing employee and existing vacation range without creating other-module data. Start fresh, select that employee and open New. Isolate this collision type; all other required fields must be valid. Execution mode: Controlled negative Save.
+  1. Start a fresh authenticated context using the shared fixture, construct PermissionsPage and call goto(). Search supplied employee document `43433798` directly and capture the baseline permission history/detail. Open New; use the supplied existing vacation collision fixture without creating other-module data. Isolate this collision type; all other required fields must be valid. Execution mode: Controlled negative Save, explicitly requested for this scenario.
     - expect: URL ends in /permisos; heading and search controls are ready; no state is inherited from another test.
-  2. Use a candidate range that overlaps the discovered vacation interval; set act date <= start and valid description/act/flags.
+  2. Hardcode `21/04/2025` in both start and end date inputs (one-day overlap), and use the same administrative-act date; fill valid description, act number 1 and default flags. Assert no permission-history overlap on this date before Save.
   3. Register validation response capture, click Save and assert exact error; dismiss and reload history.
   4. Assert the final UI and relevant network results.
     - expect: Existing vacation record remains untouched; proposed permission is absent; no successful create/update.
-    - expect: Repeat full containment and partial overlap as independent parameterized runs if suitable controlled data exists; do not rely on a preceding test.
+    - expect: This scenario covers the supplied one-day overlap only; distinct partial-overlap coverage is not claimed.
   5. Check message behavior and finish this scenario independently.
-    - expect: Message contract: Title "Error"; body "Existe un registro de vacaciones que se cruza con las fechas registradas.". Supplied contract awaiting runtime verification.
+    - expect: Message contract: Title "Error"; body "Existe un registro de vacaciones que se cruza con las fechas registradas.". Runtime-verified HTTP 400 BAD_REQUEST contract.
     - expect: Read back history/details after reload; rejected operations preserve the original records. Clean up only this test's disposable data when applicable.
     - expect: Failure conditions: incorrect message, incorrect field/action state, wrong employee or row, incorrect response/persistence, or unmet prerequisite. Report missing prerequisites explicitly; never treat them as passing coverage.
+
+**Implementation summary:** Implemented `collision-vacation.spec.ts` through the generator workflow using the shared authentication fixture and PermissionsPage. Direct-searches `43433798`; hardcodes start/end/act dates to `21/04/2025`. Asserts the transmitted dates and valid remaining fields, HTTP 400 BAD_REQUEST, and exact dialog title/body before dismissal. Reload verifies complete permission history and baseline detail unchanged; exactly one rejected Permissions POST and continued usability are asserted. Cleanup is restricted to an owned record returned by unexpected acceptance. Focused Chromium passed (1 test, 1 worker, retries=0). Covers the supplied one-day vacation overlap; vacation-module detail readback and a distinct partial overlap were not exercised.
 
 #### 5.3. PER-029 — Overlap with incapacity
 
