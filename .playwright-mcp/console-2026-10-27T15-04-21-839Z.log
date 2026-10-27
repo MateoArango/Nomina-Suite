@@ -1,0 +1,15 @@
+[       7ms] TypeError: Cannot read properties of null (reading 'appendChild')
+    at <anonymous>:6:32
+    at <anonymous>:7:7
+    at <anonymous>:8:7
+[   13164ms] [ERROR] [test-id bridge][collapsible-nav] sidebar=10, controles=12 @ https://nomina-qa.adacsc.co/chunk-LHIWZAOW.js:0
+[   13164ms] [ERROR] [test-id bridge][collapsible-nav] sidebar=10, controles=12 @ https://nomina-qa.adacsc.co/chunk-LHIWZAOW.js:0
+[   43336ms] TypeError: Cannot read properties of null (reading 'appendChild')
+    at <anonymous>:6:32
+    at <anonymous>:7:7
+    at <anonymous>:8:7
+[   46837ms] [ERROR] Failed to load resource: the server responded with a status of 400 () @ https://nomina-qa-api.adacsc.co/api/v1/w-vacaciones-licencias-ascensos-permisos/rows:0
+[   54683ms] TypeError: Cannot read properties of null (reading 'appendChild')
+    at <anonymous>:6:32
+    at <anonymous>:7:7
+    at <anonymous>:8:7
