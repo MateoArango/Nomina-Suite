@@ -694,7 +694,7 @@ Permission/compensatory accepted combinations from the source: (Yes,No), (No,No)
 
 **Implementation summary:** Implemented `approved-protection.spec.ts` through the generator workflow with the shared authentication fixture and PermissionsPage. Direct-searches supplied employee `70324693`, discovers an existing approved row at runtime and fails explicitly if the prerequisite is absent. Verifies employee/history/detail identity, disabled Save/Delete and all six flag checkboxes, and available New. Captures the observed discrepancy: all five date, description and administrative-act inputs remain enabled; no edit or save is attempted. Reloads, searches the same employee and reselects the same runtime row; compares complete history and detail unchanged and repeats UI protection checks. No error modal or permission mutation request occurs. Focused Chromium passed (1 test, 1 worker, retries=0; 6.8s); `git diff --check` passed.
 
-#### 6.2. PER-034 — Create unapproved permission and prove persistence
+#### 6.2. PER-034 — Create unapproved permission and prove persistence ✅
 
 **File:** `tests/Permissions/create-permission.spec.ts`
 
@@ -711,6 +711,8 @@ Permission/compensatory accepted combinations from the source: (Yes,No), (No,No)
     - expect: Message contract: No error dialog; exact success text is unprovided and must be captured. Include its literal wording in generated test context.
     - expect: Read back history/details after reload; rejected operations preserve the original records. Clean up only this test's disposable data when applicable.
     - expect: Failure conditions: incorrect message, incorrect field/action state, wrong employee or row, incorrect response/persistence, or unmet prerequisite. Report missing prerequisites explicitly; never treat them as passing coverage.
+
+**Implementation summary:** Implemented `create-permission.spec.ts` through the generator workflow with the shared authentication fixture and PermissionsPage. Direct-searches supplied employee `70324693`, derives ownership/history and returned ID at runtime, and uses exactly `02/01/2026` for start, end and administrative-act dates. Verifies POST `/rows` payload and HTTP 201, literal success dialog, complete detail after reload, employee identity, dates, description, administrative act, unapproved permission flags and disabled history indicators. Deletes only the owned returned ID through UI confirmation (HTTP 204), then reloads to prove original history restored. Authenticated UI fallback cleanup is restricted to the owned ID. Focused Chromium passed (1 test, 1 worker, retries=0; 10.8s); `git diff --check` passed.
 
 #### 6.3. PER-035 — Create compensatory record and prove flags persist
 
