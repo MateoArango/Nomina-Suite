@@ -714,23 +714,7 @@ Permission/compensatory accepted combinations from the source: (Yes,No), (No,No)
 
 **Implementation summary:** Implemented `create-permission.spec.ts` through the generator workflow with the shared authentication fixture and PermissionsPage. Direct-searches supplied employee `70324693`, derives ownership/history and returned ID at runtime, and uses exactly `02/01/2026` for start, end and administrative-act dates. Verifies POST `/rows` payload and HTTP 201, literal success dialog, complete detail after reload, employee identity, dates, description, administrative act, unapproved permission flags and disabled history indicators. Deletes only the owned returned ID through UI confirmation (HTTP 204), then reloads to prove original history restored. Authenticated UI fallback cleanup is restricted to the owned ID. Focused Chromium passed (1 test, 1 worker, retries=0; 10.8s); `git diff --check` passed.
 
-#### 6.3. PER-035 — Create compensatory record and prove flags persist
-
-**File:** `tests/Permissions/create-compensatory.spec.ts`
-
-**Steps:**
-  1. Start a fresh authenticated context using the shared fixture, construct PermissionsPage and call goto(). Authorized disposable fixture; fresh valid form and unused range. Execution mode: Authorized mutation.
-    - expect: URL ends in /permisos; heading and search controls are ready; no state is inherited from another test.
-  2. Check compensatory Yes; verify permission No and approval No; enter valid required values and Save.
-  3. Reload history/detail by returned ID; assert compensatory/permission status and dates; clean up owned row.
-  4. Assert the final UI and relevant network results.
-    - expect: Compensatory Yes/permission No persists and matches history status indicator.
-  5. Check message behavior and finish this scenario independently.
-    - expect: Message contract: No collision/validation error; capture exact save success text before generation.
-    - expect: Read back history/details after reload; rejected operations preserve the original records. Clean up only this test's disposable data when applicable.
-    - expect: Failure conditions: incorrect message, incorrect field/action state, wrong employee or row, incorrect response/persistence, or unmet prerequisite. Report missing prerequisites explicitly; never treat them as passing coverage.
-
-#### 6.4. PER-036 — Update an existing unapproved permission
+#### 6.3. ✅ PER-035 — Update an existing unapproved permission
 
 **File:** `tests/Permissions/update-unapproved.spec.ts`
 
@@ -748,7 +732,9 @@ Permission/compensatory accepted combinations from the source: (Yes,No), (No,No)
     - expect: Read back history/details after reload; rejected operations preserve the original records. Clean up only this test's disposable data when applicable.
     - expect: Failure conditions: incorrect message, incorrect field/action state, wrong employee or row, incorrect response/persistence, or unmet prerequisite. Report missing prerequisites explicitly; never treat them as passing coverage.
 
-#### 6.5. PER-037 — Administrative act number may be reused
+**Implementation summary:** Implemented `update-unapproved.spec.ts` through the generator workflow with the shared auth fixture and PermissionsPage. Direct-searches employee `70324693`, captures runtime identity/history, creates an independent disposable unapproved permission on a history-derived unused date, and changes only its unique description. Asserts PUT `/rows/{ownedId}` HTTP 200, exact success dialog, unchanged date range without self-overlap, identical remaining payload/detail fields, same ID and no duplicate after reload, and unchanged unrelated history. Captures response/payload/dialog evidence; rejected updates read back original detail. Deletes only the owned ID through UI confirmation (HTTP 204), verifies complete baseline restoration, and retains owned-ID fallback cleanup. Focused Chromium passed (1 test, 1 worker, retries=0; 30.3s); `git diff --check` passed.
+
+#### 6.4. PER-036 — Administrative act number may be reused
 
 **File:** `tests/Permissions/reused-administrative-act.spec.ts`
 
@@ -764,7 +750,7 @@ Permission/compensatory accepted combinations from the source: (Yes,No), (No,No)
     - expect: Read back history/details after reload; rejected operations preserve the original records. Clean up only this test's disposable data when applicable.
     - expect: Failure conditions: incorrect message, incorrect field/action state, wrong employee or row, incorrect response/persistence, or unmet prerequisite. Report missing prerequisites explicitly; never treat them as passing coverage.
 
-#### 6.6. PER-038 — Persist approval then verify record locks
+#### 6.5. PER-037 — Persist approval then verify record locks
 
 **File:** `tests/Permissions/approve-and-lock.spec.ts`
 
@@ -782,7 +768,7 @@ Permission/compensatory accepted combinations from the source: (Yes,No), (No,No)
     - expect: Read back history/details after reload; rejected operations preserve the original records. Clean up only this test's disposable data when applicable.
     - expect: Failure conditions: incorrect message, incorrect field/action state, wrong employee or row, incorrect response/persistence, or unmet prerequisite. Report missing prerequisites explicitly; never treat them as passing coverage.
 
-#### 6.7. PER-039 — Cancel deletion preserves an unapproved record
+#### 6.6. PER-038 — Cancel deletion preserves an unapproved record
 
 **File:** `tests/Permissions/delete-cancel.spec.ts`
 
