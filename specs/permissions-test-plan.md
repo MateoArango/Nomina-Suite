@@ -734,53 +734,21 @@ Permission/compensatory accepted combinations from the source: (Yes,No), (No,No)
 
 **Implementation summary:** Implemented `update-unapproved.spec.ts` through the generator workflow with the shared auth fixture and PermissionsPage. Direct-searches employee `70324693`, captures runtime identity/history, creates an independent disposable unapproved permission on a history-derived unused date, and changes only its unique description. Asserts PUT `/rows/{ownedId}` HTTP 200, exact success dialog, unchanged date range without self-overlap, identical remaining payload/detail fields, same ID and no duplicate after reload, and unchanged unrelated history. Captures response/payload/dialog evidence; rejected updates read back original detail. Deletes only the owned ID through UI confirmation (HTTP 204), verifies complete baseline restoration, and retains owned-ID fallback cleanup. Focused Chromium passed (1 test, 1 worker, retries=0; 30.3s); `git diff --check` passed.
 
-#### 6.4. PER-036 — Administrative act number may be reused
-
-**File:** `tests/Permissions/reused-administrative-act.spec.ts`
-
-**Steps:**
-  1. Start a fresh authenticated context using the shared fixture, construct PermissionsPage and call goto(). Authorized disposable environment; existing act number from runtime detail and a separate unused range. Execution mode: Authorized mutation.
-    - expect: URL ends in /permisos; heading and search controls are ready; no state is inherited from another test.
-  2. Enter that existing valid act number on a new valid unapproved permission.
-  3. Save and reload new row; verify exact act number and no uniqueness rejection; clean up owned row.
-  4. Assert the final UI and relevant network results.
-    - expect: Repeated act number is accepted under supplied source contract; no duplicate date range is used.
-  5. Check message behavior and finish this scenario independently.
-    - expect: Message contract: No act-uniqueness error is supplied or expected. Capture exact save success or unexpected rejection wording.
-    - expect: Read back history/details after reload; rejected operations preserve the original records. Clean up only this test's disposable data when applicable.
-    - expect: Failure conditions: incorrect message, incorrect field/action state, wrong employee or row, incorrect response/persistence, or unmet prerequisite. Report missing prerequisites explicitly; never treat them as passing coverage.
-
-#### 6.5. PER-037 — Persist approval then verify record locks
-
-**File:** `tests/Permissions/approve-and-lock.spec.ts`
-
-**Steps:**
-  1. Start a fresh authenticated context using the shared fixture, construct PermissionsPage and call goto(). Disposable environment or explicit restoration agreement; create this test's independent unapproved row. Approval may prevent UI cleanup. Execution mode: Authorized mutation.
-    - expect: URL ends in /permisos; heading and search controls are ready; no state is inherited from another test.
-  2. Select owned unapproved row, choose approval Yes and Save; discover exact approval persistence mechanism.
-  3. Reload row/detail; inspect approved indicators, Save/Delete and flag states.
-  4. Perform agreed fixture restoration outside locked UI if necessary and verify readback.
-  5. Assert the final UI and relevant network results.
-    - expect: Approval persists on the intended row; subsequent Save/Delete are disabled and no further UI mutation occurs.
-    - expect: Do not reuse an unrelated shared approved record or require another test to create this fixture.
-  6. Check message behavior and finish this scenario independently.
-    - expect: Message contract: Capture exact approval/save success text; no error for valid approval. If approval persistence is unsupported, retain actual message and report the contract gap.
-    - expect: Read back history/details after reload; rejected operations preserve the original records. Clean up only this test's disposable data when applicable.
-    - expect: Failure conditions: incorrect message, incorrect field/action state, wrong employee or row, incorrect response/persistence, or unmet prerequisite. Report missing prerequisites explicitly; never treat them as passing coverage.
-
-#### 6.6. PER-038 — Cancel deletion preserves an unapproved record
+#### 6.4. PER-036 — Cancel deletion preserves an unapproved record
 
 **File:** `tests/Permissions/delete-cancel.spec.ts`
 
 **Steps:**
-  1. Start a fresh authenticated context using the shared fixture, construct PermissionsPage and call goto(). Authorized disposable unapproved fixture; read and snapshot row ID/details. Execution mode: Authorized controlled deletion.
+  1. Start a fresh authenticated context using the shared fixture, construct PermissionsPage and call goto(). Use the existing unapproved record for employee document `70324693`, start date `06/01/2026`, and exact description `per-036`; resolve and snapshot its runtime row ID/details. Execution mode: cancel only; block unexpected mutations to preserve this supplied record.
     - expect: URL ends in /permisos; heading and search controls are ready; no state is inherited from another test.
-  2. Select owned row; click Delete and inspect whether a confirmation dialog exists before any destructive confirmation.
+  2. Select the supplied row; click Delete and inspect whether a confirmation dialog exists before any destructive confirmation.
   3. If confirmation exists, record exact title/body/button names and cancel; reload history/detail.
   4. Assert the final UI and relevant network results.
     - expect: Cancel leaves record intact; no DELETE mutation occurs.
-    - expect: If Delete immediately dispatches without confirmation, report that behavior and do not fabricate a cancel flow; run only in disposable environment.
+    - expect: If Delete immediately dispatches without confirmation, block the mutation and fail explicitly; never delete the supplied existing fixture.
   5. Check message behavior and finish this scenario independently.
     - expect: Message contract: Confirmation title/body/action labels are unprovided: capture exact runtime text before generation. No success-deletion message after cancel.
     - expect: Read back history/details after reload; rejected operations preserve the original records. Clean up only this test's disposable data when applicable.
     - expect: Failure conditions: incorrect message, incorrect field/action state, wrong employee or row, incorrect response/persistence, or unmet prerequisite. Report missing prerequisites explicitly; never treat them as passing coverage.
+
+**Implementation summary:** Implemented `delete-cancel.spec.ts` through the generator workflow with the shared auth fixture and PermissionsPage. Direct-searches employee `70324693`, uniquely resolves the existing unapproved `per-036` record dated `06/01/2026`, and captures runtime identity, complete history and detail. Asserts the exact runtime confirmation title/body and both action labels, selects No, and verifies unchanged form, complete history, record ID and full detail after reload. No DELETE or other Permissions mutation is dispatched; unexpected mutations are blocked to protect the supplied record. No deletion success dialog appears. Focused Chromium passed (1 test, 1 worker, retries=0; 21.7s); `git diff --check` passed.
