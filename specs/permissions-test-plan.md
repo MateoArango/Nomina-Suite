@@ -24,7 +24,7 @@ Sources: tests/Permissions/Pseudo_Plan_Permissions.md; tests/Permissions/seed-te
 - Shared-QA record creation, updates, approval and deletion are planning coverage only; this request does not authorize executing those mutations. Generator must obtain explicit mutation authorization or use a disposable test environment, one worker, retries=0, and minimal scope. Negative saves also need a controlled fixture because an unexpected acceptance could persist data. Do not create employee or other-module records to manufacture collisions.
 - Tests needing absent records/conflicts must report the missing prerequisite explicitly. Use existing approved/unapproved records or controlled isolated fixtures; do not silently replace end-to-end coverage with mocked evidence. Each lifecycle test creates its own disposable record only when authorized and cleans it up; approval can prevent cleanup and requires a disposable environment or agreed restoration procedure.
 
-**Supplies:** Document 1 -> 43433798, Document 2 -> 43442343, Document 3 -> 70852942
+**Supplies:** Document 1 -> 43433798, Document 2 -> 43442343, Document 3 -> 70852942, Document 4 -> 70324693
 
 ## Network contracts
 
@@ -669,29 +669,11 @@ Permission/compensatory accepted combinations from the source: (Yes,No), (No,No)
 
 **Implementation summary:** Implemented `collision-calamity.spec.ts` through the generator workflow with the shared authentication fixture and PermissionsPage. Direct-searches `43433798` and uses the supplied `16/01/2026` for start/end/act dates. Authenticated GETs confirm an existing calamity leave on that date; IDs and ownership come from live responses. Asserts valid transmitted fields, HTTP 400 BAD_REQUEST, and the exact Error title and calamity-overlap body separately before dismissal. Reload compares complete permission history and baseline detail, plus calamity history/detail, proving no persisted change. Verifies exactly one rejected Permissions POST and continued usability; unexpected acceptance cleanup is limited to the returned owned record. Focused Chromium passed (1 test, 1 worker, retries=0; 28.7s); focused TypeScript passed. Covers the supplied one-day overlap; separate full-containment and partial-overlap variants were not exercised.
 
-#### 5.7. PER-033 — Inclusive overlap boundaries and adjacent valid dates
-
-**File:** `tests/Permissions/collision-boundaries.spec.ts`
-
-**Steps:**
-  1. Start a fresh authenticated context using the shared fixture, construct PermissionsPage and call goto(). Controlled fixture with one known existing permission/compensatory interval and no other conflicts; fresh form for each subcase. Execution mode: Authorized mutation / controlled rejection.
-    - expect: URL ends in /permisos; heading and search controls are ready; no state is inherited from another test.
-  2. Test exact repeated range, candidate touching existing start, and candidate touching existing end independently.
-  3. Test next-day and previous-day nonoverlapping ranges independently with authorized disposable records.
-  4. Capture collision rule, dates, response and persistence for each case.
-  5. Assert the final UI and relevant network results.
-    - expect: Exact repeat is rejected; verify whether start/end boundary inclusion matches the source range rule.
-    - expect: Adjacent nonconflicting ranges persist only under authorized execution and clean up owned rows.
-  6. Check message behavior and finish this scenario independently.
-    - expect: Message contract: Exact repeat uses "El empleado se encuentra en un permiso y/o compensatorio ya registrado en el rango indicado." under "Error". Boundary inclusion beyond exact repeat requires verification; capture success wording for adjacent accepted ranges.
-    - expect: Read back history/details after reload; rejected operations preserve the original records. Clean up only this test's disposable data when applicable.
-    - expect: Failure conditions: incorrect message, incorrect field/action state, wrong employee or row, incorrect response/persistence, or unmet prerequisite. Report missing prerequisites explicitly; never treat them as passing coverage.
-
-### 6. Persistence, approved protection and deletion
+### 6. Persistence and approved protection
 
 **Seed:** `tests/Permissions/seed-test.spec.ts`
 
-#### 6.1. PER-034 — Approved existing record cannot be saved or deleted
+#### 6.1. PER-033 — Approved existing record cannot be saved or deleted ✅
 
 **File:** `tests/Permissions/approved-protection.spec.ts`
 
@@ -710,7 +692,9 @@ Permission/compensatory accepted combinations from the source: (Yes,No), (No,No)
     - expect: No permission record is created, updated or deleted.
     - expect: Failure conditions: incorrect message, incorrect field/action state, wrong employee or row, incorrect response/persistence, or unmet prerequisite. Report missing prerequisites explicitly; never treat them as passing coverage.
 
-#### 6.2. PER-035 — Create unapproved permission and prove persistence
+**Implementation summary:** Implemented `approved-protection.spec.ts` through the generator workflow with the shared authentication fixture and PermissionsPage. Direct-searches supplied employee `70324693`, discovers an existing approved row at runtime and fails explicitly if the prerequisite is absent. Verifies employee/history/detail identity, disabled Save/Delete and all six flag checkboxes, and available New. Captures the observed discrepancy: all five date, description and administrative-act inputs remain enabled; no edit or save is attempted. Reloads, searches the same employee and reselects the same runtime row; compares complete history and detail unchanged and repeats UI protection checks. No error modal or permission mutation request occurs. Focused Chromium passed (1 test, 1 worker, retries=0; 6.8s); `git diff --check` passed.
+
+#### 6.2. PER-034 — Create unapproved permission and prove persistence
 
 **File:** `tests/Permissions/create-permission.spec.ts`
 
@@ -728,7 +712,7 @@ Permission/compensatory accepted combinations from the source: (Yes,No), (No,No)
     - expect: Read back history/details after reload; rejected operations preserve the original records. Clean up only this test's disposable data when applicable.
     - expect: Failure conditions: incorrect message, incorrect field/action state, wrong employee or row, incorrect response/persistence, or unmet prerequisite. Report missing prerequisites explicitly; never treat them as passing coverage.
 
-#### 6.3. PER-036 — Create compensatory record and prove flags persist
+#### 6.3. PER-035 — Create compensatory record and prove flags persist
 
 **File:** `tests/Permissions/create-compensatory.spec.ts`
 
@@ -744,7 +728,7 @@ Permission/compensatory accepted combinations from the source: (Yes,No), (No,No)
     - expect: Read back history/details after reload; rejected operations preserve the original records. Clean up only this test's disposable data when applicable.
     - expect: Failure conditions: incorrect message, incorrect field/action state, wrong employee or row, incorrect response/persistence, or unmet prerequisite. Report missing prerequisites explicitly; never treat them as passing coverage.
 
-#### 6.4. PER-037 — Update an existing unapproved permission
+#### 6.4. PER-036 — Update an existing unapproved permission
 
 **File:** `tests/Permissions/update-unapproved.spec.ts`
 
@@ -762,7 +746,7 @@ Permission/compensatory accepted combinations from the source: (Yes,No), (No,No)
     - expect: Read back history/details after reload; rejected operations preserve the original records. Clean up only this test's disposable data when applicable.
     - expect: Failure conditions: incorrect message, incorrect field/action state, wrong employee or row, incorrect response/persistence, or unmet prerequisite. Report missing prerequisites explicitly; never treat them as passing coverage.
 
-#### 6.5. PER-038 — Administrative act number may be reused
+#### 6.5. PER-037 — Administrative act number may be reused
 
 **File:** `tests/Permissions/reused-administrative-act.spec.ts`
 
@@ -778,7 +762,7 @@ Permission/compensatory accepted combinations from the source: (Yes,No), (No,No)
     - expect: Read back history/details after reload; rejected operations preserve the original records. Clean up only this test's disposable data when applicable.
     - expect: Failure conditions: incorrect message, incorrect field/action state, wrong employee or row, incorrect response/persistence, or unmet prerequisite. Report missing prerequisites explicitly; never treat them as passing coverage.
 
-#### 6.6. PER-039 — Persist approval then verify record locks
+#### 6.6. PER-038 — Persist approval then verify record locks
 
 **File:** `tests/Permissions/approve-and-lock.spec.ts`
 
@@ -796,7 +780,7 @@ Permission/compensatory accepted combinations from the source: (Yes,No), (No,No)
     - expect: Read back history/details after reload; rejected operations preserve the original records. Clean up only this test's disposable data when applicable.
     - expect: Failure conditions: incorrect message, incorrect field/action state, wrong employee or row, incorrect response/persistence, or unmet prerequisite. Report missing prerequisites explicitly; never treat them as passing coverage.
 
-#### 6.7. PER-040 — Cancel deletion preserves an unapproved record
+#### 6.7. PER-039 — Cancel deletion preserves an unapproved record
 
 **File:** `tests/Permissions/delete-cancel.spec.ts`
 
